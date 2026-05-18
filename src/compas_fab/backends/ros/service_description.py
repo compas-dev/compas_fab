@@ -40,6 +40,8 @@ class ServiceDescription:
             request_msg = self.request_class(*request)
         else:
             request_msg = self.request_class(**request)
+        if hasattr(request_msg, "filter_fields_for_distro"):
+            request_msg.filter_fields_for_distro(client.ros_distro)
         srv = Service(client, self.name, self.type)
         srv.call(ServiceRequest(request_msg.msg), callback=inner_handler, errback=errback)
 

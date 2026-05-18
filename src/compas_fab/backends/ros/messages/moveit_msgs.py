@@ -13,6 +13,7 @@ from compas_fab.backends.ros.messages.shape_msgs import Plane
 from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
 from compas_fab.backends.ros.messages.std_msgs import Header
 from compas_fab.backends.ros.messages.std_msgs import ROSmsg
+from compas_fab.backends.ros.messages.std_msgs import format_header_for_distro
 from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
 from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
 
@@ -82,6 +83,11 @@ class CollisionObject(ROSmsg):
 
         return cls(**kwargs)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC) and hasattr(self, "pose"):
+            del self.pose
+
 
 class AttachedCollisionObject(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html"""
@@ -94,6 +100,21 @@ class AttachedCollisionObject(ROSmsg):
         self.touch_links = touch_links or []
         self.detach_posture = detach_posture or JointTrajectory()
         self.weight = weight
+
+    def filter_fields_for_distro(self, ros_distro):
+        # `self.object` and `self.detach_posture` may be dicts after a round-trip
+        # through `get_planning_scene` because `from_msg` does not recursively
+        # rehydrate nested messages. Handle both shapes (rosbridge accepts both).
+        if hasattr(self.object, "filter_fields_for_distro"):
+            self.object.filter_fields_for_distro(ros_distro)
+        elif isinstance(self.object, dict):
+            self.object["header"] = format_header_for_distro(self.object.get("header"), ros_distro)
+            if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
+                self.object.pop("pose", None)
+        if hasattr(self.detach_posture, "filter_fields_for_distro"):
+            self.detach_posture.filter_fields_for_distro(ros_distro)
+        elif isinstance(self.detach_posture, dict):
+            self.detach_posture["header"] = format_header_for_distro(self.detach_posture.get("header"), ros_distro)
 
 
 class Constraints(ROSmsg):
@@ -114,6 +135,12 @@ class Constraints(ROSmsg):
         self.position_constraints = position_constraints if position_constraints else []
         self.orientation_constraints = orientation_constraints if orientation_constraints else []
         self.visibility_constraints = visibility_constraints if visibility_constraints else []
+
+    def filter_fields_for_distro(self, ros_distro):
+        for constraint in self.position_constraints:
+            constraint.filter_fields_for_distro(ros_distro)
+        for constraint in self.orientation_constraints:
+            constraint.filter_fields_for_distro(ros_distro)
 
 
 class RobotState(ROSmsg):
@@ -139,10 +166,10 @@ class RobotState(ROSmsg):
     def filter_fields_for_distro(self, ros_distro):
         """To maintain backwards compatibility with older ROS distros,
         we need to make sure newly added fields are removed from the request."""
-        # Remove the field `pose` for distros older than NOETIC
-        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
-            for aco in self.attached_collision_objects:
-                del aco.object.pose
+        self.joint_state.filter_fields_for_distro(ros_distro)
+        self.multi_dof_joint_state.filter_fields_for_distro(ros_distro)
+        for aco in self.attached_collision_objects:
+            aco.filter_fields_for_distro(ros_distro)
 
 
 class PositionIKRequest(ROSmsg):
@@ -225,8 +252,19 @@ class MoveItErrorCodes(ROSmsg):
     # kinematics errors
     NO_IK_SOLUTION = -31
 
-    def __init__(self, val=-31):
+    def __init__(self, val=-31, message="", source=""):
         self.val = val
+        self.message = message
+        self.source = source
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg["val"], msg.get("message", ""), msg.get("source", ""))
+
+    def filter_fields_for_distro(self, ros_distro):
+        if not ros_distro.is_ros2:
+            del self.message
+            del self.source
 
     def __int__(self):
         return self.val
@@ -267,6 +305,9 @@ class WorkspaceParameters(ROSmsg):
         self.min_corner = min_corner or Vector3(-1000, -1000, -1000)
         self.max_corner = max_corner or Vector3(1000, 1000, 1000)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class TrajectoryConstraints(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html"""
@@ -275,6 +316,10 @@ class TrajectoryConstraints(ROSmsg):
 
     def __init__(self, constraints=None):
         self.constraints = constraints or []  # Constraints[]
+
+    def filter_fields_for_distro(self, ros_distro):
+        for constraint in self.constraints:
+            constraint.filter_fields_for_distro(ros_distro)
 
 
 class JointConstraint(ROSmsg):
@@ -388,6 +433,9 @@ class PositionConstraint(ROSmsg):
         constraint_region = BoundingVolume.from_bounding_volume(position_constraint.bounding_volume)
         return cls(header, position_constraint.link_name, None, constraint_region, position_constraint.weight)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class OrientationConstraint(ROSmsg):
     """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html"""
@@ -437,6 +485,9 @@ class OrientationConstraint(ROSmsg):
         kwargs["weight"] = orientation_constraint.weight
 
         return cls(**kwargs)
+
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
 
 
 class PlanningSceneComponents(ROSmsg):
@@ -504,10 +555,15 @@ class PlanningSceneWorld(ROSmsg):
     def filter_fields_for_distro(self, ros_distro):
         """To maintain backwards compatibility with older ROS distros,
         we need to make sure newly added fields are removed from the request."""
-        # Remove the field `pose` for distros older than NOETIC
-        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
-            for co in self.collision_objects:
-                del co.pose
+        for co in self.collision_objects:
+            co.filter_fields_for_distro(ros_distro)
+        if hasattr(self.octomap, "filter_fields_for_distro"):
+            self.octomap.filter_fields_for_distro(ros_distro)
+        elif isinstance(self.octomap, dict):
+            self.octomap["header"] = format_header_for_distro(self.octomap.get("header"), ros_distro)
+            octomap = self.octomap.get("octomap")
+            if isinstance(octomap, dict):
+                octomap["header"] = format_header_for_distro(octomap.get("header"), ros_distro)
 
 
 class PlanningScene(ROSmsg):

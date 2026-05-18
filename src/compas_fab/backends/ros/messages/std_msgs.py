@@ -1,7 +1,37 @@
 import json
 from collections.abc import Mapping
 
+from roslibpy import Header as RoslibpyRos1Header
+from roslibpy.ros2 import Header as RoslibpyRos2Header
+
 _TYPE_MAP = {}
+
+
+def format_header_for_distro(header, ros_distro):
+    if hasattr(header, "filter_fields_for_distro"):
+        header.filter_fields_for_distro(ros_distro)
+        return header
+
+    stamp = _format_stamp_for_roslibpy(header.get("stamp")) if header else None
+    frame_id = header.get("frame_id") if header else None
+
+    if ros_distro.is_ros2:
+        return dict(RoslibpyRos2Header(stamp=stamp, frame_id=frame_id))
+
+    seq = header.get("seq") if header else None
+    return dict(RoslibpyRos1Header(seq=seq, stamp=stamp, frame_id=frame_id))
+
+
+def _format_stamp_for_roslibpy(stamp):
+    if not stamp:
+        return None
+    if hasattr(stamp, "msg"):
+        stamp = stamp.msg
+    if "secs" in stamp and "nsecs" in stamp:
+        return stamp
+    if "sec" in stamp and "nanosec" in stamp:
+        return {"secs": stamp["sec"], "nsecs": stamp["nanosec"]}
+    return stamp
 
 
 class ROSmsg:
@@ -92,6 +122,12 @@ class Time(ROSmsg):
         self.secs = secs
         self.nsecs = nsecs
 
+    @classmethod
+    def from_msg(cls, msg):
+        if "secs" in msg and "nsecs" in msg:
+            return cls(msg["secs"], msg["nsecs"])
+        return cls(msg["sec"], msg["nanosec"])
+
     def seconds(self):
         return self.secs + 1e-9 * self.nsecs
 
@@ -105,6 +141,20 @@ class Header(ROSmsg):
         self.seq = seq
         self.stamp = stamp
         self.frame_id = frame_id
+        self._roslibpy_header_cls = RoslibpyRos1Header
+
+    @property
+    def msg(self):
+        stamp = _format_stamp_for_roslibpy(self.stamp)
+        if self._roslibpy_header_cls is RoslibpyRos2Header:
+            return dict(RoslibpyRos2Header(stamp=stamp, frame_id=self.frame_id))
+        return dict(RoslibpyRos1Header(seq=self.seq, stamp=stamp, frame_id=self.frame_id))
+
+    def filter_fields_for_distro(self, ros_distro):
+        self._roslibpy_header_cls = RoslibpyRos2Header if ros_distro.is_ros2 else RoslibpyRos1Header
+
+    def __repr__(self):
+        return "Header(seq={!r}, stamp={!r}, frame_id={!r})".format(self.seq, self.stamp, self.frame_id)
 
 
 class String(ROSmsg):

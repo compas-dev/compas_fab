@@ -1,6 +1,7 @@
 from .std_msgs import Header
 from .std_msgs import ROSmsg
 from .std_msgs import Time
+from .std_msgs import format_header_for_distro
 
 
 class JointTrajectoryPoint(ROSmsg):
@@ -48,6 +49,9 @@ class JointTrajectory(ROSmsg):
         points = [JointTrajectoryPoint.from_msg(item) for item in msg["points"]]
         return cls(header, joint_names, points)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class MultiDOFJointTrajectoryPoint(ROSmsg):
     """https://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/MultiDOFJointTrajectoryPoint.html"""
@@ -77,3 +81,6 @@ class MultiDOFJointTrajectory(ROSmsg):
         joint_names = msg["joint_names"]
         points = [MultiDOFJointTrajectoryPoint.from_msg(item) for item in msg["points"]]
         return cls(header, joint_names, points)
+
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
