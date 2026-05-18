@@ -7,17 +7,17 @@ x-ros-env: &ros-env
   ZENOH_ROUTER_CHECK_ATTEMPTS: "-1"
 
 services:
-  ur-sim:
-    image: universalrobots/ursim_e-series:latest
-    container_name: ur-sim
-    # URSim ships amd64-only. Apple Silicon runs it under emulation.
-    platform: linux/amd64
-    environment:
-      # UR10 in the e-series image means UR10e. Other valid values: UR3, UR5, UR16.
-      - ROBOT_MODEL=UR5
-    ports:
-      - "5900:5900"   # VNC for the simulated teach pendant
-      - "6080:6080"   # noVNC web view of the simulated teach pendant
+  # ur-sim:
+  #   image: universalrobots/ursim_e-series:latest
+  #   container_name: ur-sim
+  #   # URSim ships amd64-only. Apple Silicon runs it under emulation.
+  #   platform: linux/amd64
+  #   environment:
+  #     # UR10 in the e-series image means UR10e. Other valid values: UR3, UR5, UR16.
+  #     - ROBOT_MODEL=UR5
+  #   ports:
+  #     - "5900:5900"   # VNC for the simulated teach pendant
+  #     - "6080:6080"   # noVNC web view of the simulated teach pendant
 
   # Zenoh router that federates traffic for all ROS 2 nodes in this stack.
   # Replaces DDS discovery — every ROS service is a Zenoh client pointing
@@ -33,20 +33,20 @@ services:
       - -lc
       - source /opt/ros/jazzy/setup.bash && exec ros2 run rmw_zenoh_cpp rmw_zenohd
 
-  ur-driver:
-    image: compas-fab/ros-jazzy-moveit2
-    container_name: ur-driver
-    environment:
-      <<: *ros-env
-    depends_on:
-      - ur-sim
-      - zenoh-router
-    # `launch_rviz:=false` here disables the driver's bare-bones RViz — we get a
-    # richer planning-scene RViz from `ur_moveit.launch.py` in `moveit-demo`.
-    command:
-      - bash
-      - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5 robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
+  # ur-driver:
+  #   image: compas-fab/ros-jazzy-moveit2
+  #   container_name: ur-driver
+  #   environment:
+  #     <<: *ros-env
+  #   depends_on:
+  #     - ur-sim
+  #     - zenoh-router
+  #   # `launch_rviz:=false` here disables the driver's bare-bones RViz — we get a
+  #   # richer planning-scene RViz from `ur_moveit.launch.py` in `moveit-demo`.
+  #   command:
+  #     - bash
+  #     - -lc
+  #     - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5 robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
 
   moveit-demo:
     image: compas-fab/ros-jazzy-moveit2
@@ -58,15 +58,15 @@ services:
       # macOS, VcXsrv on Windows, native on Linux), comment the line below and uncomment
       # this one:
       # DISPLAY: host.docker.internal:0.0
-      DISPLAY: gui:0.0
+      # DISPLAY: gui:0.0
     depends_on:
-      - ur-driver
+      # - ur-driver
       - zenoh-router
       - gui
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=true
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=false
 
   ros-bridge:
     image: compas-fab/ros-jazzy-moveit2
@@ -74,9 +74,12 @@ services:
     environment:
       <<: *ros-env
     ports:
-      - "9090:9090"
+      # Default 9091 so this stack can run alongside the ROS 1 test stack
+      # (which defaults to 9090). Override with `ROS2_BRIDGE_PORT=...` if
+      # needed. See `tests/integration_setup/README.md`.
+      - "${ROS2_BRIDGE_PORT:-9091}:9090"
     depends_on:
-      - ur-driver
+      # - ur-driver
       - zenoh-router
     command:
       - bash
@@ -87,7 +90,10 @@ services:
     image: compas-fab/ros-jazzy-moveit2
     container_name: file-server
     ports:
-      - "9091:9091"
+      # Default 9092 so this stack can run alongside another HTTP file server
+      # on the host. The container-internal port stays 9091, which is what
+      # other services in this stack hit via `file-server:9091`.
+      - "${ROS2_HTTP_PORT:-9092}:9091"
     working_dir: /opt/ros/jazzy/share
     command:
       - python3
@@ -104,8 +110,5 @@ services:
     # theasp/novnc only ships amd64 manifests; force the platform so Docker stops
     # complaining on arm64 hosts (Apple Silicon). Rosetta 2 / qemu handle the emulation.
     platform: linux/amd64
-    # environment:
-    #   - DISPLAY_WIDTH=1600
-    #   - DISPLAY_HEIGHT=900
     ports:
       - "8080:8080"

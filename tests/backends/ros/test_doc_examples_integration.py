@@ -30,7 +30,14 @@ ROS_PORT_ENV_VAR = "COMPAS_FAB_ROS_PORT"
 @pytest.fixture(scope="module")
 def ros_client():
     if os.environ.get(RUN_ENV_VAR) != "1":
-        pytest.skip("ROS integration tests are opt-in. Start tests/integration_setup/docker-compose.yml and set {}=1 to run the ROS docs examples as tests.".format(RUN_ENV_VAR))
+        pytest.skip(
+            "ROS integration tests are opt-in. Set {0}=1 and connect to a running stack.\n"
+            "ROS 1: `docker compose -f tests/integration_setup/docker-compose.yml up -d` "
+            "(rosbridge on COMPAS_FAB_ROS_PORT=9090).\n"
+            "ROS 2: `docker compose -f docs/installation/docker_files/ros2-ur10e-demo/docker-compose.yml up -d` "
+            "(rosbridge on COMPAS_FAB_ROS_PORT=9091).\n"
+            "See tests/integration_setup/README.md for the parallel-run pattern.".format(RUN_ENV_VAR)
+        )
 
     host = os.environ.get(ROS_HOST_ENV_VAR, "localhost")
     port = int(os.environ.get(ROS_PORT_ENV_VAR, "9090"))

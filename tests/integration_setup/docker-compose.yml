@@ -21,7 +21,9 @@ services:
     image: gramaziokohler/ros-noetic-moveit
     container_name: ros-core
     ports:
-      - "11311:11311"
+      # `${ROS1_CORE_PORT:-11311}` lets you remap the ROS master port if 11311
+      # is already taken on the host (e.g. an existing native ROS install).
+      - "${ROS1_CORE_PORT:-11311}:11311"
     command:
       - roscore
 
@@ -32,7 +34,10 @@ services:
       - "ROS_HOSTNAME=ros-bridge"
       - "ROS_MASTER_URI=http://ros-core:11311"
     ports:
-      - "9090:9090"
+      # Default 9090; override with `ROS1_BRIDGE_PORT=...` to run alongside
+      # the ROS 2 stack (which defaults to 9091). See
+      # `tests/integration_setup/README.md` for the parallel-run pattern.
+      - "${ROS1_BRIDGE_PORT:-9090}:9090"
     depends_on:
       - ros-core
     command:
