@@ -524,7 +524,7 @@ class RobotCell(Data):
         --------
         >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
         >>> robot_cell.get_configurable_joint_types("manipulator")
-        [0, 0, 0, 0, 0, 0]
+        [<JointType.REVOLUTE: 0>, <JointType.REVOLUTE: 0>, <JointType.REVOLUTE: 0>, <JointType.REVOLUTE: 0>, <JointType.REVOLUTE: 0>, <JointType.REVOLUTE: 0>]
         """
         group = group or self.main_group_name
         configurable_joints = self.get_configurable_joints(group)

@@ -46,7 +46,7 @@ jobs:
         env:
           COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS: "1"
         run: |
-          pytest
+          pytest --doctest-modules
 
       - name: Tear down docker containers
         if: always()
