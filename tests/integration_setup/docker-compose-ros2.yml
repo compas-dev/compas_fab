@@ -32,6 +32,22 @@ services:
       - -lc
       - source /opt/ros/jazzy/setup.bash && exec ros2 run rmw_zenoh_cpp rmw_zenohd
 
+  # UR ROS 2 driver
+  # `update_rate.yaml` lowers the
+  # control loop from the default 500 Hz to 100 Hz so the controller
+  # manager doesn't spam "Overrun detected!" warnings under Docker.
+  ur-driver:
+    image: compas-fab/ros-jazzy-moveit2
+    container_name: ur-driver
+    environment:
+      <<: *ros-env
+    depends_on:
+      - zenoh-router
+    command:
+      - bash
+      - -lc
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur10e robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
+
   # MoveIt 2 planning node — exposes /compute_ik, /compute_fk,
   # /compute_cartesian_path, /plan_kinematic_path, /get_planning_scene,
   # /apply_planning_scene.
@@ -42,10 +58,11 @@ services:
       <<: *ros-env
     depends_on:
       - zenoh-router
+      - ur-driver
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=false
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur10e launch_rviz:=false
 
   # rosbridge — WebSocket bridge that compas_fab's RosClient connects to.
   ros2-bridge:
