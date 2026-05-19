@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - wip_process
   pull_request:
     branches:
       - main
@@ -12,29 +11,40 @@ on:
 
 jobs:
   build:
-    name: ubuntu-py311-integration
+    name: ubuntu-py39-integration
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v5
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Set up docker containers
+          python-version: '3.9'
+
+      - name: Bring up both ROS stacks
+        # Defaults: ROS 1 rosbridge on 9090, ROS 2 rosbridge on 9091, ROS 2
+        # HTTP assets on 9092. See `tests/integration_setup/README.md`.
         run: |
-          docker compose -f "tests/integration_setup/docker-compose.yml" up -d --build
+          docker compose -f tests/integration_setup/docker-compose.yml      up -d --build
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml up -d --build
           docker ps -a
+
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install wheel
-      - name: Install
-        run: |
+          python -m pip install --upgrade pip wheel
           python -m pip install --no-cache-dir -r requirements-dev.txt
-      - name: Run integration tests
+
+      - name: Run tests + doctests
+        # `COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS=1` opts the `ros1_client` /
+        # `ros2_client` fixtures into actually connecting (otherwise every
+        # integration test is skipped). `--doctest-modules` picks up
+        # doctests embedded in `src/compas_fab/` modules.
+        env:
+          COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS: "1"
         run: |
           pytest --doctest-modules
-          pytest docs
+
       - name: Tear down docker containers
+        if: always()
         run: |
-          docker compose -f "tests/integration_setup/docker-compose.yml" down
+          docker compose -f tests/integration_setup/docker-compose.yml      down
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml down
