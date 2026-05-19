@@ -4,12 +4,12 @@ Create a point and axis target for the robot's end-effector motion planning.
 COMPAS FAB v1.1.0
 """
 
+from compas.geometry import Point
+from compas.geometry import Vector
 from compas_rhino.conversions import point_to_compas
 from compas_rhino.conversions import vector_to_compas
 from ghpythonlib.componentbase import executingcomponent as component
 
-from compas.geometry import Point
-from compas.geometry import Vector
 from compas_fab.robots import PointAxisTarget
 
 

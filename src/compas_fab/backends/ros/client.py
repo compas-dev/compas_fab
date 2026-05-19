@@ -2,12 +2,12 @@ import os
 from typing import Optional
 
 from compas_robots import RobotModel
+from roslibpy import ActionClient as Ros2ActionClient
 from roslibpy import Message
 from roslibpy import Param
 from roslibpy import Ros
 from roslibpy import Service
 from roslibpy import ServiceRequest
-from roslibpy import ActionClient as Ros2ActionClient
 from roslibpy.ros1.actionlib import ActionClient
 from roslibpy.ros1.actionlib import Goal
 

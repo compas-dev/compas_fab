@@ -6,10 +6,9 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+from compas.scene import SceneObject
 from compas_ghpython import create_id
 from scriptcontext import sticky as st
-
-from compas.scene import SceneObject
 
 
 class ROSRobot(Grasshopper.Kernel.GH_ScriptInstance):

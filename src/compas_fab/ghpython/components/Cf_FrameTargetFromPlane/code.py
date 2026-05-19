@@ -6,10 +6,10 @@ COMPAS FAB v1.1.0
 
 import math
 
+from compas.geometry import Frame
 from compas_rhino.conversions import plane_to_compas_frame
 from ghpythonlib.componentbase import executingcomponent as component
 
-from compas.geometry import Frame
 from compas_fab.robots import FrameTarget
 
 

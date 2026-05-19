@@ -54,18 +54,10 @@ class PyBulletSetRobotCellState(SetRobotCellState):
             if rigid_body_state.attached_to_tool:
                 tool_name = rigid_body_state.attached_to_tool
                 if tool_name not in robot_cell_state.tool_states:
-                    raise ValueError(
-                        "State inconsistency: Rigid body {} is attached to a non-existent tool {}".format(
-                            rigid_body_name, tool_name
-                        )
-                    )
+                    raise ValueError("State inconsistency: Rigid body {} is attached to a non-existent tool {}".format(rigid_body_name, tool_name))
                 tool_state = robot_cell_state.tool_states[tool_name]
                 if tool_state.is_hidden:
-                    raise ValueError(
-                        "State inconsistency: Rigid body {} is attached to a hidden tool {}".format(
-                            rigid_body_name, tool_name
-                        )
-                    )
+                    raise ValueError("State inconsistency: Rigid body {} is attached to a hidden tool {}".format(rigid_body_name, tool_name))
 
         # Update the robot configuration if it is provided
         # Note robot_cell_state.robot_configuration is a full configuration
@@ -91,13 +83,11 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                     continue
                 # If tool is attached to a group, update the tool's base frame using the group's FK frame
                 link_name = client.robot_cell.get_link_names(tool_state.attached_to_group)[-1]
-                robot_configuration = robot_cell_state.robot_configuration
+                _robot_configuration = robot_cell_state.robot_configuration
                 # Get PCF of the Robot
                 pcf_link_id = client.robot_link_puids[link_name]
                 planner_coordinate_frame = client._get_link_frame(pcf_link_id, client.robot_puid)
-                tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(
-                    tool_state, planner_coordinate_frame
-                )
+                tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(tool_state, planner_coordinate_frame)
             else:
                 # If the tool is not attached, update the tool's base frame using the frame in tool state
                 tool_base_frame = tool_state.frame
@@ -127,9 +117,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 tool_state = robot_cell_state.tool_states[tool_name]
 
                 # The following function computes the rigid body base frame from the tool base frame and attachment frame
-                rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(
-                    rigid_body_state, tool_model, tool_base_frames[tool_name]
-                )
+                rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(rigid_body_state, tool_model, tool_base_frames[tool_name])
             elif rigid_body_state.attached_to_link:
                 # Skip if robot_configuration is not provided
                 if not robot_cell_state.robot_configuration:
@@ -164,9 +152,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         # keep track of the previous state and only update the models that have changed to improve performance.
         # We can improve when we have proper profiling and performance tests.
 
-    def set_attached_tool_and_rigid_body_state(
-        self, state: RobotCellState, group: str, planner_coordinate_frame: Frame
-    ):
+    def set_attached_tool_and_rigid_body_state(self, state: RobotCellState, group: str, planner_coordinate_frame: Frame):
         """Change the state of the models in the robot cell that have already been set to the Pybullet client.
 
         Similar to the :meth:`set_robot_cell_state` method, but affects only the tools and rigid bodies
@@ -184,9 +170,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         for tool_name, tool_state in robot_cell_state.tool_states.items():
             # If the tool is attached to the group, update the tool's base frame using the planner_coordinate_frame
             if tool_state.attached_to_group == group:
-                tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(
-                    tool_state, planner_coordinate_frame
-                )
+                tool_base_frame = self._compute_tool_base_frame_from_planner_coordinate_frame(tool_state, planner_coordinate_frame)
                 tool_base_frames[tool_name] = tool_base_frame
                 client._set_tool_base_frame(tool_name, tool_base_frame)
 
@@ -198,15 +182,11 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 tool_model = robot_cell.tool_models[tool_name]
 
                 # The following function computes the rigid body base frame from the tool base frame and attachment frame
-                rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(
-                    rigid_body_state, tool_model, tool_base_frame
-                )
+                rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(rigid_body_state, tool_model, tool_base_frame)
 
                 client._set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
 
-    def _compute_workpiece_frame_from_tool_base_frame(
-        self, rigid_body_state: RigidBodyState, tool_model: ToolModel, tool_base_frame: Frame
-    ):
+    def _compute_workpiece_frame_from_tool_base_frame(self, rigid_body_state: RigidBodyState, tool_model: ToolModel, tool_base_frame: Frame):
         """Compute the rigid body base frame from the tool base frame and attachment frame."""
         # Note: The attachment order from the World to the Workpiece are as follows:
         # t_wcf_tbcf is Tool Base Frame, describing Tool Base Coordinate Frame (TBCF) relative to World Coordinate Frame (WCF)
@@ -223,9 +203,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         rigid_body_base_frame = Frame.from_transformation(t_wcf_ocf)
         return rigid_body_base_frame
 
-    def _compute_tool_base_frame_from_planner_coordinate_frame(
-        self, tool_state: ToolState, planner_coordinate_frame: Frame
-    ):
+    def _compute_tool_base_frame_from_planner_coordinate_frame(self, tool_state: ToolState, planner_coordinate_frame: Frame):
         """Compute the tool base frame from the planner coordinate frame."""
 
         # Note: The position of the attached tool in the world coordinate frame is given by t_wcf_tbcf

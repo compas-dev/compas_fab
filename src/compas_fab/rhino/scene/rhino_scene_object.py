@@ -20,7 +20,6 @@ from typing import Optional
 
 import scriptcontext as sc  # type: ignore
 import System  # type: ignore
-
 from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Transformation
