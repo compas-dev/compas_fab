@@ -5,8 +5,7 @@ invoke >= 0.14
 pytest
 pytest-cov
 pytest-mock
+pybullet
 ruff
 tomlkit
 twine
-# pybullet must be installed separately due to missing wheels for newer Python versions:
-# CFLAGS="-fno-define-target-os-macros" uv pip install pybullet
