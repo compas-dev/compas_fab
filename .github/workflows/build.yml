@@ -20,6 +20,8 @@ jobs:
 
     steps:
       - uses: compas-dev/compas-actions.build@v5
+        env:
+          CFLAGS: ${{ startsWith(matrix.os, 'macos') && '-fno-define-target-os-macros' || '' }}
         with:
           python: ${{ matrix.python }}
           invoke_lint: true
