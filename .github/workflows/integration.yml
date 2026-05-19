@@ -29,9 +29,14 @@ jobs:
           docker ps -a
 
       - name: Install dependencies
+        # `pip install -r requirements-dev.txt` alone installs the dev tools
+        # but NOT the package itself nor its runtime deps. The top-level
+        # `conftest.py` then crashes on `from twisted.internet import ...`
+        # because twisted only arrives transitively via `roslibpy` (a runtime
+        # dep). Installing the package with the `[dev]` extra pulls both.
         run: |
           python -m pip install --upgrade pip wheel
-          python -m pip install --no-cache-dir -r requirements-dev.txt
+          python -m pip install --no-cache-dir -e ".[dev]"
 
       - name: Run tests + doctests
         # `COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS=1` opts the `ros1_client` /
