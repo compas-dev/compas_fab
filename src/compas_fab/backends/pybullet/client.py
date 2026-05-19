@@ -41,11 +41,13 @@ if TYPE_CHECKING:
     from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
 
 
-# If Pybullet is not defined, load it from LazyLoader
-try:
-    import pybullet  # Try to import directly
-except ImportError:
-    # Fallback to LazyLoader if import fails
+# `pybullet`'s native extension is heavy to import (several seconds on
+# macOS) and is unrelated to ROS / analytical backends. Install a
+# `LazyLoader` proxy unless someone has already imported the real module
+# in this process. Either way, code inside this file can refer to
+# `pybullet` as if it were a normal module — the proxy forwards attribute
+# access to the real module on first touch.
+if "pybullet" not in sys.modules:
     pybullet = LazyLoader("pybullet", globals(), "pybullet")  # noqa: F811
 
 __all__ = [
