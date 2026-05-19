@@ -63,7 +63,7 @@ python_files = [
     "test_*.py",
     "tests.py",
 ]
-addopts = "-ra --strict-markers --doctest-glob=*.md --tb=short"
+addopts = "-ra --strict-markers --doctest-glob=*.md --tb=short --import-mode=importlib"
 doctest_optionflags = "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL ALLOW_UNICODE ALLOW_BYTES NUMBER"
 filterwarnings = "ignore::DeprecationWarning"
 
