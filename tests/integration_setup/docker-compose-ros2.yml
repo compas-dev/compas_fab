@@ -46,7 +46,7 @@ services:
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur10e robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur5 robot_ip:=ur-sim launch_rviz:=false initial_joint_controller:=joint_trajectory_controller update_rate_config_file:=/etc/compas_fab/update_rate.yaml
 
   # MoveIt 2 planning node — exposes /compute_ik, /compute_fk,
   # /compute_cartesian_path, /plan_kinematic_path, /get_planning_scene,
@@ -62,7 +62,7 @@ services:
     command:
       - bash
       - -lc
-      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur10e launch_rviz:=false
+      - source /opt/ros/jazzy/setup.bash && ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur5 launch_rviz:=false
 
   # rosbridge — WebSocket bridge that compas_fab's RosClient connects to.
   ros2-bridge:
