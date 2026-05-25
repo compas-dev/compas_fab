@@ -91,4 +91,4 @@ Ready to release a new version of **COMPAS FAB**? Here's how to do it:
 ## Credits
 
 This package is maintained by Gramazio Kohler Research [`@gramaziokohler`](https://github.com/gramaziokohler)
-and a long list of [contributors](https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.rst).
+and a long list of [contributors](https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.md).
