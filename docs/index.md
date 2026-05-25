@@ -1,8 +1,8 @@
 # COMPAS FAB
 
 **Robotic fabrication for the COMPAS Framework.** One library that drives
-five planning backends — from microsecond closed-form IK to full ROS 2 /
-MoveIt 2 motion planning — and works from any CAD environment or a plain
+five planning backends, from microsecond closed-form IK to full ROS 2 /
+MoveIt 2 motion planning, and works from any CAD environment or a plain
 Python script.
 
 ```pycon

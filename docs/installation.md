@@ -71,9 +71,9 @@ You should see a confirmation message that `compas_fab` is installed correctly.
 
 ## Next steps
 
-- **[Choose a backend](backends/index.md)** — pick a planner that matches what
+- **[Choose a backend](backends/index.md)**: pick a planner that matches what
   you want to do.
-- **[Set up a CAD front-end](frontends.md)** — Rhino, Grasshopper, Blender,
+- **[Set up a CAD front-end](frontends.md)**: Rhino, Grasshopper, Blender,
   COMPAS Viewer or headless Python.
-- **[Concepts](concepts.md)** — a backend-agnostic walkthrough of the data
+- **[Concepts](concepts.md)**: a backend-agnostic walkthrough of the data
   model (`RobotCell`, `RobotCellState`, `Target`, `Waypoints`).

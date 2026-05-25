@@ -52,7 +52,7 @@ common variants:
   for the tool or robot flange.
 - [`PointAxisTarget`][compas_fab.robots.PointAxisTarget]: a point plus an
   axis, leaving the rotation around the axis free. Useful for drilling,
-  milling, 3D printing — anything with a cylindrical tool.
+  milling, 3D printing, anything with a cylindrical tool.
 - [`ConfigurationTarget`][compas_fab.robots.ConfigurationTarget]: joint
   values directly.
 - [`ConstraintSetTarget`][compas_fab.robots.ConstraintSetTarget]: for

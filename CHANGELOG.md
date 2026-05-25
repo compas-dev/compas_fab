@@ -9,15 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* New backend page [Analytical IK + PyBullet](docs/backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner` — the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.
+* New backend page [Analytical IK + PyBullet](backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner`, the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.
 * `docs/backends/pybullet.md` now flags that free-space `plan_motion` is not yet implemented for `PyBulletPlanner` (Cartesian motion via `plan_cartesian_motion` works).
 
 ### Fixed (examples)
 
 * Fixed three analytical/PyBullet examples that crashed at startup due to cell-state desync after objects were added to the cell:
-  * `docs/backends/analytical_kinematics/files/02_inverse_kinematics with_tools.py` — now refreshes the state from the cell after adding the cone tool.
-  * `docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py` — rewritten to use the pre-configured `RobotCellLibrary.abb_irb4600_40_255_printing_tool()` cell (which has the correct `touch_links` semantics) and derives its target frame via FK from a chosen seed pose. Was previously crashing on `KeyError: 'cone'` and then yielding 0 IK solutions even after that.
-  * `docs/backends/pybullet/files/04_ik_semi_constrained.py` — now creates the `target_marker` rigid body state explicitly (was crashing on `KeyError: 'target_marker'`).
+  * `docs/backends/analytical_kinematics/files/02_inverse_kinematics with_tools.py`: now refreshes the state from the cell after adding the cone tool.
+  * `docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py`: rewritten to use the pre-configured `RobotCellLibrary.abb_irb4600_40_255_printing_tool()` cell (which has the correct `touch_links` semantics) and derives its target frame via FK from a chosen seed pose. Was previously crashing on `KeyError: 'cone'` and then yielding 0 IK solutions even after that.
+  * `docs/backends/pybullet/files/04_ik_semi_constrained.py`: now creates the `target_marker` rigid body state explicitly (was crashing on `KeyError: 'target_marker'`).
 * `docs/backends/analytical_kinematics/files/03_iter_ik_pybullet.py` (already covered above) now derives its target via FK for clarity.
 * `docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py` now has a comment noting that `matplotlib` is an optional dependency that must be installed separately.
 * All analytical-backend examples now import solver classes (`UR5Kinematics`, `ABB_IRB4600_40_255Kinematics`) from `compas_fab.backends` (the public top-level path), not the private `compas_fab.backends.kinematics.solvers`.
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
 * Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
 * Split `docs/installation.md` into a focused library-install page (uv/pip/conda + verify) and a new `docs/frontends.md` covering CAD environment setup (Rhino 8, Grasshopper, Blender, COMPAS Viewer, headless). The new front-ends page also documents which CAD environments work with which backends, surfacing the limitation that PyBullet cannot run inside Rhino's interpreter.
-* Rebranded the old `tutorial.md` as `concepts.md`: a backend-agnostic walkthrough of the data model (`RobotCell`, `RobotCellState`, `Target`/`Waypoints`, `TargetMode`). No planner calls — the concepts page now reads as "this is the data; backends are how you execute it" and links out to the backends section for the actual planning calls.
+* Rebranded the old `tutorial.md` as `concepts.md`: a backend-agnostic walkthrough of the data model (`RobotCell`, `RobotCellState`, `Target`/`Waypoints`, `TargetMode`). No planner calls, the concepts page now reads as "this is the data; backends are how you execute it" and links out to the backends section for the actual planning calls.
 * Rewrote `docs/index.md` as a real landing page (was a 1-paragraph blurb): leads with the five-backend table, "I want to..." quick links, and a four-step what's-next list. Updated MkDocs nav to surface the new structure (Home → Installation → CAD front-ends → Concepts → Backends → API → Developer guide).
 
 ### Fixed
@@ -53,10 +53,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* New `ros2-ur10e-demo` docker reference backend (ROS 2 Jazzy + MoveIt 2 + UR10e) with a `ur-sim` service running the official `universalrobots/ursim_e-series` Polyscope simulator, a `zenoh-router` service running `rmw_zenohd` as the RMW transport (replaces DDS — no more multicast discovery issues on Docker Desktop), a `ur-driver` service running the real `ur_robot_driver` against the simulator (with the ros2_control + RTDE update rate lowered from the default 500 Hz to 100 Hz via a baked-in `update_rate.yaml`, to stop the controller manager from spamming "Overrun detected!" warnings under Docker virtualisation), `moveit-demo` running `ur_moveit.launch.py`, rosbridge on `9090`, an HTTP file server on `9091` for serving meshes from `/opt/ros/jazzy/share/`, and a `theasp/novnc` web GUI on `8080` for viewing RViz.
+* New `ros2-ur10e-demo` docker reference backend (ROS 2 Jazzy + MoveIt 2 + UR10e) with a `ur-sim` service running the official `universalrobots/ursim_e-series` Polyscope simulator, a `zenoh-router` service running `rmw_zenohd` as the RMW transport (replaces DDS, no more multicast discovery issues on Docker Desktop), a `ur-driver` service running the real `ur_robot_driver` against the simulator (with the ros2_control + RTDE update rate lowered from the default 500 Hz to 100 Hz via a baked-in `update_rate.yaml`, to stop the controller manager from spamming "Overrun detected!" warnings under Docker virtualisation), `moveit-demo` running `ur_moveit.launch.py`, rosbridge on `9090`, an HTTP file server on `9091` for serving meshes from `/opt/ros/jazzy/share/`, and a `theasp/novnc` web GUI on `8080` for viewing RViz.
 * New `compas_fab.backends.HttpFileServerLoader` that mirrors `RosFileServerLoader`'s interface but fetches meshes over plain HTTP and reads URDF/SRDF from rosbridge topics (the ROS 2 convention) instead of ROS parameters.
 * Migrated documentation from Sphinx to MkDocs Material, matching the structure used in `compas_robots`. New `mkdocs.yml` at the repository root; documentation sources are now Markdown (`docs/*.md`) with API pages driven by `mkdocstrings`. Backlinks are disabled. `inventories` includes `compas`, `compas_robots`, and `compas_viewer`. Sphinx config (`docs/conf.py`) and Sphinx-only `docs/requirements.txt` have been removed; `tasks.py` now invokes `compas_invocations2.mkdocs.docs` so `invoke docs` builds the MkDocs site.
-* New developer guide section: [Backend architecture](docs/developer/architecture.md) ported from the old `docs/developer/backends.rst`, plus [Grasshopper components](docs/developer/grasshopper.md) ported from `docs/developer/grasshopper.rst`.
+* New developer guide section: [Backend architecture](developer/architecture.md) ported from the old `docs/developer/backends.rst`, plus [Grasshopper components](developer/grasshopper.md) ported from `docs/developer/grasshopper.rst`.
 * New API pages explicitly exposing `compas_fab.backends.interfaces`, `compas_fab.backends.ros.backend_features` and `compas_fab.backends.pybullet.backend_features` via `mkdocstrings`, replacing the Sphinx `autosummary` tables that previously generated stub `.rst` files per symbol.
 * New `Target` and `Waypoints` classes to represent inputs of planning functions.
   * New `PointAxisTarget` and `PointAxisWaypoint` classes for processes that have a cylindrical tool (e.g. drilling, milling, 3D printing).
@@ -314,7 +314,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 
-## [[1.0.3] 2025-04-15]
+## [1.0.3] 2025-04-15
 
 ### Added
 
