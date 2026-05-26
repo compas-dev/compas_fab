@@ -6,6 +6,7 @@ pytest
 pytest-cov
 pytest-mock
 pybullet
+pythonnet
 ruff
 tomlkit
 twine
