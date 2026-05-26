@@ -1,0 +1,48 @@
+{
+    "name": "Point Axis Target",
+    "nickname": "Point Axis Target",
+    "category": "COMPAS FAB",
+    "subcategory": "Targets",
+    "description": "Create a PointAxisTarget for tools with cylindrical symmetry (drilling, milling, 3D printing). Rotation around the target Z axis is unconstrained.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "point",
+                "description": "Target point in WCF. Accepts Rhino Point or COMPAS Point."
+            },
+            {
+                "name": "target_z_axis",
+                "description": "Direction the tool's Z axis must align with. Rotation around this axis is free. Accepts Rhino Vector or COMPAS Vector."
+            },
+            {
+                "name": "target_mode",
+                "description": "Which frame to align: 'ROBOT' (default), 'TOOL', or 'WORKPIECE'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "tolerance_position",
+                "description": "Position tolerance in meters. If unset, the planner default is used.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_orientation",
+                "description": "Orientation tolerance in radians. If unset, the planner default is used.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "native_scale",
+                "description": "Scale factor: user_value * native_scale = meters. Use 0.001 for millimeter documents. Defaults to 1.0.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "target",
+                "description": "PointAxisTarget."
+            }
+        ]
+    }
+}

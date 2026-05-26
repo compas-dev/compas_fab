@@ -1,0 +1,39 @@
+{
+    "name": "Load Robot Cell From Library",
+    "nickname": "Cell from Library",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a pre-defined RobotCell and matching default RobotCellState from RobotCellLibrary (e.g. 'ur5', 'ur10e', 'abb_irb4600_40_255', 'panda', 'ur5_cone_tool').",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Name of the RobotCellLibrary classmethod to call (e.g. 'ur5', 'ur10e', 'abb_irb4600_40_255', 'abb_irb120_3_58', 'panda', 'rfl', 'ur5_cone_tool', 'abb_irb4600_40_255_printing_tool').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "load_geometry",
+                "description": "Whether to load the robot's mesh geometry. Required for visualization and planning. Defaults to True.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "reload",
+                "description": "Force a reload (bypass cache). Defaults to False.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "The loaded RobotCell."
+            },
+            {
+                "name": "robot_cell_state",
+                "description": "The default RobotCellState matching the cell."
+            }
+        ]
+    }
+}

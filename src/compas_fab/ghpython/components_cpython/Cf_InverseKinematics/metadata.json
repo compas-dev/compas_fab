@@ -3,36 +3,39 @@
     "nickname": "IK",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Calculate the robot's inverse kinematic for a given plane.",
+    "description": "Solve inverse kinematics for a target using the given planner and starting RobotCellState.",
     "exposure": 2,
-
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
         "inputParameters": [
             {
-                "name": "robot",
-                "description": "The robot.",
-                "wireDisplay": "hidden"
+                "name": "planner",
+                "description": "A planner instance (AnalyticalKinematicsPlanner, MoveItPlanner, PyBulletPlanner, AnalyticalPyBulletPlanner)."
             },
             {
-                "name": "plane",
-                "description": "The plane or frame to calculate the inverse kinematic for."
+                "name": "target",
+                "description": "Target to reach (FrameTarget, PointAxisTarget, etc.)."
             },
             {
-                "name": "start_configuration",
-                "description": "If passed, calculates the inverse such that the joint positions differ the least from the start_configuration. Defaults to the zero configuration."
+                "name": "start_state",
+                "description": "Starting RobotCellState. The robot's configuration in this state is used as the IK seed."
             },
             {
                 "name": "group",
-                "description": "The planning group used for calculation. Defaults to the robot's main planning group.",
+                "description": "Optional planning group name. Defaults to the cell's main planning group.",
                 "typeHintID": "str"
+            },
+            {
+                "name": "compute",
+                "description": "If True, compute IK. Defaults to False so the canvas does not solve on every refresh.",
+                "typeHintID": "bool"
             }
         ],
         "outputParameters": [
             {
                 "name": "configuration",
-                "description": "The planning group's configuration."
+                "description": "Resulting Configuration, or None if no solution was found."
             }
         ]
     }

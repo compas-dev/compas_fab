@@ -1,0 +1,34 @@
+{
+    "name": "Analytical Kinematics Planner",
+    "nickname": "Analytical Planner",
+    "category": "COMPAS FAB",
+    "subcategory": "Backends",
+    "description": "Create an AnalyticalKinematicsPlanner for closed-form FK/IK. Runs in-process; no ROS or PyBullet required.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "solver",
+                "description": "Name of the analytical solver: 'ur3', 'ur3e', 'ur5', 'ur5e', 'ur10', 'ur10e', 'staubli_tx260l', or 'abb_irb4600_40_255'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "robot_cell",
+                "description": "Optional RobotCell to assign to the planner (planner.set_robot_cell). Recommended so FK/IK/Cartesian-motion components can resolve TargetMode.TOOL / TargetMode.WORKPIECE."
+            },
+            {
+                "name": "verbose",
+                "description": "Print solver diagnostics. Defaults to False.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "planner",
+                "description": "Configured AnalyticalKinematicsPlanner."
+            }
+        ]
+    }
+}

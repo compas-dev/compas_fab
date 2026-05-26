@@ -1,0 +1,34 @@
+{
+    "name": "Configuration Target",
+    "nickname": "Configuration Target",
+    "category": "COMPAS FAB",
+    "subcategory": "Targets",
+    "description": "Create a ConfigurationTarget defined by joint values. Useful for go-to-home or named-pose motions.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "target_configuration",
+                "description": "Target Configuration (joint values in radians/meters)."
+            },
+            {
+                "name": "tolerance_above",
+                "description": "Per-joint upper tolerance list. Defaults to 0.001 m (prismatic) / 1 deg (revolute) per joint.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_below",
+                "description": "Per-joint lower tolerance list. Defaults to 0.001 m (prismatic) / 1 deg (revolute) per joint.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "target",
+                "description": "ConfigurationTarget."
+            }
+        ]
+    }
+}

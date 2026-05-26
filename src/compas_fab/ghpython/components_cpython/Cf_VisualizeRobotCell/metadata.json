@@ -1,0 +1,55 @@
+{
+    "name": "Visualize Robot Cell",
+    "nickname": "Visualize",
+    "category": "COMPAS FAB",
+    "subcategory": "Display",
+    "description": "Draw a RobotCell at the configuration described by a RobotCellState. The cached SceneObject only rebuilds meshes when the cell changes; updating only state changes is fast.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "The RobotCell to draw."
+            },
+            {
+                "name": "cell_state",
+                "description": "RobotCellState describing the configuration to draw."
+            },
+            {
+                "name": "draw_visual",
+                "description": "Draw visual meshes. Defaults to True.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "draw_collision",
+                "description": "Draw collision meshes. Defaults to False.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "native_scale",
+                "description": "Scale factor for the drawn geometry: meter_value / native_scale = native_value. Use 0.001 for a millimeter document. Defaults to 1.0.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot_meshes",
+                "description": "Rhino meshes of the robot model."
+            },
+            {
+                "name": "tool_meshes",
+                "description": "Rhino meshes of all tool models in the cell."
+            },
+            {
+                "name": "rigid_body_meshes",
+                "description": "Rhino meshes of all rigid bodies in the cell."
+            },
+            {
+                "name": "base_plane",
+                "description": "Rhino plane at the robot's base frame."
+            }
+        ]
+    }
+}
