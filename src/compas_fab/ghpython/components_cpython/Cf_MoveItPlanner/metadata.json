@@ -1,0 +1,28 @@
+{
+    "name": "MoveIt Planner",
+    "nickname": "MoveIt Planner",
+    "category": "COMPAS FAB",
+    "subcategory": "Backends",
+    "description": "Create a MoveItPlanner from a connected RosClient. Optionally sets the robot cell on construction so planning calls don't re-upload geometry.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "ros_client",
+                "description": "Connected RosClient (from the ROS Client component)."
+            },
+            {
+                "name": "robot_cell",
+                "description": "Optional RobotCell to assign to the planner via set_robot_cell. Recommended when the cell is known upfront."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "planner",
+                "description": "MoveItPlanner."
+            }
+        ]
+    }
+}

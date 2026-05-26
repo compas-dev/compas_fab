@@ -1,0 +1,43 @@
+{
+    "name": "ROS Client",
+    "nickname": "ROS Client",
+    "category": "COMPAS FAB",
+    "subcategory": "Backends",
+    "description": "Connect to a ROS bridge (ROS 1 or ROS 2). The distro is auto-detected.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "host",
+                "description": "ROS bridge host. Defaults to '127.0.0.1'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "port",
+                "description": "ROS bridge port. Defaults to 9090.",
+                "typeHintID": "int"
+            },
+            {
+                "name": "connect",
+                "description": "If True, (re)connects. If False, disconnects.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "ros_client",
+                "description": "Connected RosClient (or None if disconnected)."
+            },
+            {
+                "name": "is_connected",
+                "description": "True if the client is currently connected."
+            },
+            {
+                "name": "ros_distro",
+                "description": "Detected ROS distribution (e.g. 'noetic', 'jazzy')."
+            }
+        ]
+    }
+}

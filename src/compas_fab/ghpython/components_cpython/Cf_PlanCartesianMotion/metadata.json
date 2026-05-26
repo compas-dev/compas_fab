@@ -1,0 +1,60 @@
+{
+    "name": "Plan Cartesian Motion",
+    "nickname": "Cartesian Motion",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Plan a linear-in-tool-space motion through waypoints. Result is cached; trigger via `compute`.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "planner",
+                "description": "A planner that supports plan_cartesian_motion (e.g. MoveItPlanner, PyBulletPlanner, AnalyticalKinematicsPlanner)."
+            },
+            {
+                "name": "waypoints",
+                "description": "FrameWaypoints or PointAxisWaypoints to interpolate through."
+            },
+            {
+                "name": "start_state",
+                "description": "Starting RobotCellState. The robot's configuration in this state is used as the seed."
+            },
+            {
+                "name": "group",
+                "description": "Planning group name. Defaults to the cell's main planning group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "max_step",
+                "description": "Maximum interpolation step in meters. Defaults to 0.01.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "avoid_collisions",
+                "description": "If True, the planner checks for collisions along the path. Defaults to True.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "compute",
+                "description": "Trigger planning. Defaults to False so the canvas does not plan on every refresh.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "trajectory",
+                "description": "Resulting JointTrajectory (full or partial)."
+            },
+            {
+                "name": "fraction",
+                "description": "Fraction of the requested path that was achievable (0..1)."
+            },
+            {
+                "name": "error",
+                "description": "Error message if planning failed; None on success."
+            }
+        ]
+    }
+}

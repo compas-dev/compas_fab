@@ -1,0 +1,53 @@
+{
+    "name": "Load Robot Cell From ROS",
+    "nickname": "Cell from ROS",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a RobotCell (URDF + SRDF, optionally with meshes) from a connected ROS bridge. Auto-detects ROS 1 vs ROS 2 transport.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "ros_client",
+                "description": "Connected RosClient."
+            },
+            {
+                "name": "load_geometry",
+                "description": "If True (default), fetch mesh geometry. Set to False for faster loads when only kinematics are needed.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "urdf_param_name",
+                "description": "ROS parameter / topic name for the URDF. Defaults to '/robot_description'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "srdf_param_name",
+                "description": "ROS parameter / topic name for the SRDF. Defaults to '/robot_description_semantic'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "http_file_server_base_url",
+                "description": "ROS 2 only: base URL of the HTTP file server hosting package:// meshes. Defaults to http://<rosbridge-host>:9091.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "load",
+                "description": "Trigger the (re)load. Defaults to False so the canvas does not refetch on every refresh.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "Loaded RobotCell."
+            },
+            {
+                "name": "robot_cell_state",
+                "description": "Default RobotCellState matching the loaded cell."
+            }
+        ]
+    }
+}
