@@ -83,7 +83,6 @@ select = ["E", "F", "I"]
 "__init__.py" = ["I001"]
 "tests/*" = ["I001", "E501"]
 "tasks.py" = ["I001"]
-"src/compas_fab/ghpython/components/*/code.py" = ["F821", "F401"]
 "src/compas_fab/ghpython/components_cpython/*/code.py" = ["F821", "F401"]
 
 [tool.ruff.lint.isort]

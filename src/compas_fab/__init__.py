@@ -57,9 +57,7 @@ except Exception:
 
 
 __all_plugins__ = [
-    "compas_fab.rhino.install",
     "compas_fab.rhino.scene",
-    "compas_fab.ghpython.install",
     "compas_fab.ghpython.scene",
     "compas_fab.blender.scene",
 ]

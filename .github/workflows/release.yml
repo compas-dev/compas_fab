@@ -29,8 +29,8 @@ jobs:
           pypi_token: ${{ secrets.PYPI_PASSWORD }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           build_ghpython_components: true
-          gh_source: src/compas_fab/ghpython/components
-          gh_target: src/compas_fab/ghpython/components/ghuser
+          gh_source: src/compas_fab/ghpython/components_cpython
+          gh_target: src/compas_fab/ghpython/components_cpython/ghuser
           gh_prefix: "COMPAS FAB: "
-          gh_interpreter: "ironpython"
+          gh_interpreter: "cpython"
           release_name_prefix: COMPAS FAB

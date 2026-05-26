@@ -21,7 +21,6 @@ ns = Collection(
     build.prepare_changelog,
     build.clean,
     build.release,
-    build.build_ghuser_components,
     build.build_cpython_ghuser_components,
     grasshopper.yakerize,
     grasshopper.publish_yak,
@@ -29,11 +28,6 @@ ns = Collection(
 ns.configure(
     {
         "base_folder": os.path.dirname(__file__),
-        "ghuser": {
-            "source_dir": "src/compas_fab/ghpython/components",
-            "target_dir": "src/compas_fab/ghpython/components/ghuser",
-            "prefix": "COMPAS FAB: ",
-        },
         "ghuser_cpython": {
             "source_dir": "src/compas_fab/ghpython/components_cpython",
             "target_dir": "src/compas_fab/ghpython/components_cpython/ghuser",
