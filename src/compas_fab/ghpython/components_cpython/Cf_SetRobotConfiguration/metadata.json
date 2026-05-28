@@ -1,0 +1,28 @@
+{
+    "name": "Set Robot Configuration",
+    "nickname": "Set Config",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Return a new RobotCellState with `robot_configuration` overridden. Bridges IK output (Configuration) back into a state that can be visualized or fed into further planning.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "cell_state",
+                "description": "The RobotCellState to copy and modify."
+            },
+            {
+                "name": "configuration",
+                "description": "The Configuration to set on the new state. If None, the input state is returned unchanged."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "cell_state",
+                "description": "New RobotCellState with the given robot configuration."
+            }
+        ]
+    }
+}

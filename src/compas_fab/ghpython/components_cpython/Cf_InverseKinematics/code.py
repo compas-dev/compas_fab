@@ -16,17 +16,16 @@ from compas_fab.backends.exceptions import InverseKinematicsError
 
 
 class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, planner, target, start_state, group: str, compute: bool):
-        if not (planner and target and start_state and compute):
+    def RunScript(self, planner, target, start_state, group: str):
+        if not (planner and target and start_state):
             return None
 
         try:
-            configuration = planner.inverse_kinematics(
+            return planner.inverse_kinematics(
                 target=target,
                 robot_cell_state=start_state,
                 group=group or None,
             )
-            return configuration
         except InverseKinematicsError as e:
             print("Inverse kinematics failed: {}".format(e))
             return None

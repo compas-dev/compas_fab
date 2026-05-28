@@ -16,8 +16,7 @@
             },
             {
                 "name": "load_geometry",
-                "description": "Whether to load the robot's mesh geometry. Required for visualization and planning. Defaults to True.",
-                "typeHintID": "bool"
+                "description": "Whether to load the robot's mesh geometry. Required for visualization. Defaults to True when unwired."
             },
             {
                 "name": "reload",

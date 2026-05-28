@@ -10,6 +10,13 @@ Works against ROS 1 (rosbridge param server + fileserver) and ROS 2 (rosbridge
 topics + HTTP file server) — the RosClient auto-detects the distro and picks
 the matching loader.
 
+If you see HTTP 404 errors while loading geometry, your local ROS may be
+ROS 1 but missing the `/rosapi/get_ros_version` service AND the
+`/rosdistro` parameter, which causes the client to fall back to ROS 2
+defaults. Workarounds: (a) set the `/rosdistro` ROS param on your master,
+(b) install the rosapi service, or (c) set `load_geometry` to False and use
+a robot cell library instead for visualization.
+
 COMPAS FAB v1.1.0
 """
 
@@ -29,9 +36,14 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
         load: bool,
     ):
         if ros_client is None or not ros_client.is_connected:
-            return (None, None)
+            return (None, None, None)
 
         load_geometry = True if load_geometry is None else load_geometry
+
+        try:
+            detected_distro = ros_client.ros_distro.value
+        except Exception:
+            detected_distro = None
 
         key = create_id(  # noqa: F821
             ghenv.Component,  # noqa: F821
@@ -47,12 +59,28 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
             if http_file_server_base_url:
                 kwargs["http_file_server_base_url"] = http_file_server_base_url
 
-            robot_cell = ros_client.load_robot_cell(**kwargs)
-            robot_cell_state = robot_cell.default_cell_state()
-            st[key] = (robot_cell, robot_cell_state)
+            try:
+                robot_cell = ros_client.load_robot_cell(**kwargs)
+                robot_cell_state = robot_cell.default_cell_state()
+                st[key] = (robot_cell, robot_cell_state)
+            except Exception as e:
+                msg = str(e)
+                if "404" in msg or "Not Found" in msg:
+                    print(
+                        "ROS load failed with HTTP 404. Detected ROS distro: '{}'. "
+                        "If your ROS is ROS 1, the client may be falling back to the ROS 2 HTTP loader. "
+                        "Either set the '/rosdistro' ROS parameter on the master, install rosapi, or "
+                        "uncheck load_geometry and use Cf_LoadRobotCellFromLibrary for visualization.".format(
+                            detected_distro
+                        )
+                    )
+                else:
+                    print("ROS load failed: {}".format(e))
+                raise
 
         cached = st.get(key)
         if cached is None:
-            return (None, None)
+            return (None, None, detected_distro)
 
-        return cached
+        robot_cell, robot_cell_state = cached
+        return (robot_cell, robot_cell_state, detected_distro)

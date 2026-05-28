@@ -25,11 +25,6 @@
                 "name": "group",
                 "description": "Optional planning group name. Defaults to the cell's main planning group.",
                 "typeHintID": "str"
-            },
-            {
-                "name": "compute",
-                "description": "If True, compute IK. Defaults to False so the canvas does not solve on every refresh.",
-                "typeHintID": "bool"
             }
         ],
         "outputParameters": [

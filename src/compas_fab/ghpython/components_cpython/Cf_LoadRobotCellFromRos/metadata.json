@@ -15,8 +15,7 @@
             },
             {
                 "name": "load_geometry",
-                "description": "If True (default), fetch mesh geometry. Set to False for faster loads when only kinematics are needed.",
-                "typeHintID": "bool"
+                "description": "If True (default when unwired), fetch mesh geometry. Set to False for faster loads when only kinematics are needed."
             },
             {
                 "name": "urdf_param_name",
@@ -47,6 +46,10 @@
             {
                 "name": "robot_cell_state",
                 "description": "Default RobotCellState matching the loaded cell."
+            },
+            {
+                "name": "detected_distro",
+                "description": "ROS distribution detected by the client (e.g. 'noetic', 'jazzy'). Useful for diagnosing ROS 1 vs ROS 2 loader mismatches."
             }
         ]
     }
