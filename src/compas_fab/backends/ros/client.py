@@ -250,7 +250,7 @@ class RosClient(Ros, ClientInterface):
             for all robots. If not assigned, the robot will not be cached locally.
         http_file_server_base_url : str, optional
             Base URL of the HTTP file server used by ROS 2 to resolve ``package://`` mesh URLs.
-            Defaults to ``http://<rosbridge-host>:9091``.
+            Defaults to ``http://<rosbridge-host>:9190``.
 
         Examples
         --------
@@ -298,7 +298,7 @@ class RosClient(Ros, ClientInterface):
         return RosFileServerLoader(self, use_local_cache, local_cache_directory)
 
     def _default_http_file_server_base_url(self):
-        return "http://{}:9091".format(self.host)
+        return "http://{}:9190".format(self.host)
 
     # ==========================================================================
     # executing

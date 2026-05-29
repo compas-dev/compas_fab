@@ -29,7 +29,7 @@
             },
             {
                 "name": "http_file_server_base_url",
-                "description": "ROS 2 only: base URL of the HTTP file server hosting package:// meshes. Defaults to http://<rosbridge-host>:9091.",
+                "description": "ROS 2 only: base URL of the HTTP file server hosting package:// meshes. Defaults to http://<rosbridge-host>:9190.",
                 "typeHintID": "str"
             },
             {

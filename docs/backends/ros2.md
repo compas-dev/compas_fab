@@ -67,7 +67,7 @@ docker compose -f tests/integration_setup/docker-compose-ros2.yml up
 | `zenoh-router` | Zenoh router federating ROS 2 traffic | — |
 | `moveit2-demo` | MoveIt 2 planning node | — |
 | `ros2-bridge` | rosbridge WebSocket | 9091 |
-| `file-server` | HTTP server for URDF/mesh assets | 9092 |
+| `file-server` | HTTP server for URDF/mesh assets | 9190 |
 
 ### Full demo stack (URSim + GUI)
 
@@ -111,7 +111,7 @@ URDFs and meshes from the `file-server` container, instead of the legacy
 ```python
 from compas_fab.backends import HttpFileServerLoader
 
-loader = HttpFileServerLoader(base_url="http://localhost:9091")
+loader = HttpFileServerLoader(base_url="http://localhost:9190")
 urdf = loader.load_urdf("/robot_description", "std_msgs/String")
 ```
 

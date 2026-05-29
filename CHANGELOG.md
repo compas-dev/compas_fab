@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+* Changed the default HTTP file server port used by `RosClient.load_robot_cell` (and `HttpFileServerLoader`) from `9091` to `9190`. The previous default collided with the rosbridge port `9091` commonly used when remapping a ROS 2 stack to coexist with a ROS 1 stack (rosbridge `9090` + ROS 2 rosbridge `9091`), causing HTTP 404s when the loader hit the bridge instead of the file server. `9190` stays clear of the 909x cluster while remaining mnemonic. The `docker-compose-ros2.yml` test stack and the `ros2-ur10e-demo` reference stack both default `ROS2_HTTP_PORT` and the container-internal port to `9190` to match.
+
 ### Added
 
 * New backend page [Analytical IK + PyBullet](backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner`, the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.

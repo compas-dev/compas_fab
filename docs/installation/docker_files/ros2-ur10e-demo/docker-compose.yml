@@ -104,15 +104,15 @@ services:
     image: compas-fab/ros-jazzy-moveit2
     container_name: file-server
     ports:
-      # Default 9092 so this stack can run alongside another HTTP file server
-      # on the host. Container-internal stays 9091.
-      - "${ROS2_HTTP_PORT:-9092}:9091"
+      # Default 9190 — matches the `HttpFileServerLoader` library default,
+      # so the demo works out of the box without overriding the URL.
+      - "${ROS2_HTTP_PORT:-9190}:9190"
     working_dir: /opt/ros/jazzy/share
     command:
       - python3
       - -m
       - http.server
-      - "9091"
+      - "9190"
 
   # Web-based X11 server. Reachable as `gui` on the Docker network so other
   # services can render into it via `DISPLAY=gui:0.0`. The noVNC web client

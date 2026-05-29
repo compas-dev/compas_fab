@@ -23,7 +23,7 @@ Open in a browser:
 - `http://localhost:8080/vnc.html` — RViz (planning scene, motion previews)
 - `http://localhost:6080/vnc.html` — Simulated UR teach pendant (Polyscope)
 
-`roslibpy` / `compas_fab` connects to `ws://localhost:9090`; meshes referenced as `package://...` come from `http://localhost:9091/...`.
+`roslibpy` / `compas_fab` connects to `ws://localhost:9090`; meshes referenced as `package://...` come from `http://localhost:9190/...`.
 
 ## Services
 
@@ -34,7 +34,7 @@ Open in a browser:
 | `ur-driver`     | —                      | `ur_control.launch.py` — real `ur_robot_driver` connected to `ur-sim`                              |
 | `moveit-demo` | —                        | `ur_moveit.launch.py` — `move_group`, planning scene, RViz                                         |
 | `ros-bridge`  | 9090                     | rosbridge WebSocket for `roslibpy` / `compas_fab`                                                  |
-| `file-server` | 9091                     | Plain HTTP server over `/opt/ros/jazzy/share/` for meshes                                          |
+| `file-server` | 9190                     | Plain HTTP server over `/opt/ros/jazzy/share/` for meshes (matches `HttpFileServerLoader` library default) |
 | `gui`         | 8080                     | `theasp/novnc` — shared X11 server; serves RViz via the browser                                    |
 
 ### Why `ur-sim` instead of `use_fake_hardware`
@@ -64,7 +64,7 @@ This eliminates DDS's multicast discovery problems on Docker Desktop (macOS, Win
 
 ROS 1 demos rely on the custom [`ros_file_server`](https://github.com/gramaziokohler/ros_file_server) package, which exposes a ROS service (`/file_server/get_file`) so that `roslibpy` clients can fetch mesh files referenced by `package://...` URLs.
 
-There is no equivalent in the ROS 2 ecosystem. Rather than porting that package, this demo serves the entire `/opt/ros/jazzy/share/` directory over HTTP. A `package://my_pkg/path/to/foo.stl` reference becomes `http://localhost:9091/my_pkg/path/to/foo.stl`. Use `compas_fab.backends.HttpFileServerLoader` on the client side.
+There is no equivalent in the ROS 2 ecosystem. Rather than porting that package, this demo serves the entire `/opt/ros/jazzy/share/` directory over HTTP. A `package://my_pkg/path/to/foo.stl` reference becomes `http://localhost:9190/my_pkg/path/to/foo.stl`. Use `compas_fab.backends.HttpFileServerLoader` on the client side.
 
 The URDF itself is published by `robot_state_publisher` on the `/robot_description` topic and can be fetched through rosbridge — no file-server call is needed for the URDF, only for the meshes it references.
 

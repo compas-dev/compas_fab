@@ -87,13 +87,14 @@ services:
     image: compas-fab/ros-jazzy-moveit2
     container_name: file-server
     ports:
-      # Default 9092 so this stack can run alongside another HTTP file server
-      # on the host. The container-internal port stays 9091, which is what
-      # other services in this stack hit via `file-server:9091`.
-      - "${ROS2_HTTP_PORT:-9092}:9091"
+      # Default 9190 — matches the `HttpFileServerLoader` library default,
+      # so this stack works out of the box without overriding the URL.
+      # Chosen well clear of the 909x cluster (rosbridge, etc.) to avoid
+      # collisions when remapping ports.
+      - "${ROS2_HTTP_PORT:-9190}:9190"
     working_dir: /opt/ros/jazzy/share
     command:
       - python3
       - -m
       - http.server
-      - "9091"
+      - "9190"

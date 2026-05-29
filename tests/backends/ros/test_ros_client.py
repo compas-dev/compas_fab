@@ -103,11 +103,11 @@ def test_ros2_robot_cell_loader_uses_http_file_server(monkeypatch):
     loader = client._get_robot_cell_loader(
         use_local_cache=True,
         local_cache_directory="/tmp/cache",
-        http_file_server_base_url="http://assets.example.com:9091",
+        http_file_server_base_url="http://assets.example.com:9190",
     )
 
     assert isinstance(loader, FakeHttpFileServerLoader)
-    assert calls == [("http", "http://assets.example.com:9091", client, True, "/tmp/cache")]
+    assert calls == [("http", "http://assets.example.com:9190", client, True, "/tmp/cache")]
 
 
 def test_ros2_robot_cell_loader_defaults_http_file_server_to_rosbridge_host(monkeypatch):
@@ -124,7 +124,7 @@ def test_ros2_robot_cell_loader_defaults_http_file_server_to_rosbridge_host(monk
 
     client._get_robot_cell_loader()
 
-    assert calls == [("http://ros-host.local:9091", client, False, None)]
+    assert calls == [("http://ros-host.local:9190", client, False, None)]
 
 
 def test_ros1_robot_cell_loader_uses_ros_file_server(monkeypatch):

@@ -36,7 +36,7 @@ class HttpFileServerLoader:
     Parameters
     ----------
     base_url
-        Base URL of the HTTP file server, e.g. ``http://localhost:9091``.
+        Base URL of the HTTP file server, e.g. ``http://localhost:9190``.
     ros
         The ROS client. Required to load URDF/SRDF from topics.
     local_cache

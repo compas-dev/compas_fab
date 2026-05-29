@@ -11,7 +11,7 @@ the distro from `client.ros_distro` and adapts.
 | Stack | Compose file | rosbridge port | other ports |
 |---|---|---|---|
 | **ROS 1** (Noetic + MoveIt 1, UR5) | [`docker-compose.yml`](docker-compose.yml) | **9090** | `11311` (rosmaster) |
-| **ROS 2** (Jazzy + MoveIt 2, UR5) | [`docker-compose-ros2.yml`](docker-compose-ros2.yml) | **9091** | `9092` (HTTP assets) |
+| **ROS 2** (Jazzy + MoveIt 2, UR5) | [`docker-compose-ros2.yml`](docker-compose-ros2.yml) | **9091** | `9190` (HTTP assets) |
 
 Both stacks are deliberately minimal — just enough MoveIt to answer the
 service calls the test suite makes. Default ports don't collide, so both
@@ -80,7 +80,7 @@ something on the host already holds the default:
 | `ROS1_BRIDGE_PORT` | ROS 1 | 9090 | 9090 |
 | `ROS1_CORE_PORT`   | ROS 1 | 11311 | 11311 |
 | `ROS2_BRIDGE_PORT` | ROS 2 | 9091 | 9090 |
-| `ROS2_HTTP_PORT`   | ROS 2 | 9092 | 9091 |
+| `ROS2_HTTP_PORT`   | ROS 2 | 9190 | 9190 |
 
 For example, to run the ROS 2 rosbridge on the traditional 9090:
 
