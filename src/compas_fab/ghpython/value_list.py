@@ -58,3 +58,8 @@ def ensure_value_list(component, input_name, options, default=None, x_offset=240
 
     doc.AddObject(value_list, False)
     param.AddSource(value_list)
+
+    # The source was wired during this solve, so the new value won't reach the
+    # input until the next one. Schedule a fresh solve so the user doesn't have
+    # to manually re-trigger the component.
+    doc.ScheduleSolution(5)
