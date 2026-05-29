@@ -7,6 +7,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 from compas_ghpython import create_id
+from compas_ghpython import error
 from scriptcontext import sticky as st
 
 from compas_fab.robots import RobotCellLibrary
@@ -23,7 +24,8 @@ class LoadRobotCellFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
         loader = getattr(RobotCellLibrary, name, None)
         if loader is None:
             available = [attr for attr in dir(RobotCellLibrary) if not attr.startswith("_") and callable(getattr(RobotCellLibrary, attr))]
-            raise ValueError("Unknown RobotCellLibrary entry '{}'. Available: {}".format(name, ", ".join(available)))
+            error(ghenv.Component, "Unknown RobotCellLibrary entry '{}'. Available: {}".format(name, ", ".join(available)))  # noqa: F821
+            return (None, None)
 
         key = create_id(ghenv.Component, "robot_cell_{}_{}".format(name, load_geometry))  # noqa: F821
         cached = st.get(key)

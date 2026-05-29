@@ -7,13 +7,16 @@ attached tools/workpieces (which affect what 'TOOL'/'WORKPIECE' target modes
 resolve to). The resulting Configuration is returned; the input state is not
 mutated.
 
-If no IK solution is found, the planner's `InverseKinematicsError` propagates
-out — the component will turn red on the canvas with the error in its tooltip.
+If no IK solution is found, the component is flagged with an error message
+(visible in the component balloon) and returns None.
 
 COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+from compas_ghpython import error
+
+from compas_fab.backends.exceptions import InverseKinematicsError
 
 
 class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
@@ -21,8 +24,12 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if not (planner and target and start_state):
             return None
 
-        return planner.inverse_kinematics(
-            target=target,
-            robot_cell_state=start_state,
-            group=group or None,
-        )
+        try:
+            return planner.inverse_kinematics(
+                target=target,
+                robot_cell_state=start_state,
+                group=group or None,
+            )
+        except InverseKinematicsError as e:
+            error(ghenv.Component, "Inverse kinematics failed: {}".format(e))  # noqa: F821
+            return None

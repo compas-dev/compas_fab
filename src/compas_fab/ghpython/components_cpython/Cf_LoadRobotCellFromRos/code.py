@@ -22,6 +22,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 from compas_ghpython import create_id
+from compas_ghpython import error
 from scriptcontext import sticky as st
 
 
@@ -66,15 +67,13 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
             except Exception as e:
                 msg = str(e)
                 if "404" in msg or "Not Found" in msg:
-                    print(
-                        "ROS load failed with HTTP 404. Detected ROS distro: '{}'. "
-                        "If your ROS is ROS 1, the client may be falling back to the ROS 2 HTTP loader. "
-                        "Either set the '/rosdistro' ROS parameter on the master, install rosapi, or "
-                        "uncheck load_geometry and use Cf_LoadRobotCellFromLibrary for visualization.".format(detected_distro)
+                    error(  # noqa: F821
+                        ghenv.Component,  # noqa: F821
+                        "ROS load failed with HTTP 404. Detected ROS distro: '{}'. If your ROS is ROS 1, the client may be falling back to the ROS 2 HTTP loader. Either set the '/rosdistro' ROS parameter on the master, install rosapi, or uncheck load_geometry and use Cf_LoadRobotCellFromLibrary for visualization.".format(detected_distro),
                     )
                 else:
-                    print("ROS load failed: {}".format(e))
-                raise
+                    error(ghenv.Component, "ROS load failed: {}".format(e))  # noqa: F821
+                return (None, None, detected_distro)
 
         cached = st.get(key)
         if cached is None:

@@ -23,6 +23,10 @@
             {
                 "name": "tool",
                 "description": "ToolModel."
+            },
+            {
+                "name": "visual_meshes",
+                "description": "Rhino meshes of the tool's visual geometry, drawn in the tool's own base frame. Useful for previewing the tool before attaching it to a robot."
             }
         ]
     }

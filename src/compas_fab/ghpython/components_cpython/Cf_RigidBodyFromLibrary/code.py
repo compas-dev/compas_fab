@@ -9,6 +9,7 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+from compas_ghpython import error
 
 from compas_fab.robots import RigidBodyLibrary
 
@@ -22,7 +23,8 @@ class RigidBodyFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
         loader = getattr(RigidBodyLibrary, name, None)
         if loader is None:
             available = [attr for attr in dir(RigidBodyLibrary) if not attr.startswith("_") and callable(getattr(RigidBodyLibrary, attr))]
-            raise ValueError("Unknown RigidBodyLibrary entry '{}'. Available: {}".format(name, ", ".join(available)))
+            error(ghenv.Component, "Unknown RigidBodyLibrary entry '{}'. Available: {}".format(name, ", ".join(available)))  # noqa: F821
+            return None
 
         size = size if size else 1.0
         return loader(size)

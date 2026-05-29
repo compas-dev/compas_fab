@@ -12,6 +12,7 @@ COMPAS FAB v1.1.0
 from copy import deepcopy
 
 import Grasshopper
+from compas_ghpython import error
 
 
 class AddRigidBodyToCell(Grasshopper.Kernel.GH_ScriptInstance):
@@ -20,7 +21,8 @@ class AddRigidBodyToCell(Grasshopper.Kernel.GH_ScriptInstance):
             return robot_cell
 
         if not rigid_body_id:
-            raise ValueError("rigid_body_id is required")
+            error(ghenv.Component, "rigid_body_id is required")  # noqa: F821
+            return robot_cell
 
         cell = deepcopy(robot_cell)
         cell.rigid_body_models[rigid_body_id.strip()] = rigid_body

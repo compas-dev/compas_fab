@@ -14,6 +14,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 from compas_ghpython import create_id
+from compas_ghpython import error
 from scriptcontext import sticky as st
 
 from compas_fab.backends import AnalyticalKinematicsPlanner
@@ -27,7 +28,8 @@ class AnalyticalKinematicsPlannerComponent(Grasshopper.Kernel.GH_ScriptInstance)
 
         solver = solver.strip().lower()
         if solver not in PLANNER_BACKENDS:
-            raise ValueError("Unknown analytical solver '{}'. Available: {}".format(solver, ", ".join(sorted(PLANNER_BACKENDS.keys()))))
+            error(ghenv.Component, "Unknown analytical solver '{}'. Available: {}".format(solver, ", ".join(sorted(PLANNER_BACKENDS.keys()))))  # noqa: F821
+            return None
 
         verbose = bool(verbose)
 

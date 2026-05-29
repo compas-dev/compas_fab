@@ -17,6 +17,7 @@ from copy import deepcopy
 import Grasshopper
 import System
 from compas.geometry import Frame
+from compas_ghpython import error
 from compas_rhino.conversions import plane_to_compas_frame
 
 
@@ -35,9 +36,8 @@ class AttachToolToRobot(Grasshopper.Kernel.GH_ScriptInstance):
 
         if not group:
             if robot_cell is None:
-                raise ValueError(
-                    "`group` is empty and no `robot_cell` was wired in — provide one or the other so the tool's planning group can be resolved."
-                )
+                error(ghenv.Component, "`group` is empty and no `robot_cell` was wired in — provide one or the other so the tool's planning group can be resolved.")  # noqa: F821
+                return cell_state
             group = robot_cell.main_group_name
 
         attachment_frame = None

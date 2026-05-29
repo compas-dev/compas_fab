@@ -13,6 +13,7 @@ import Grasshopper
 import System
 from compas.geometry import Point
 from compas.geometry import Vector
+from compas_ghpython import error
 from compas_rhino.conversions import point_to_compas
 from compas_rhino.conversions import vector_to_compas
 
@@ -33,7 +34,8 @@ class PointAxisWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if not points or not axes:
             return None
         if len(points) != len(axes):
-            raise ValueError("Number of points ({}) and axes ({}) must match".format(len(points), len(axes)))
+            error(ghenv.Component, "Number of points ({}) and axes ({}) must match".format(len(points), len(axes)))  # noqa: F821
+            return None
 
         pairs = []
         for p, a in zip(points, axes):

@@ -14,6 +14,7 @@ COMPAS FAB v1.1.0
 from copy import deepcopy
 
 import Grasshopper
+from compas_ghpython import error
 
 
 class AddToolToCell(Grasshopper.Kernel.GH_ScriptInstance):
@@ -21,10 +22,11 @@ class AddToolToCell(Grasshopper.Kernel.GH_ScriptInstance):
         if robot_cell is None or tool is None:
             return robot_cell
 
-        cell = deepcopy(robot_cell)
         name = tool_id.strip() if tool_id else getattr(tool, "name", None)
         if not name:
-            raise ValueError("tool_id is required when the tool has no .name")
+            error(ghenv.Component, "tool_id is required when the tool has no .name")  # noqa: F821
+            return robot_cell
 
+        cell = deepcopy(robot_cell)
         cell.tool_models[name] = tool
         return cell

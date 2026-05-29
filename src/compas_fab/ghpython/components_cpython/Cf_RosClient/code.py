@@ -11,6 +11,8 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 from compas_ghpython import create_id
+from compas_ghpython import remark
+from compas_ghpython import warning
 from scriptcontext import sticky as st
 
 from compas_fab.backends import RosClient
@@ -28,7 +30,7 @@ class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
             try:
                 ros_client.close()
             except Exception as e:
-                print("Warning while closing previous ROS client: {}".format(e))
+                warning(ghenv.Component, "Error closing previous ROS client: {}".format(e))  # noqa: F821
             st.pop(key, None)
             ros_client = None
 
@@ -43,6 +45,6 @@ class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
             try:
                 ros_distro = ros_client.ros_distro.value
             except Exception as e:
-                print("Could not read ROS distro: {}".format(e))
+                remark(ghenv.Component, "Could not detect ROS distro: {}".format(e))  # noqa: F821
 
         return (ros_client, is_connected, ros_distro)

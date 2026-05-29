@@ -6,14 +6,17 @@ Calls `planner.plan_motion(target, start_state)`. The result is cached in
 sticky so the canvas does not re-plan on every refresh - set `compute` to
 True to (re)plan.
 
-Catches the common motion-planning exceptions and surfaces a `partial_trajectory`
-when the planner could provide one.
+On `MotionPlanningError` the partial trajectory (if any) is surfaced and the
+component is flagged with a warning. If no partial trajectory is available,
+the component is flagged with an error.
 
 COMPAS FAB v1.1.0
 """
 
 import Grasshopper
 from compas_ghpython import create_id
+from compas_ghpython import error as gh_error
+from compas_ghpython import warning as gh_warning
 from scriptcontext import sticky as st
 
 from compas_fab.backends import MotionPlanningError
@@ -54,11 +57,14 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
                 group=group or None,
                 options=options or None,
             )
-            error = None
+            error_msg = None
         except MotionPlanningError as e:
-            print("Motion planning failed: {}".format(e))
             trajectory = getattr(e, "partial_trajectory", None)
-            error = str(e)
+            error_msg = str(e)
+            if trajectory is not None:
+                gh_warning(ghenv.Component, "Motion planning failed but a partial trajectory was returned: {}".format(error_msg))  # noqa: F821
+            else:
+                gh_error(ghenv.Component, "Motion planning failed: {}".format(error_msg))  # noqa: F821
 
-        st[key] = (trajectory, error)
+        st[key] = (trajectory, error_msg)
         return st[key]
