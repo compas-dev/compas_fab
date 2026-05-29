@@ -1,0 +1,44 @@
+{
+    "name": "Load Robot Cell From URDF/SRDF",
+    "nickname": "Cell from URDF",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a RobotCell from URDF + SRDF files on disk. Optionally points at a local mesh package folder for geometry. No ROS required.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "urdf_filename",
+                "description": "Absolute path to the URDF file.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "srdf_filename",
+                "description": "Absolute path to the SRDF file.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "local_package_mesh_folder",
+                "description": "Optional path to a local package folder holding the meshes referenced as `package://` in the URDF. Required for visualization.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "reload",
+                "description": "Force a reload (bypass cache). Defaults to False.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "Loaded RobotCell."
+            },
+            {
+                "name": "robot_cell_state",
+                "description": "Default RobotCellState matching the cell."
+            }
+        ]
+    }
+}

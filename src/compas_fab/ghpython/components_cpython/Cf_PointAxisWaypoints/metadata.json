@@ -1,0 +1,50 @@
+{
+    "name": "Point Axis Waypoints",
+    "nickname": "Point Axis Waypoints",
+    "category": "COMPAS FAB",
+    "subcategory": "Targets",
+    "description": "Create PointAxisWaypoints from parallel lists of points and Z-axes, for cylindrically symmetric tools.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "points",
+                "description": "Ordered list of target points (Rhino Point or COMPAS Point) in WCF.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "axes",
+                "description": "Ordered list of target Z-axes (Rhino Vector or COMPAS Vector). Must match `points` in length.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "target_mode",
+                "description": "Which frame on the robot to align: 'ROBOT' (default), 'TOOL', or 'WORKPIECE'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "tolerance_position",
+                "description": "Position tolerance in meters.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "tolerance_orientation",
+                "description": "Orientation tolerance in radians.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "native_scale",
+                "description": "Scale factor: user_value * native_scale = meters. Defaults to 1.0.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "waypoints",
+                "description": "PointAxisWaypoints."
+            }
+        ]
+    }
+}

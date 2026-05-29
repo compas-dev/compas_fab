@@ -1,0 +1,35 @@
+{
+    "name": "Set Touch Links",
+    "nickname": "Touch Links",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Set the allowed-collision links (touch_links) on a RigidBody state. Use for static bodies that are expected to touch specific robot links.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "cell_state",
+                "description": "The RobotCellState to modify."
+            },
+            {
+                "name": "rigid_body_id",
+                "description": "Id of the rigid body inside the RobotCell.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "touch_links",
+                "description": "List of robot link names allowed to collide with the body. Empty list clears the touch_links.",
+                "typeHintID": "str",
+                "scriptParamAccess": 1
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "cell_state",
+                "description": "New RobotCellState with the touch_links updated."
+            }
+        ]
+    }
+}

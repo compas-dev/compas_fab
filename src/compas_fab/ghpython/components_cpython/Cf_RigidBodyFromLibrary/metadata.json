@@ -1,0 +1,30 @@
+{
+    "name": "Rigid Body From Library",
+    "nickname": "Body From Library",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a pre-defined RigidBody from RigidBodyLibrary (e.g. 'target_marker').",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Name of the RigidBodyLibrary classmethod to call (e.g. 'target_marker').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "size",
+                "description": "Scaling parameter passed to the library factory. Defaults to 1.0.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "rigid_body",
+                "description": "RigidBody."
+            }
+        ]
+    }
+}

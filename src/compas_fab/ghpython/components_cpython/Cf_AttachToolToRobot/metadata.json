@@ -1,0 +1,44 @@
+{
+    "name": "Attach Tool To Robot",
+    "nickname": "Attach Tool",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Attach a tool to a robot planning group inside a RobotCellState. Any tool already attached to the same group is automatically detached.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "cell_state",
+                "description": "The RobotCellState to modify."
+            },
+            {
+                "name": "tool_id",
+                "description": "Id of the tool inside the RobotCell.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "group",
+                "description": "Planning group to attach the tool to.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "attachment_plane",
+                "description": "Optional Rhino Plane or COMPAS Frame describing the tool's frame relative to the end-effector link. Defaults to World XY (coincident with the end link)."
+            },
+            {
+                "name": "touch_links",
+                "description": "Optional list of robot link names allowed to collide with the tool.",
+                "typeHintID": "str",
+                "scriptParamAccess": 1
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "cell_state",
+                "description": "New RobotCellState with the tool attached."
+            }
+        ]
+    }
+}

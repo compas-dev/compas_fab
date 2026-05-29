@@ -1,0 +1,38 @@
+{
+    "name": "Attach Rigid Body To Tool",
+    "nickname": "Attach Body to Tool",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Attach a RigidBody (workpiece) to a tool inside a RobotCellState. TargetMode.WORKPIECE will resolve to the body's frame.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "cell_state",
+                "description": "The RobotCellState to modify."
+            },
+            {
+                "name": "rigid_body_id",
+                "description": "Id of the rigid body inside the RobotCell.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "tool_id",
+                "description": "Id of the tool the body is attached to.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "attachment_plane",
+                "description": "Optional grasp frame: body pose relative to the tool's TCF. Defaults to World XY (body at the tool tip)."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "cell_state",
+                "description": "New RobotCellState with the body attached to the tool."
+            }
+        ]
+    }
+}
