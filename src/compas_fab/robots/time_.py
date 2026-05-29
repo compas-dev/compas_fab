@@ -11,20 +11,20 @@ class Duration(Data):
 
     Parameters
     ----------
-    secs : :obj:`int` or :obj:`float`
+    secs : `int` or `float`
         Integer representing number of seconds.
         If a float is passed, the integer portion is assigned to secs and
         the decimal portion of the secs variable is converted and added to nsecs.
-    nsecs : :obj:`int`
+    nsecs : `int`
         Integer representing number of nanoseconds.
 
     Attributes
     ----------
-    seconds : :obj:`float`, read-only
+    seconds : `float`, read-only
         Returns the total duration as floating-point seconds.
-    secs : :obj:`int` or :obj:`float`
+    secs : `int` or `float`
         Float representing number of seconds.
-    nsecs : :obj:`int`
+    nsecs : `int`
         Integer representing number of nanoseconds.
 
     Examples
@@ -81,5 +81,5 @@ class Duration(Data):
 
     @property
     def __data__(self):
-        """:obj:`dict` : The data representing the duration."""
+        """`dict` : The data representing the duration."""
         return {"secs": self.secs, "nsecs": self.nsecs}

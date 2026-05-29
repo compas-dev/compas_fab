@@ -16,16 +16,16 @@ class Inertia:
 
     Attributes
     ----------
-    inertia_tensor : :obj:`list` of :obj:`float`
+    inertia_tensor : `list` of `float`
         A symmetric positive-definite 3x3 matrix:
         | ixx ixy ixz |
         | ixy iyy iyz |
         | ixz iyz izz |
         with [ixx, iyy, izz] as the principal moments of inertia and
         [ixy, ixz, iyz] as the products of inertia.
-    mass: :obj:`float`
+    mass: `float`
         The mass of the object in kg.
-    center_of_mass : :class:`compas.geometry.Point`
+    center_of_mass : [`Point`][compas.geometry.Point]
         The center of mass of the object in meters.
 
     Examples
@@ -39,7 +39,7 @@ class Inertia:
     Notes
     -----
     Assuming uniform mass density, inertial data can be obtained using the
-    free software MeshLab, referring to this great `tutorial <http://gazebosim.org/tutorials?tut=inertia>`_.
+    free software MeshLab, referring to this great [tutorial](http://gazebosim.org/tutorials?tut=inertia).
     """
 
     def __init__(self, inertia_tensor, mass, center_of_mass):

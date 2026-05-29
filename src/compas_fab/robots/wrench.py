@@ -26,9 +26,9 @@ class Wrench(Data):
 
     Attributes
     ----------
-    force : :class:`Vector`
+    force : `Vector`
         [Fx, Fy, Fz] force vector in Newtons
-    torque : :class:`Vector`
+    torque : `Vector`
         [Tx, Ty, Tz] moments vector in Newton-meters
 
     Examples
@@ -61,16 +61,16 @@ class Wrench(Data):
 
     @classmethod
     def from_list(cls, values: list[float]) -> "Wrench":
-        """Construct a wrench from a list of 6 :obj:`float` values.
+        """Construct a wrench from a list of 6 `float` values.
 
         Parameters
         ----------
-        values : :obj:`list` of :obj:`float`
+        values : `list` of `float`
             The list of 6 values representing a wrench.
 
         Returns
         -------
-        :class:`Wrench`
+        `Wrench`
             The constructed wrench.
 
         Examples
@@ -88,9 +88,9 @@ class Wrench(Data):
 
         Parameters
         ----------
-        wrenches : list of :class:`Wrench`
+        wrenches : list of `Wrench`
             List of wrenches.
-        proportion_to_cut : :obj:`float`
+        proportion_to_cut : `float`
             Fraction to cut off of both tails of the distribution
 
         Returns
@@ -259,7 +259,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        transformation : :class:`Transformation`
+        transformation : `Transformation`
             The transformation to transform the `Wrench`.
 
         Returns
@@ -280,7 +280,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        transformation : :class:`Transformation`
+        transformation : `Transformation`
             The transformation to transform the `Wrench`.
 
         Returns
@@ -303,11 +303,11 @@ class Wrench(Data):
 
         Parameters
         ----------
-        ft_sensor_frame : :class:`compas.geometry.Frame`
+        ft_sensor_frame : [`Frame`][compas.geometry.Frame]
             The coordinate frame of the force torque sensor.
         mass : float
             The mass of the object in kg.
-        center_of_mass : :class:`compas.geometry.Point`
+        center_of_mass : [`Point`][compas.geometry.Point]
             The center of mass of the object in meters.
 
         Returns

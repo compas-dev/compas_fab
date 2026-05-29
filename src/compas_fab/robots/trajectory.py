@@ -18,7 +18,7 @@ __all__ = [
 class JointTrajectoryPoint(Configuration):
     """Defines a point within a trajectory.
 
-    A trajectory point is a sub-class of :class:`compas_robots.Configuration` extended
+    A trajectory point is a sub-class of [`Configuration`][compas_robots.Configuration] extended
     with acceleration, effort and time from start information.
 
     Trajectory points are defined either as *joint_values + velocities and
@@ -26,38 +26,38 @@ class JointTrajectoryPoint(Configuration):
 
     Parameters
     ----------
-    joint_values : :obj:`list` of :obj:`float`, optional
+    joint_values : `list` of `float`, optional
         Joint values expressed in radians or meters, depending on the respective
         type.
-    joint_types : :obj:`list` of :attr:`compas_robots.Joint.TYPE`, optional
-        Joint types, e.g. a :obj:`list` of
-        :attr:`compas_robots.Joint.REVOLUTE` for revolute joints.
-    velocities : :obj:`list` of :obj:`float`, optional
+    joint_types : `list` of [`Joint.TYPE`][compas_robots.Joint.TYPE], optional
+        Joint types, e.g. a `list` of
+        [`Joint.REVOLUTE`][compas_robots.Joint.REVOLUTE] for revolute joints.
+    velocities : `list` of `float`, optional
         Velocity of each joint.
-    accelerations : :obj:`list` of :obj:`float`, optional
+    accelerations : `list` of `float`, optional
         Acceleration of each joint.
-    effort : :obj:`list` of :obj:`float`, optional
+    effort : `list` of `float`, optional
         Effort of each joint.
-    time_from_start : :class:`Duration`, optional
+    time_from_start : `Duration`, optional
         Duration of trajectory point counting from the start.
 
     Attributes
     ----------
-    joint_values : :obj:`list` of :obj:`float`
+    joint_values : `list` of `float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    joint_types : :obj:`list` of :attr:`compas_robots.Joint.TYPE`
-        Joint types, e.g. a :obj:`list` of
-        :attr:`compas_robots.Joint.REVOLUTE` for revolute joints.
-    velocities : :obj:`list` of :obj:`float`
+    joint_types : `list` of [`Joint.TYPE`][compas_robots.Joint.TYPE]
+        Joint types, e.g. a `list` of
+        [`Joint.REVOLUTE`][compas_robots.Joint.REVOLUTE] for revolute joints.
+    velocities : `list` of `float`
         Velocity of each joint.
-    accelerations : :obj:`list` of :obj:`float`
+    accelerations : `list` of `float`
         Acceleration of each joint.
-    effort : :obj:`list` of :obj:`float`
+    effort : `list` of `float`
         Effort of each joint.
-    time_from_start : :class:`Duration`
+    time_from_start : `Duration`
         Duration of trajectory point counting from the start.
-    positions : :obj:`list` of :obj:`float`
+    positions : `list` of `float`
         Alias of `joint_values`.
     data : obj:`dict`
         The data representing the trajectory point.
@@ -135,10 +135,10 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def __data__(self):
-        """:obj:`dict` : The data representing the trajectory point.
+        """`dict` : The data representing the trajectory point.
 
         By assigning a data dictionary to this property, the current data of the
-        configuration will be replaced by the data in the :obj:`dict`. The data getter
+        configuration will be replaced by the data in the `dict`. The data getter
         and setter should always be used in combination with each other.
         """
         data_obj = super(JointTrajectoryPoint, self).__data__
@@ -199,17 +199,17 @@ class JointTrajectoryPoint(Configuration):
 
         Parameters
         ----------
-        other : :class:`JointTrajectoryPoint`
+        other : `JointTrajectoryPoint`
             The ``JointTrajectoryPoint`` to be merged.
 
         Returns
         -------
-        :class:`JointTrajectoryPoint`
+        `JointTrajectoryPoint`
             A ``JointTrajectoryPoint`` with values for all included joints.
 
         Raises
         ------
-        :exc:`ValueError`
+        `ValueError`
             If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
             joint names for all joint values.
         """
@@ -245,9 +245,9 @@ class Trajectory(Data):
 
     Attributes
     ----------
-    planning_time : :obj:`float`
+    planning_time : `float`
         Amount of time it took to complete the motion plan.
-    attributes : :obj:`dict`
+    attributes : `dict`
         Custom attributes of the trajectory.
     """
 
@@ -275,31 +275,31 @@ class JointTrajectory(Trajectory):
 
     Parameters
     ----------
-    trajectory_points : :obj:`list` of :class:`JointTrajectoryPoint`, optional
+    trajectory_points : `list` of `JointTrajectoryPoint`, optional
         List of points composing the trajectory.
-    joint_names : :obj:`list` of :obj:`str`, optional
+    joint_names : `list` of `str`, optional
         List of joint names of the trajectory.
-    start_configuration : :class:`compas_robots.Configuration`, optional
+    start_configuration : [`Configuration`][compas_robots.Configuration], optional
         Start configuration for the trajectory.
-    fraction : :obj:`float`, optional
+    fraction : `float`, optional
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
-    attributes : :obj:`dict`
+    attributes : `dict`
         Custom attributes of the trajectory.
 
     Attributes
     ----------
-    points : :obj:`list` of :class:`JointTrajectoryPoint`
+    points : `list` of `JointTrajectoryPoint`
         List of points composing the trajectory.
-    joint_names : :obj:`list` of :obj:`str`
+    joint_names : `list` of `str`
         List of joint names of the trajectory.
-    start_configuration : :class:`compas_robots.Configuration`
+    start_configuration : [`Configuration`][compas_robots.Configuration]
         Start configuration for the trajectory.
-    fraction : :obj:`float`
+    fraction : `float`
         Indicates the percentage of requested trajectory that was calculated,
         e.g. ``1`` means the full trajectory was found.
-    attributes : :obj:`dict`
-    data : :obj:`dict`
+    attributes : `dict`
+    data : `dict`
         The data representing the trajectory.
     """
 
@@ -319,7 +319,7 @@ class JointTrajectory(Trajectory):
 
     @property
     def __data__(self):
-        """:obj:`dict` : The data representing the trajectory."""
+        """`dict` : The data representing the trajectory."""
         data_obj = {}
         data_obj["points"] = [p.__data__ for p in self.points]
         data_obj["joint_names"] = self.joint_names or []

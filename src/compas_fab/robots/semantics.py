@@ -14,30 +14,30 @@ class RobotSemantics(Data):
     """Represents semantic information of a robot.
 
     The semantic model is based on the
-    `Semantic Robot Description Format` (`SRDF <https://wiki.ros.org/srdf>`__).
-    Typically, the RobotSemantics objects are created from an SRDF file (using :meth:`from_srdf_file`)
-    or loaded by the backend client (using :meth:`compas_fab.backends.PyBulletClient.load_semantics` or
-    :meth:`compas_fab.backends.RosClient.load_robot`).
+    `Semantic Robot Description Format` ([SRDF](https://wiki.ros.org/srdf)).
+    Typically, the RobotSemantics objects are created from an SRDF file (using `from_srdf_file`)
+    or loaded by the backend client (using [`PyBulletClient.load_semantics`][compas_fab.backends.PyBulletClient.load_semantics] or
+    [`RosClient.load_robot`][compas_fab.backends.RosClient.load_robot]).
 
     Parameters
     ----------
-    groups : :obj:`dict` of (:obj:`str`, :obj:`dict` of (``links`` : :obj:`list` of :obj:`str`, ``joints`` : :obj:`list` of :obj:`str`)), optional
+    groups : `dict` of (`str`, `dict` of (``links`` : `list` of `str`, ``joints`` : `list` of `str`)), optional
         A nested dictionary defining planning groups.
         The dictionary structure is as follows:
 
-        - Level 1 keys are planning group names : :obj:`str`.
+        - Level 1 keys are planning group names : `str`.
         - Level 2 contains only two keys:
 
-            -   ``links`` is a :obj:`list` of :obj:`str` containing link names
-            -   ``joints`` is a :obj:`list` of :obj:`str` containing joint names.
+            -   ``links`` is a `list` of `str` containing link names
+            -   ``joints`` is a `list` of `str` containing joint names.
 
-    main_group_name : :obj:`str`, optional
+    main_group_name : `str`, optional
         The name of the main group.
-    passive_joints : :obj:`list` of :obj:`str`, optional
+    passive_joints : `list` of `str`, optional
         A list of passive joint names.
-    end_effectors : :obj:`list` of :obj:`str`, optional
+    end_effectors : `list` of `str`, optional
         A list of end effector link names.
-    disabled_collisions : :obj:`list` of :obj:`tuple` of (:obj:`str`, :obj:`str`), optional
+    disabled_collisions : `list` of `tuple` of (`str`, `str`), optional
         A set of disabled collision pairs.
         The order is not important, i.e. the pair `('link1', 'link2')` is the same as `('link2', 'link1')`.
         Only one pair is needed.
@@ -46,15 +46,15 @@ class RobotSemantics(Data):
         This is useful to define states such as "home" or "folded arms" for the robot.
         The dictionary structure is as follows:
 
-        - Level 1 keys are planning group names : :obj:`str`.
-        - Level 2 keys are group state names : :obj:`str`.
-        - Level 3 keys are joint names :obj:`str` and values are joint values :obj:`float`.
+        - Level 1 keys are planning group names : `str`.
+        - Level 2 keys are group state names : `str`.
+        - Level 3 keys are joint names `str` and values are joint values `float`.
 
     Attributes
     ----------
-    group_names : :obj:`list` of :obj:`str`, read-only
+    group_names : `list` of `str`, read-only
         Get the names of all planning groups.
-    unordered_disabled_collisions : :obj:`set` of :obj:`frozenset`, read-only
+    unordered_disabled_collisions : `set` of `frozenset`, read-only
         Get the disabled collision pairs as a set of frozensets.
 
 
@@ -126,9 +126,9 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        file : :obj:`str`
+        file : `str`
             The path to the SRDF file.
-        robot_model : :class:`compas_robots.RobotModel`
+        robot_model : [`RobotModel`][compas_robots.RobotModel]
             The robot model is needed when loading the semantics.
 
         Examples
@@ -151,9 +151,9 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        text : :obj:`str`
+        text : `str`
             The SRDF data as a string.
-        robot_model : :class:`compas_robots.RobotModel`
+        robot_model : [`RobotModel`][compas_robots.RobotModel]
             The robot model is needed when loading the semantics.
         """
 
@@ -167,9 +167,9 @@ class RobotSemantics(Data):
         Parameters
         ----------
 
-        xml : :class:`compas.files.XML`
+        xml : [`XML`][compas.files.XML]
             The XML object containing the SRDF data.
-        robot_model : :class:`compas_robots.RobotModel`
+        robot_model : [`RobotModel`][compas_robots.RobotModel]
             The robot model is needed when loading the semantics.
         """
 
@@ -196,12 +196,12 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`str`
+        `str`
             The name of the end effector link.
         """
 
@@ -214,12 +214,12 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`str`
+        `str`
             The name of the base link.
         """
         if not group:

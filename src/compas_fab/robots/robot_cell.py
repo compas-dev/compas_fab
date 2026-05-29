@@ -44,18 +44,18 @@ class RobotCell(Data):
 
     Attributes
     ----------
-    robot_model : :class:`~compas_robots.RobotModel`
+    robot_model : [`RobotModel`][compas_robots.RobotModel]
         The robot model in the robot cell.
         Note that there can only be one robot in the robot cell.
         This is equivalent to the URDF in ROS MoveIt workflows.
-    robot_semantics : :class:`~compas_fab.robots.RobotSemantics`
+    robot_semantics : [`RobotSemantics`][compas_fab.robots.RobotSemantics]
         Semantics describing planning groups, disabled collisions, pre-defined poses etc.
         for the robot model.
         This is equivalent to the SRDF in ROS MoveIt workflows.
-    tool_models : dict of str and :class:`~compas_robots.ToolModel`
+    tool_models : dict of str and [`ToolModel`][compas_robots.ToolModel]
         The tools in the robot cell.
         The key is the unique identifier for the tool.
-    rigid_body_models : dict of str and :class:`~compas_fab.robots.RigidBody`
+    rigid_body_models : dict of str and [`RigidBody`][compas_fab.robots.RigidBody]
         The rigid bodies in the robot cell.
         The key is the unique identifier for the rigid body.
     root_name : str
@@ -131,7 +131,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`compas_fab.robots.RobotCell`
+        [`RobotCell`][compas_fab.robots.RobotCell]
             The robot cell.
         """
         robot_model = RobotModel.__from_data__(data["robot_model"]) if data["robot_model"] else None
@@ -153,19 +153,19 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        urdf_filename : :obj:`str`
+        urdf_filename : `str`
             Path to the URDF file.
-        srdf_filename : :obj:`str`
+        srdf_filename : `str`
             Path to the SRDF file to load semantics.
-        local_package_mesh_folder : :obj:`str`, optional
+        local_package_mesh_folder : `str`, optional
             Path to the local package mesh folder.
             If the path is provided, the geometry of the robot is loaded from this folder.
             Default is `None`, which means that the geometry is not loaded.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        [`RobotCell`][compas_fab.robots.RobotCell]
+            Newly created instance of the robot cell.
 
         """
         robot_model: RobotModel = RobotModel.from_urdf_file(urdf_filename)
@@ -204,8 +204,8 @@ class RobotCell(Data):
 
         Raises
         ------
-        :exc:`Exception`
-            If :attr:`semantics` is not set.
+        `Exception`
+            If `semantics` is not set.
         """
         if not self.robot_semantics:
             raise Exception("Robot semantic is not assigned in the RobotCell.")
@@ -215,7 +215,7 @@ class RobotCell(Data):
 
         Raises
         ------
-        :exc:`Exception`
+        `Exception`
             If geometry has not been loaded.
         """
         try:
@@ -238,7 +238,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :obj:`str`
+        `str`
 
         """
         self.ensure_semantics()
@@ -250,7 +250,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :obj:`list` of :obj:`str`
+        `list` of `str`
 
         Examples
         --------
@@ -268,7 +268,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :obj:`dict` of :obj:`dict` of :obj:`dict` of :obj:`float`
+        `dict` of `dict` of `dict` of `float`
             The first key is the group name, the second key is the group state name.
             At this level you get a joint dictionary.
             The third key is the joint name, and the value is the joint value.
@@ -288,12 +288,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`str`
+        `str`
 
         Examples
         --------
@@ -308,12 +308,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`compas_robots.Link`
+        [`Link`][compas_robots.Link]
 
         Examples
         --------
@@ -330,7 +330,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -350,12 +350,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`compas_robots.Link`
+        [`Link`][compas_robots.Link]
 
         Examples
         --------
@@ -372,12 +372,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`list` of :obj:`str`
+        `list` of `str`
 
         Examples
         --------
@@ -397,11 +397,11 @@ class RobotCell(Data):
         """Get the names of the links with collision geometry.
 
         Note that returned names does not imply that the link has collision geometry loaded.
-        Use :meth:`ensure_geometry()` to ensure that collision geometry is loaded.
+        Use `ensure_geometry()` to ensure that collision geometry is loaded.
 
         Returns
         -------
-        :obj:`list` of :obj:`str`
+        `list` of `str`
 
         Examples
         --------
@@ -412,18 +412,18 @@ class RobotCell(Data):
         return [link.name for link in self.robot_model.iter_links() if link.collision]
 
     def get_all_configurable_joints(self) -> list[Joint]:
-        """Get all configurable :class:`compas_robots.model.Joint` of the robot.
+        """Get all configurable [`Joint`][compas_robots.model.Joint] of the robot.
 
         Configurable joints are joints that can be controlled,
         i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
-        See :meth:`compas_robots.model.Joint.is_configurable` for more details.
+        See [`Joint.is_configurable`][compas_robots.model.Joint.is_configurable] for more details.
 
-        The result of this function is different from :meth:`RobotModel.get_configurable_joints()`
+        The result of this function is different from `RobotModel.get_configurable_joints()`
         as this also filters out passive joints declared in the RobotSemantics.
 
         Returns
         -------
-        :obj:`list` of :class:`compas_robots.model.Joint`
+        `list` of [`Joint`][compas_robots.model.Joint]
             A list of configurable joints.
 
         """
@@ -437,37 +437,37 @@ class RobotCell(Data):
     def get_all_configurable_joint_names(self) -> list[str]:
         """Get all the names of all configurable joints of a planning group.
 
-        Similar to :meth:`get_all_configurable_joints` but returning joint names.
+        Similar to `get_all_configurable_joints` but returning joint names.
 
         Returns
         -------
-        :obj:`list` of :obj:`str`
+        `list` of `str`
         """
         return [joint.name for joint in self.get_all_configurable_joints()]
 
     def get_configurable_joints(self, group: Optional[str] = None) -> list[Joint]:
-        """Get all configurable :class:`compas_robots.model.Joint` of a planning group.
+        """Get all configurable [`Joint`][compas_robots.model.Joint] of a planning group.
 
         Configurable joints are joints that can be controlled,
         i.e., not ``Joint.FIXED``, not mimicking another joint and not a passive joint.
-        See :meth:`compas_robots.model.Joint.is_configurable` for more details.
+        See [`Joint.is_configurable`][compas_robots.model.Joint.is_configurable] for more details.
 
         Important: Setting the `group` to None, does not return all configurable joints of the robot,
         but that of the main planning group.
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`list` of :class:`compas_robots.model.Joint`
+        `list` of [`Joint`][compas_robots.model.Joint]
             A list of configurable joints.
 
         Notes
         -----
-        This function is different from :meth:`RobotModel.get_configurable_joints()`,
+        This function is different from `RobotModel.get_configurable_joints()`,
         as this function filters only the joints of the specified group.
         """
         group = group or self.main_group_name
@@ -482,21 +482,21 @@ class RobotCell(Data):
     def get_configurable_joint_names(self, group: Optional[str] = None) -> list[str]:
         """Get all the names of configurable joints of a planning group.
 
-        Similar to :meth:`get_configurable_joints` but returning joint names.
+        Similar to `get_configurable_joints` but returning joint names.
 
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`list` of :obj:`str`
+        `list` of `str`
 
         Notes
         -----
-        This function is different from :meth:`RobotModel.get_configurable_joint_name()`,
+        This function is different from `RobotModel.get_configurable_joint_name()`,
         as this function filters only the joints of the specified group.
         """
         group = group or self.main_group_name
@@ -508,16 +508,16 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :obj:`list` of :attr:`compas_robots.Joint.SUPPORTED_TYPES`
+        `list` of [`Joint.SUPPORTED_TYPES`][compas_robots.Joint.SUPPORTED_TYPES]
 
         Notes
         -----
-        If :attr:`semantics` is set and no group is passed, it returns all
+        If `semantics` is set and no group is passed, it returns all
         configurable joint types of all groups.
 
         Examples
@@ -535,12 +535,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`
+        group : `str`
             The name of the planning group.
 
         Returns
         -------
-        :obj:`list` of :obj:`str`
+        `list` of `str`
 
         Examples
         --------
@@ -555,21 +555,21 @@ class RobotCell(Data):
         return list(self.group_states[group].keys())
 
     def get_configuration_from_group_state(self, group: str, group_state_name: str) -> Configuration:
-        """Get the :class:`compas_robots.Configuration` from a predefined group state.
+        """Get the [`Configuration`][compas_robots.Configuration] from a predefined group state.
 
         Group states are predefined configurations of a planning group in the RobotSemantics.
 
         Parameters
         ----------
-        group : :obj:`str`
+        group : `str`
             The name of the planning group.
-        group_state_name : :obj:`str`
+        group_state_name : `str`
             The name of the group_state.
 
         Returns
         -------
-        :class:`compas_robots.Configuration`
-            The configuration specified by the :attr:`group_state`.
+        [`Configuration`][compas_robots.Configuration]
+            The configuration specified by the `group_state`.
         """
         joint_dict = self.group_states[group][group_state_name]
         group_joint_names = self.get_configurable_joint_names(group)
@@ -591,7 +591,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`compas_robots.Configuration`
+        [`Configuration`][compas_robots.Configuration]
             The zero configuration of the robot.
 
         """
@@ -618,12 +618,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`compas_robots.Configuration`
+        [`Configuration`][compas_robots.Configuration]
             The zero configuration of a planning group.
 
         Notes
@@ -668,12 +668,12 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to the main planning group.
 
         Returns
         -------
-        :class:`compas_robots.Configuration`
+        [`Configuration`][compas_robots.Configuration]
 
         Notes
         -----
@@ -703,16 +703,16 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        configuration : :class:`compas_robots.Configuration`
+        configuration : [`Configuration`][compas_robots.Configuration]
             The configuration of the group.
             The attributes `joint_names` and `joint_types` must be provided.
-        full_configuration : :class:`compas_robots.Configuration`, optional
+        full_configuration : [`Configuration`][compas_robots.Configuration], optional
             The full configuration of the robot.
-            If not provided, the full configuration is created using :meth:`zero_full_configuration`.
+            If not provided, the full configuration is created using `zero_full_configuration`.
 
         Returns
         -------
-        :class:`compas_robots.Configuration`
+        [`Configuration`][compas_robots.Configuration]
             A new  Configuration object with all the joints of the robot.
         """
         if not full_configuration:
@@ -726,15 +726,15 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        full_configuration : :class:`compas_robots.Configuration`
+        full_configuration : [`Configuration`][compas_robots.Configuration]
             A full configuration (with all configurable joints of the robot).
             Note that this object is not modified.
-        group : :obj:`str`
+        group : `str`
             The name of the planning group.
 
         Returns
         -------
-        :class:`compas_robots.Configuration`
+        [`Configuration`][compas_robots.Configuration]
             A new configuration object with only the joints of the specified group.
         """
         # Adds joint_names to the configuration
@@ -763,14 +763,14 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        configuration : :class:`compas_robots.Configuration`, optional
+        configuration : [`Configuration`][compas_robots.Configuration], optional
             The configuration to fill with joint names and types.
-        group : :obj:`str`, optional
+        group : `str`, optional
             The name of the planning group. Defaults to None.
 
         Returns
         -------
-        ::class:`compas_robots.Configuration`
+        :[`Configuration`][compas_robots.Configuration]
             The configuration with joint names and types.
         """
 
@@ -800,7 +800,7 @@ class RobotCell(Data):
     def default_cell_state(self) -> RobotCellState:
         """Create a default robot cell state for the robot cell.
 
-        Equivalent to :meth:`RobotCellState.from_robot_cell` with the robot cell as input.
+        Equivalent to `RobotCellState.from_robot_cell` with the robot cell as input.
 
         The robot's base frame will be assumed to be at worldXY frame.
         All tools will be assumed to be in their zero configuration and positioned at worldXY frame.
@@ -809,7 +809,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas_fab.robots.RobotCellState`
+        [`RobotCellState`][compas_fab.robots.RobotCellState]
             The default robot cell state.
         """
         return RobotCellState.from_robot_cell(self)
@@ -825,7 +825,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
             The tool attachment information is stored in the tool_states attribute.
         group : str
@@ -835,7 +835,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`compas_robots.ToolModel`
+        [`ToolModel`][compas_robots.ToolModel]
             The tool attached to the group in the robot cell state.
             None if no tool is attached.
         """
@@ -849,7 +849,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        list of :class:`compas_fab.robots.RigidBody`
+        list of [`RigidBody`][compas_fab.robots.RigidBody]
             The workpieces attached to the tool attached to the group in the robot cell state.
             Empty list if no workpiece is attached or no tool is attached.
         """
@@ -887,7 +887,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Transformation`
+        [`Transformation`][compas.geometry.Transformation]
             Transformation from the tool's TCF to TBCF.
         """
 
@@ -911,7 +911,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Transformation`
+        [`Transformation`][compas.geometry.Transformation]
             Transformation from the tool's TCF to TBCF.
         """
 
@@ -940,7 +940,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Transformation`
+        [`Transformation`][compas.geometry.Transformation]
             Transformation from the workpiece's OCF to PCF.
         """
 
@@ -979,9 +979,9 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
-        tcf_frames : list of :class:`~compas.geometry.Frame`
+        tcf_frames : list of [`Frame`][compas.geometry.Frame]
             Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
         tool_id : str
             The id of a tool found in `client.robot_cell.tool_models`.
@@ -989,7 +989,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Frame`
+        [`Frame`][compas.geometry.Frame]
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         """
         self.assert_cell_state_match(robot_cell_state)
@@ -1022,9 +1022,9 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
-        pcf_frames : list of :class:`~compas.geometry.Frame`
+        pcf_frames : list of [`Frame`][compas.geometry.Frame]
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         tool_id : str
             The id of a tool found in `client.robot_cell.tool_models`.
@@ -1032,7 +1032,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Frame`
+        [`Frame`][compas.geometry.Frame]
             Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
         """
         self.assert_cell_state_match(robot_cell_state)
@@ -1066,9 +1066,9 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
-        ocf_frames : list of :class:`~compas.geometry.Frame`
+        ocf_frames : list of [`Frame`][compas.geometry.Frame]
             Object Coordinate Frames (OCF) relative to the World Coordinate Frame (WCF).
         workpiece_id : str
             The id of a workpiece found in `client.robot_cell.rigid_body_models`.
@@ -1076,7 +1076,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Frame`
+        [`Frame`][compas.geometry.Frame]
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
 
         Notes
@@ -1117,9 +1117,9 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
-        pcf_frames : list of :class:`~compas.geometry.Frame`
+        pcf_frames : list of [`Frame`][compas.geometry.Frame]
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
         workpiece_id : str
             The id of a workpiece found in `client.robot_cell.rigid_body_models`.
@@ -1156,24 +1156,24 @@ class RobotCell(Data):
         """Converts a Frame or a list of Frames to the PCF (Planner Coordinate Frame) relative to WCF.
 
         This function is intended to be used by the planner to convert target frames to PCF for planning.
-        The transformation is equivalent to :meth:`from_tcf_to_pcf` when the target mode is `TargetMode.TOOL`,
-        and equivalent to :meth:`from_ocf_to_pcf` when the target mode is `TargetMode.WORKPIECE`.
+        The transformation is equivalent to `from_tcf_to_pcf` when the target mode is `TargetMode.TOOL`,
+        and equivalent to `from_ocf_to_pcf` when the target mode is `TargetMode.WORKPIECE`.
         If the target mode is `TargetMode.ROBOT`, the input frames are unchanged.
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
-        frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+        frame_or_frames : [`Frame`][compas.geometry.Frame] or list of [`Frame`][compas.geometry.Frame]
             The frame or frames to convert.
-        target_mode : :class:`~compas_fab.robots.TargetMode`
+        target_mode : [`TargetMode`][compas_fab.robots.TargetMode]
             The target mode of the frame or frames.
         group : str
             The planning group to check. Must be specified.
 
         Returns
         -------
-        :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+        [`Frame`][compas.geometry.Frame] or list of [`Frame`][compas.geometry.Frame]
             Planner Coordinate Frame (PCF) relative to the World Coordinate Frame (WCF).
             If the input is a single frame, the output will also be a single frame.
             If the input is a list of frames, the output will also be a list of frames.
@@ -1216,22 +1216,22 @@ class RobotCell(Data):
         If the target mode is `TargetMode.WORKPIECE`, the function will convert the PCF to the workpiece's OCF.
 
 
-        This function is the opposite of :meth:`target_frames_to_pcf`.
+        This function is the opposite of `target_frames_to_pcf`.
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
-        frame_or_frames : :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+        frame_or_frames : [`Frame`][compas.geometry.Frame] or list of [`Frame`][compas.geometry.Frame]
             The PCF frame or frames to convert.
-        target_mode : :class:`~compas_fab.robots.TargetMode`
+        target_mode : [`TargetMode`][compas_fab.robots.TargetMode]
             The target mode of the frame or frames.
         group : str
             The planning group to check. Must be specified.
 
         Returns
         -------
-        :class:`~compas.geometry.Frame` or list of :class:`~compas.geometry.Frame`
+        [`Frame`][compas.geometry.Frame] or list of [`Frame`][compas.geometry.Frame]
             Target Frame relative to the World Coordinate Frame (WCF).
             If the input is a single frame, the output will also be a single frame.
             If the input is a list of frames, the output will also be a list of frames.
@@ -1282,10 +1282,10 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
             The robot configuration must be set in the robot state.
-        target_mode : :class:`~compas_fab.robots.TargetMode`
+        target_mode : [`TargetMode`][compas_fab.robots.TargetMode]
             The target mode of the frame.
             The target mode must be supported by the robot cell state.
         group : str, optional
@@ -1294,7 +1294,7 @@ class RobotCell(Data):
 
         Returns
         -------
-        :class:`~compas.geometry.Frame`
+        [`Frame`][compas.geometry.Frame]
             The target frame as interpreted by the target mode,
             relative to the World Coordinate Frame (WCF).
 
@@ -1334,13 +1334,13 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : :class:`~compas_fab.robots.RobotCellState`
+        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
             The state of the robot cell.
             The robot configuration must be set in the robot state.
 
         Returns
         -------
-        :class:`~compas_fab.robots.RobotCellState`
+        [`RobotCellState`][compas_fab.robots.RobotCellState]
             A new robot cell state with the attached objects' frames updated.
         """
         self.assert_cell_state_match(robot_cell_state)

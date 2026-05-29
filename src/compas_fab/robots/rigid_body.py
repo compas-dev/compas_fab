@@ -34,11 +34,11 @@ class RigidBody(Data):
 
         Parameters
         ----------
-        visual_meshes : list of :class:`compas.datastructures.Mesh` | :class:`compas.datastructures.Mesh`
+        visual_meshes : list of [`Mesh`][compas.datastructures.Mesh] | [`Mesh`][compas.datastructures.Mesh]
             The visual meshes of the rigid body used for visualization purpose.
             They can be more detailed for realistic visualization without affecting planning performance.
             If left empty, the rigid body will not be visualized.
-        collision_meshes : list of :class:`compas.datastructures.Mesh` | :class:`compas.datastructures.Mesh`
+        collision_meshes : list of [`Mesh`][compas.datastructures.Mesh] | [`Mesh`][compas.datastructures.Mesh]
             The collision meshes of the rigid body used for collision checking.
             They should be less detailed (fewer polygons) for better planning performance.
             If `None`, or an empty list is passed, no collision checking will be performed for the rigid body.
@@ -50,9 +50,9 @@ class RigidBody(Data):
 
         Attributes
         ----------
-        visual_meshes : list of :class:`compas.datastructures.Mesh`
+        visual_meshes : list of [`Mesh`][compas.datastructures.Mesh]
             A list of meshes for visualization purpose.
-        collision_meshes : list of :class:`compas.datastructures.Mesh`
+        collision_meshes : list of [`Mesh`][compas.datastructures.Mesh]
             A list of meshes for collision checking.
 
         Notes
@@ -114,14 +114,14 @@ class RigidBody(Data):
 
         Parameters
         ----------
-        mesh : :class:`compas.datastructures.Mesh`
+        mesh : [`Mesh`][compas.datastructures.Mesh]
             The mesh of the rigid body.
         native_scale : float, optional
             The native scale of the rigid body. Default is 1.0.
 
         Returns
         -------
-        :class:`compas_fab.robots.RigidBody`
+        [`RigidBody`][compas_fab.robots.RigidBody]
             The rigid body.
 
         Notes
@@ -142,14 +142,14 @@ class RigidBody(Data):
 
         Parameters
         ----------
-        meshes : list of :class:`compas.datastructures.Mesh`
+        meshes : list of [`Mesh`][compas.datastructures.Mesh]
             The meshes of the rigid body.
         native_scale : float, optional
             The native scale of the rigid body. Default is 1.0.
 
         Returns
         -------
-        :class:`compas_fab.robots.RigidBody`
+        [`RigidBody`][compas_fab.robots.RigidBody]
             The rigid body.
 
         Notes

@@ -44,7 +44,7 @@ class TargetMode(Enum):
         Typically this frame is at the tool tip of the tool.
         A tool must be attached to the robot to use this.
     WORKPIECE : str
-        Refers to the frame of the workpiece (:class:`~compas_fab.robots.RigidBody`) attached to the robot.
+        Refers to the frame of the workpiece ([`RigidBody`][compas_fab.robots.RigidBody]) attached to the robot.
         There must be one and only one workpiece attached to the robot when using this mode.
 
     Notes
@@ -69,18 +69,18 @@ class Target(Data):
     velocity, acceleration, and jerk are not yet supported.
 
     Targets are intended to be used for motion planning with a planning backend
-    by using :meth:`compas_fab.robot.plan_motion`.
+    by using [`plan_motion`][compas_fab.robots.plan_motion].
     Note that different backends support different types of targets.
 
     Attributes
     ----------
     name : str , optional, default = 'target'
         A human-readable name for identifying the target.
-    target_mode : :class:`TargetMode`, optional
+    target_mode : `TargetMode`, optional
         The target mode specifies which link or frame is referenced when specifying a target.
         This attribute is optional in this base class because some child
         classes (e.g: ConfigurationTarget) do not require it.
-        See :class:`TargetMode` for more details.
+        See `TargetMode` for more details.
     native_scale : float, optional
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
@@ -89,10 +89,10 @@ class Target(Data):
 
     See Also
     --------
-    :class:`PointAxisTarget`
-    :class:`FrameTarget`
-    :class:`ConfigurationTarget`
-    :class:`ConstraintSetTarget`
+    `PointAxisTarget`
+    `FrameTarget`
+    `ConfigurationTarget`
+    `ConstraintSetTarget`
     """
 
     def __init__(self, target_mode: TargetMode = None, native_scale: float = 1.0, name: str = "Generic Target"):
@@ -137,7 +137,7 @@ class Target(Data):
 
 
 class FrameTarget(Target):
-    """Represents a fully constrained pose target for the robot's end-effector using a :class:`compas.geometry.Frame`.
+    """Represents a fully constrained pose target for the robot's end-effector using a [`Frame`][compas.geometry.Frame].
 
     When using a FrameTarget, the end-effector has no translational or rotational freedom.
     In another words, the pose of the end-effector is fully defined (constrained).
@@ -146,15 +146,15 @@ class FrameTarget(Target):
     the robot's Tool0 Coordinate Frame (T0CF) to the specified `FrameTarget.target_frame`.
 
     For robots with multiple end effector attachment points (such as the RFL Robot), the attachment point depends on
-    the planning group selected in the planning request, see :meth:`compas_fab.robots.Robot.plan_motion`.
+    the planning group selected in the planning request.
 
     Attributes
     ----------
-    target_frame : :class:`compas.geometry.Frame`
+    target_frame : [`Frame`][compas.geometry.Frame]
         The target frame.
-    target_mode : :class:`TargetMode`
+    target_mode : `TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
-        See :class:`TargetMode` for more details.
+        See `TargetMode` for more details.
     native_scale : float, optional
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
@@ -210,7 +210,7 @@ class FrameTarget(Target):
 
         Returns
         -------
-        :class:`compas_fab.robots.FrameTarget`
+        [`FrameTarget`][compas_fab.robots.FrameTarget]
             The frame target.
         """
         return cls(
@@ -239,11 +239,11 @@ class FrameTarget(Target):
 
         Parameters
         ----------
-        transformation : :class:`compas.geometry.Transformation`
+        transformation : [`Transformation`][compas.geometry.Transformation]
             The transformation matrix.
-        target_mode : :class:`TargetMode`
+        target_mode : `TargetMode`
             The target mode specifies which link or frame is referenced when specifying a target.
-            See :class:`TargetMode` for more details.
+            See `TargetMode` for more details.
         native_scale : float, optional
             The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
             In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
@@ -263,7 +263,7 @@ class FrameTarget(Target):
 
         Returns
         -------
-        :class:`FrameTarget`
+        `FrameTarget`
             The frame target.
         """
         frame = Frame.from_transformation(transformation)
@@ -327,7 +327,7 @@ class PointAxisTarget(Target):
     where aligning the end-effector with a target axis is crucial,
     but the orientation around the axis is not important.
     Note that PointAxisTarget only represents a single target,
-    for a sequence of targets, consider using :class:`PointAxisWaypoints`.
+    for a sequence of targets, consider using `PointAxisWaypoints`.
 
     The user must define (1) the target point of which the tool tip will reach
     and (2) the target axis where the tool tip coordinate frame (TCF)'s Z axis
@@ -336,19 +336,19 @@ class PointAxisTarget(Target):
 
     For robots with multiple end effector attachment points, the FCF depends on
     the planning group setting in the planning request, as defined in an SRDF file or
-    :class:`compas_fab.robots.RobotSemantics`.
+    [`RobotSemantics`][compas_fab.robots.RobotSemantics].
 
     Attributes
     ----------
-    target_point : :class:`compas.geometry.Point`
+    target_point : [`Point`][compas.geometry.Point]
         The target point defined relative to the world coordinate frame (WCF).
-    target_z_axis : :class:`compas.geometry.Vector`
+    target_z_axis : [`Vector`][compas.geometry.Vector]
         The target axis is defined by the target_point and pointing towards this vector.
         A unitized vector is recommended.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
-    target_mode : :class:`TargetMode`
+    target_mode : `TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
-        See :class:`TargetMode` for more details.
+        See `TargetMode` for more details.
     native_scale : float, optional
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_point.scale(native_scale)` will convert the input point to meter unit.
@@ -407,7 +407,7 @@ class PointAxisTarget(Target):
 
         Returns
         -------
-        :class:`compas_fab.robots.PointAxisTarget`
+        [`PointAxisTarget`][compas_fab.robots.PointAxisTarget]
             The point axis target.
         """
         return cls(
@@ -485,19 +485,19 @@ class ConfigurationTarget(Target):
 
     The number of joints in the target configuration should match the number of joints
     in the robot's planning group. Otherwise the behavior of the backend planner may
-    be undefined. See tutorial :ref:`targets` for more details.
+    be undefined. See tutorial `targets` for more details.
 
     Attributes
     ----------
-    target_configuration : :class:`compas_robots.Configuration`
+    target_configuration : [`Configuration`][compas_robots.Configuration]
         The target configuration. joint_names and joint_values must be specified.
         Defaults unit is radians for revolute and continuous joints, and meters for prismatic joints.
-    tolerance_above : :obj:`list` of :obj:`float`, optional
+    tolerance_above : `list` of `float`, optional
         Acceptable deviation above the targeted configurations. One for each joint.
         Always use positive values.
         Units must be in meters for prismatic joints and radians for revolute and continuous joints.
         If not specified, the default value from the planner is used.
-    tolerance_below : :obj:`list` of :obj:`float`, optional
+    tolerance_below : `list` of `float`, optional
         Acceptable deviation below the targeted configurations. One for each joint.
         Always use positive values.
         Units must be in meters for prismatic joints and radians for revolute and continuous joints.
@@ -561,7 +561,7 @@ class ConfigurationTarget(Target):
 
         Returns
         -------
-        :obj:`tuple` of (:obj:`list` of :obj:`float`, :obj:`list` of :obj:`float`)
+        `tuple` of (`list` of `float`, `list` of `float`)
             The tolerances_above and tolerances_below lists.
 
         Examples
@@ -610,7 +610,7 @@ class ConfigurationTarget(Target):
 
     #     Returns
     #     -------
-    #     :class:`ConfigurationTarget`
+    #     `ConfigurationTarget`
     #         The scaled configuration target.
     #     """
     #     target_configuration = self.target_configuration.scaled(factor)
@@ -680,14 +680,14 @@ class ConstraintSetTarget(Target):
     ConstraintSetTarget is suitable for advanced users who want to specify
     custom constraints for the robot motion planning.
     Different planner backends may support different types of Constraints.
-    See tutorial :ref:`targets` for more details.
+    See tutorial `targets` for more details.
 
     ConstraintSetTarget is only supported by Free motion planning,
     Cartesian motion planning do not support this target type.
 
     Attributes
     ----------
-    constraint_set : :obj:`list` of :class:`compas_fab.robots.Constraint`
+    constraint_set : `list` of [`Constraint`][compas_fab.robots.Constraint]
         A list of constraints to be satisfied.
     name : str, optional
         The human-readable name of the target.
@@ -717,22 +717,22 @@ class Waypoints(Target):
     """Represents a sequence of kinematic target for motion planning.
 
     Waypoints represent a sequence of targets the robot should pass through in the order they are defined.
-    This is in contrast to :class:`Target` which represent only a single target.
+    This is in contrast to `Target` which represent only a single target.
     The initial (starting) point should not be included in the waypoints list.
     It is valid for a Waypoints object to have one target.
 
     Waypoints are useful for tasks like painting, welding, or 3D printing, where the programmer
     wants to define the waypoints the robot should pass through.
 
-    Waypoints are intended to be used for motion planning with a planning backend by using :meth:`compas_fab.robot.plan_cartesian_motion`.
+    Waypoints are intended to be used for motion planning with a planning backend by using [`plan_cartesian_motion`][compas_fab.robots.plan_cartesian_motion].
     Note that different backends support different types of waypoints.
     The method of interpolation between the waypoints is controlled by the motion planner backend.
 
     Attributes
     ----------
-    target_mode : :class:`TargetMode`, optional
+    target_mode : `TargetMode`, optional
         The target mode specifies which link or frame is referenced when specifying a target.
-        See :class:`TargetMode` for more details.
+        See `TargetMode` for more details.
     native_scale : float, optional
         The native scale factor of the waypoint targets defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
@@ -743,8 +743,8 @@ class Waypoints(Target):
 
     See Also
     --------
-    :class:`PointAxisWaypoints`
-    :class:`FrameWaypoints`
+    `PointAxisWaypoints`
+    `FrameWaypoints`
     """
 
     def __init__(self, target_mode: TargetMode = None, native_scale: float = 1.0, name: str = "Generic Waypoints"):
@@ -752,20 +752,20 @@ class Waypoints(Target):
 
 
 class FrameWaypoints(Waypoints):
-    """Represents a sequence of fully constrained pose target for the robot's end-effector using a :class:`compas.geometry.Frame`.
+    """Represents a sequence of fully constrained pose target for the robot's end-effector using a [`Frame`][compas.geometry.Frame].
 
     When using a FrameWaypoints, the end-effector has no translational or rotational freedom.
     In another words, the pose of the end-effector is fully defined (constrained).
 
-    The behavior of FrameWaypoints is similar to :class:`FrameTarget`, but it represents a sequence of targets.
+    The behavior of FrameWaypoints is similar to `FrameTarget`, but it represents a sequence of targets.
 
     Attributes
     ----------
-    target_frames : :obj:`list` of :class:`compas.geometry.Frame`
+    target_frames : `list` of [`Frame`][compas.geometry.Frame]
         The target frames.
-    target_mode : :class:`TargetMode`
+    target_mode : `TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
-        See :class:`TargetMode` for more details.
+        See `TargetMode` for more details.
     native_scale : float, optional
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter unit.
@@ -824,11 +824,11 @@ class FrameWaypoints(Waypoints):
 
         Parameters
         ----------
-        transformations : :obj:`list` of :class: `compas.geometry.Transformation`
+        transformations : `list` of [`Transformation`][compas.geometry.Transformation]
             The list of transformation matrices.
-        target_mode : :class:`TargetMode`
+        target_mode : `TargetMode`
             The target mode specifies which link or frame is referenced when specifying a target.
-            See :class:`TargetMode` for more details.
+            See `TargetMode` for more details.
         native_scale : float, optional
             The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
             In another words, `input_frame.scale(native_scale)` will convert the input frame to meter unit.
@@ -848,7 +848,7 @@ class FrameWaypoints(Waypoints):
 
         Returns
         -------
-        :class:`FrameWaypoints`
+        `FrameWaypoints`
             The frame waypoints.
         """
         frames = [Frame.from_transformation(transformation) for transformation in transformations]
@@ -904,18 +904,18 @@ class PointAxisWaypoints(Waypoints):
     where aligning the end-effector with a target axis is crucial,
     but the orientation around the axis is not important.
 
-    The behavior of PointAxisWaypoints is similar to :class:`PointAxisTarget`, but it represents a sequence of targets.
-    See :class:`PointAxisTarget` for more details.
+    The behavior of PointAxisWaypoints is similar to `PointAxisTarget`, but it represents a sequence of targets.
+    See `PointAxisTarget` for more details.
 
     Attributes
     ----------
-    target_points_and_axes : :obj:`list` of :obj:`tuple` of (:class:`compas.geometry.Point`, :class:`compas.geometry.Vector`)
+    target_points_and_axes : `list` of `tuple` of ([`Point`][compas.geometry.Point], [`Vector`][compas.geometry.Vector])
         The target points and axes.
         Both values are defined relative to the world coordinate frame (WCF).
         Unitized vectors are recommended for the target axes.
-    target_mode : :class:`TargetMode`
+    target_mode : `TargetMode`
         The target mode specifies which link or frame is referenced when specifying a target.
-        See :class:`TargetMode` for more details.
+        See `TargetMode` for more details.
     native_scale : float, optional
         The native scale factor of the target points defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_point.scale(native_scale)` will convert the input point to meter unit.

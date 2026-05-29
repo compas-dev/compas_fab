@@ -13,14 +13,14 @@ class OrthonormalVectorsFromAxisGenerator:
 
     Parameters
     ----------
-    axis : :class:`compas.geometry.Vector`
+    axis : [`Vector`][compas.geometry.Vector]
         The axis to which the vectors should be orthonormal to.
     angle_step : float
         The angle in radians as the spacing between generated vectors.
 
     Yields
     ------
-    :class:`compas.geometry.Vector`
+    [`Vector`][compas.geometry.Vector]
         The orthonormal vector.
 
     Examples
@@ -74,7 +74,7 @@ class DeviationVectorsGenerator:
 
     Parameters
     ----------
-    axis : :class:`compas.geometry.Vector`
+    axis : [`Vector`][compas.geometry.Vector]
         The axis about which to calculate vectors.
     max_alpha : float
         The maximum angle in radians that a vector should deviate from the axis.
@@ -83,7 +83,7 @@ class DeviationVectorsGenerator:
 
     Yields
     ------
-    list of :class:`compas.geometry.Vector`
+    list of [`Vector`][compas.geometry.Vector]
 
     Examples
     --------

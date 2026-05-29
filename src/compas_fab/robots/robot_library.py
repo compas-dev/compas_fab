@@ -19,7 +19,7 @@ __all__ = [
 
 class ToolLibrary:
     """A collection of built-in tools that can be used for testing and demonstration.
-    The :class:`compas_robot.ToolModel` objects created by the factory methods
+    The [compas_robots.ToolModel][] objects created by the factory methods
     can be used to write examples, so that the example code can stay short.
 
     Some of the tools are created programmatically, these usually contain simple shapes such as cones, boxes, etc.
@@ -31,9 +31,9 @@ class ToolLibrary:
     Some of the tools have a kinematic chain, which is used to represent shape-changing tools such as a gripper with jaws.
     These are referred to kinematic tools in the compas_fab library.
     The kinematic chain is represented similar to a RobotModel. The configuration of the kinematic chain can be described
-    in the context of a RobotCell using :class:`compas_fab.robots.ToolState` object in :attr:`compas_fab.robots.RobotCellState.tool_states`.
+    in the context of a RobotCell using [`ToolState`][compas_fab.robots.ToolState] object in [`RobotCellState.tool_states`][compas_fab.robots.RobotCellState.tool_states].
 
-    All the tools are modelled following ROS REP 199 recommendations (`REP 199 https://gavanderhoorn.github.io/rep/rep-0199.html>`_)
+    All the tools are modelled following [ROS REP 199](https://gavanderhoorn.github.io/rep/rep-0199.html) recommendations,
     where the tool's base frame is attached to the link named 'flange' in the RobotModel.
     The 'flange' link frame must have its Positive X (x+) point away from the last link.
 
@@ -65,17 +65,17 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
-        radius: :obj:`float`, optional
+        radius: `float`, optional
             Default is `0.02`, which means that the radius of the cone is 2cm.
-        length: :obj:`float`, optional
+        length: `float`, optional
             Default is `0.1`, which means that the length of the cone is 10cm.
 
         Returns
         -------
-        :class:`compas_fab.robots.ToolModel`
+        [`ToolModel`][compas_fab.robots.ToolModel]
             Newly created instance of the tool.
         """
         tool_frame = Frame([length, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
@@ -107,10 +107,10 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
-        tool_size: :obj:`float`, optional
+        tool_size: `float`, optional
             Default is `1.0`, which means that the tool tip is 1m away from the base frame.
         """
 
@@ -144,13 +144,13 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
 
         Returns
         -------
-        :class:`compas_fab.robots.ToolModel`
+        [`ToolModel`][compas_fab.robots.ToolModel]
             Newly created instance of the tool.
         """
         tool_frame = Frame([0.1, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
@@ -193,13 +193,13 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
 
         Returns
         -------
-        :class:`compas_fab.robots.ToolModel`
+        [`ToolModel`][compas_fab.robots.ToolModel]
             Newly created instance of the tool.
         """
         tool_frame = Frame([0.05, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
@@ -249,13 +249,13 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
 
         Returns
         -------
-        :class:`compas_fab.robots.ToolModel`
+        [`ToolModel`][compas_fab.robots.ToolModel]
             Newly created instance of the tool.
         """
 
@@ -308,7 +308,7 @@ class RigidBodyLibrary:
 
 class RobotCellLibrary:
     """A collection of built-in robot cells that can be used for testing and demonstrations.
-    The :class:`compas_fab.robots.RobotCell` and :class:`compas_fab.robots.RobotCellState`
+    The [`RobotCell`][compas_fab.robots.RobotCell] and [`RobotCellState`][compas_fab.robots.RobotCellState]
     objects created by the factory methods can be used to write examples,
     so that the example code can stay short.
 
@@ -345,18 +345,18 @@ class RobotCellLibrary:
     def rfl(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
+            Newly created robot cell and its default state.
         """
 
         robot_cell = RobotCell.from_urdf_and_srdf(
@@ -372,21 +372,21 @@ class RobotCellLibrary:
     def ur5(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a UR5 robot.
 
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         The main planning group of the robot is named 'manipulator'.
         The first and last link on the 'manipulator' group is named 'base_link' and 'tool0'.
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
+            Newly created robot cell and its default state.
         """
 
         robot_cell = RobotCell.from_urdf_and_srdf(
@@ -402,18 +402,18 @@ class RobotCellLibrary:
     def ur10e(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a UR10e robot.
 
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
+            Newly created robot cell and its default state.
         """
 
         robot_cell = RobotCell.from_urdf_and_srdf(
@@ -429,18 +429,18 @@ class RobotCellLibrary:
     def abb_irb4600_40_255(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a ABB irb4600-40/2.55 robot.
 
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
+            Newly created robot cell and its default state.
         """
 
         robot_cell = RobotCell.from_urdf_and_srdf(
@@ -456,18 +456,18 @@ class RobotCellLibrary:
     def abb_irb120_3_58(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a ABB irb120-3/58 robot.
 
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
+            Newly created robot cell and its default state.
         """
 
         robot_cell = RobotCell.from_urdf_and_srdf(
@@ -483,18 +483,18 @@ class RobotCellLibrary:
     def panda(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a Panda robot.
 
-        The returned :class:`compas_fab.robots.Robot` object contains the robot model and semantics.
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            Newly created instance of the robot.
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
+            Newly created robot cell and its default state.
         """
 
         robot_cell = RobotCell.from_urdf_and_srdf(
@@ -530,12 +530,12 @@ class RobotCellLibrary:
     def ur5_cone_tool(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the UR5 robot with a cone tool attached. A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotCellLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.cone`
+        See [`RobotCellLibrary.ur5`][compas_fab.robots.RobotCellLibrary.ur5] and [`ToolLibrary.cone`][compas_fab.robots.ToolLibrary.cone]
         for details on the robot and tool.
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -543,7 +543,7 @@ class RobotCellLibrary:
 
         Returns
         -------
-        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -578,9 +578,7 @@ class RobotCellLibrary:
         # UR5 has the last planning link as 'tool0' not 'flange', therefore the cone tool
         # that is REP 199 compliant is attached with the following rotation to match.
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
-        robot_cell_state.set_tool_attached_to_group(
-            "cone", robot_cell.main_group_name, attachment_frame=attachment_frame, touch_links=touch_links
-        )
+        robot_cell_state.set_tool_attached_to_group("cone", robot_cell.main_group_name, attachment_frame=attachment_frame, touch_links=touch_links)
 
         # ------------------------------------------------------------------------
         # Static Rigid Body Touch Links
@@ -597,12 +595,12 @@ class RobotCellLibrary:
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotCellLibrary.ur5` and :meth:`compas_fab.robots.ToolLibrary.static_gripper_small`
+        See [`RobotCellLibrary.ur5`][compas_fab.robots.RobotCellLibrary.ur5] and [`ToolLibrary.static_gripper_small`][compas_fab.robots.ToolLibrary.static_gripper_small]
         for details on the robot and tool.
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -610,7 +608,7 @@ class RobotCellLibrary:
 
         Returns
         -------
-        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -631,9 +629,7 @@ class RobotCellLibrary:
 
         # Z axis is the length of the beam, X axis points away from the robot
         beam_length = 0.4
-        beam = Box.from_corner_corner_height(
-            [0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length
-        )
+        beam = Box.from_corner_corner_height([0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length)
         beam_mesh = Mesh.from_shape(beam)
         robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
@@ -663,9 +659,7 @@ class RobotCellLibrary:
         # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
         # However the last link with geometry attached is `wrist_3_link`.
 
-        robot_cell_state.set_tool_attached_to_group(
-            "gripper", robot_cell.main_group_name, attachment_frame, touch_links
-        )
+        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, attachment_frame, touch_links)
         # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
         # does not follow the REP 199 convention.
 
@@ -691,12 +685,12 @@ class RobotCellLibrary:
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.static_gripper`
+        See [`RobotCellLibrary.abb_irb4600_40_255`][compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255] and [`ToolLibrary.static_gripper`][compas_fab.robots.ToolLibrary.static_gripper]
         for details on the robot and tool.
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -704,7 +698,7 @@ class RobotCellLibrary:
 
         Returns
         -------
-        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -725,9 +719,7 @@ class RobotCellLibrary:
 
         # Z axis is the length of the beam, X axis points away from the robot
         beam_length = 1.0
-        beam = Box.from_corner_corner_height(
-            [0.0, -0.1, -beam_length * 0.5], [0.2, 0.1, -beam_length * 0.5], beam_length
-        )
+        beam = Box.from_corner_corner_height([0.0, -0.1, -beam_length * 0.5], [0.2, 0.1, -beam_length * 0.5], beam_length)
         beam_mesh = Mesh.from_shape(beam)
         robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
@@ -757,12 +749,12 @@ class RobotCellLibrary:
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotCellLibrary.ur10e` and :meth:`compas_fab.robots.ToolLibrary.static_gripper_small`
+        See [`RobotCellLibrary.ur10e`][compas_fab.robots.RobotCellLibrary.ur10e] and [`ToolLibrary.static_gripper_small`][compas_fab.robots.ToolLibrary.static_gripper_small]
         for details on the robot and tool.
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -770,7 +762,7 @@ class RobotCellLibrary:
 
         Returns
         -------
-        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -791,9 +783,7 @@ class RobotCellLibrary:
 
         # Z axis is the length of the beam, X axis points away from the robot
         beam_length = 0.4
-        beam = Box.from_corner_corner_height(
-            [0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length
-        )
+        beam = Box.from_corner_corner_height([0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length)
         beam_mesh = Mesh.from_shape(beam)
         robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
@@ -823,9 +813,7 @@ class RobotCellLibrary:
         # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
         # However the last link with geometry attached is `wrist_3_link`.
 
-        robot_cell_state.set_tool_attached_to_group(
-            "gripper", robot_cell.main_group_name, attachment_frame, touch_links
-        )
+        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, attachment_frame, touch_links)
         # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
         # does not follow the REP 199 convention.
 
@@ -850,12 +838,12 @@ class RobotCellLibrary:
         """Create and return the ABB irb4600-40-255 robot with a printing tool attached.
         A floor is also included.
 
-        See :meth:`compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255` and :meth:`compas_fab.robots.ToolLibrary.printing_tool`
+        See [`RobotCellLibrary.abb_irb4600_40_255`][compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255] and [`ToolLibrary.printing_tool`][compas_fab.robots.ToolLibrary.printing_tool]
         for details on the robot and tool.
 
         Parameters
         ----------
-        load_geometry: :obj:`bool`, optional
+        load_geometry: `bool`, optional
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -863,7 +851,7 @@ class RobotCellLibrary:
 
         Returns
         -------
-        tuple[:class:`compas_fab.robots.RobotCell`, :class:`compas_fab.robots.RobotCellState`]
+        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
             Newly created instance of the robot cell and robot cell state.
         """
         # ---------------------------------------------------------------------
@@ -898,9 +886,7 @@ class RobotCellLibrary:
         # Attach the tool to the robot's main group
         attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
         touch_links = ["link_6"]
-        robot_cell_state.set_tool_attached_to_group(
-            "printing_tool", robot_cell.main_group_name, attachment_frame, touch_links=touch_links
-        )
+        robot_cell_state.set_tool_attached_to_group("printing_tool", robot_cell.main_group_name, attachment_frame, touch_links=touch_links)
 
         # ------------------------------------------------------------------------
         # Static Rigid Body Touch Links
