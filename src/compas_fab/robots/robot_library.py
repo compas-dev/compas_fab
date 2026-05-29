@@ -345,7 +345,8 @@ class RobotCellLibrary:
     def rfl(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
+        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
@@ -372,7 +373,8 @@ class RobotCellLibrary:
     def ur5(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a UR5 robot.
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
+        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         The main planning group of the robot is named 'manipulator'.
         The first and last link on the 'manipulator' group is named 'base_link' and 'tool0'.
@@ -402,7 +404,8 @@ class RobotCellLibrary:
     def ur10e(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a UR10e robot.
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
+        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
@@ -429,7 +432,8 @@ class RobotCellLibrary:
     def abb_irb4600_40_255(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a ABB irb4600-40/2.55 robot.
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
+        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
@@ -456,7 +460,8 @@ class RobotCellLibrary:
     def abb_irb120_3_58(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a ABB irb120-3/58 robot.
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
+        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
@@ -483,7 +488,8 @@ class RobotCellLibrary:
     def panda(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Returns a Panda robot.
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
+        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
 
         Parameters
         ----------
@@ -685,7 +691,8 @@ class RobotCellLibrary:
         One beam (a RigidBody) is included and is attached to the gripper.
         A floor is also included.
 
-        See [`RobotCellLibrary.abb_irb4600_40_255`][compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255] and [`ToolLibrary.static_gripper`][compas_fab.robots.ToolLibrary.static_gripper]
+        See [`RobotCellLibrary.abb_irb4600_40_255`][compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255] and
+        [`ToolLibrary.static_gripper`][compas_fab.robots.ToolLibrary.static_gripper]
         for details on the robot and tool.
 
         Parameters
@@ -838,7 +845,8 @@ class RobotCellLibrary:
         """Create and return the ABB irb4600-40-255 robot with a printing tool attached.
         A floor is also included.
 
-        See [`RobotCellLibrary.abb_irb4600_40_255`][compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255] and [`ToolLibrary.printing_tool`][compas_fab.robots.ToolLibrary.printing_tool]
+        See [`RobotCellLibrary.abb_irb4600_40_255`][compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255]
+        and [`ToolLibrary.printing_tool`][compas_fab.robots.ToolLibrary.printing_tool]
         for details on the robot and tool.
 
         Parameters
