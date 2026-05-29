@@ -62,10 +62,6 @@ host, which is useful for headless planning, batch jobs, CI, and more.
 | COMPAS Viewer | ✓ | ✓ | ✓ | ✓ |
 | Headless / VS Code | ✓ | ✓ | ✓ | ✓ |
 
-PyBullet are notoriously difficult to run inside Rhino's
+PyBullet is notoriously difficult to run inside Rhino's
 Python because PyBullet ships no wheels for newer Python
-versions and doesn't compile easily. For Rhino users
-who want collision checking, the recommended option is
-to set up a separate Python environment with PyBullet
-and run collision checks in a subprocess, communicating
-with the main Rhino process over a local socket or similar.
+versions and doesn't compile easily.

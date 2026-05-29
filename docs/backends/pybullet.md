@@ -17,8 +17,7 @@ planning.
 - You are running headless (CI, batch planning) or from VS Code.
 - You want a PyBullet GUI to visualize the planning scene.
 
-PyBullet is **not** usable inside Rhino 7 or 8. From Rhino, serialize the
-planning problem and run the PyBullet planner from an outside Python process.
+PyBullet is difficult to install inside Rhino 8+.
 
 ## Trade-offs
 
