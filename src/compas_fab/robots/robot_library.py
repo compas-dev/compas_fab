@@ -31,7 +31,7 @@ class ToolLibrary:
     Some of the tools have a kinematic chain, which is used to represent shape-changing tools such as a gripper with jaws.
     These are referred to kinematic tools in the compas_fab library.
     The kinematic chain is represented similar to a RobotModel. The configuration of the kinematic chain can be described
-    in the context of a RobotCell using [`ToolState`][compas_fab.robots.ToolState] object in [`RobotCellState.tool_states`][compas_fab.robots.RobotCellState.tool_states].
+    in the context of a RobotCell using [`ToolState`][compas_fab.robots.ToolState] objects in [`RobotCellState`][compas_fab.robots.RobotCellState].tool_states.
 
     All the tools are modelled following [ROS REP 199](https://gavanderhoorn.github.io/rep/rep-0199.html) recommendations,
     where the tool's base frame is attached to the link named 'flange' in the RobotModel.

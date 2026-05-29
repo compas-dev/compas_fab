@@ -29,9 +29,9 @@ class JointTrajectoryPoint(Configuration):
     joint_values : `list` of `float`, optional
         Joint values expressed in radians or meters, depending on the respective
         type.
-    joint_types : `list` of [`Joint.TYPE`][compas_robots.Joint.TYPE], optional
+    joint_types : `list` of `Joint.TYPE`, optional
         Joint types, e.g. a `list` of
-        [`Joint.REVOLUTE`][compas_robots.Joint.REVOLUTE] for revolute joints.
+        `Joint.REVOLUTE` for revolute joints.
     velocities : `list` of `float`, optional
         Velocity of each joint.
     accelerations : `list` of `float`, optional
@@ -46,9 +46,9 @@ class JointTrajectoryPoint(Configuration):
     joint_values : `list` of `float`
         Joint values expressed in radians or meters, depending on the respective
         type.
-    joint_types : `list` of [`Joint.TYPE`][compas_robots.Joint.TYPE]
+    joint_types : `list` of `Joint.TYPE`
         Joint types, e.g. a `list` of
-        [`Joint.REVOLUTE`][compas_robots.Joint.REVOLUTE] for revolute joints.
+        `Joint.REVOLUTE` for revolute joints.
     velocities : `list` of `float`
         Velocity of each joint.
     accelerations : `list` of `float`

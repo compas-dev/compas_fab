@@ -16,8 +16,8 @@ class RobotSemantics(Data):
     The semantic model is based on the
     `Semantic Robot Description Format` ([SRDF](https://wiki.ros.org/srdf)).
     Typically, the RobotSemantics objects are created from an SRDF file (using `from_srdf_file`)
-    or loaded by the backend client (using [`PyBulletClient.load_semantics`][compas_fab.backends.PyBulletClient.load_semantics] or
-    [`RosClient.load_robot`][compas_fab.backends.RosClient.load_robot]).
+    or loaded as part of a [`RobotCell`][compas_fab.robots.RobotCell] by a backend client
+    (e.g. [`RosClient.load_robot_cell`][compas_fab.backends.RosClient.load_robot_cell]).
 
     Parameters
     ----------
