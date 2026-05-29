@@ -1,4 +1,4 @@
-FROM osrf/ros:jazzy-desktop
+FROM ros:jazzy
 
 # MoveIt 2, Universal Robots driver + MoveIt config, rosbridge for compas_fab/roslibpy,
 # and rmw_zenoh_cpp for Zenoh-based transport (replacing DDS).
