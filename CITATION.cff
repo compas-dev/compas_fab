@@ -51,6 +51,9 @@ authors:
   - family-names: "Leung"
     given-names: "Victor Pok Yin"
     affiliation: "ETH Zürich"
+  - family-names: "Saral"
+    given-names: "Begüm"
+    affiliation: "Technical University of Munich"
 url: "https://github.com/compas-dev/compas_fab"
 repository-code: "https://github.com/compas-dev/compas_fab"
 license: MIT
@@ -105,3 +108,5 @@ preferred-citation:
       given-names: "Edvard"
     - family-names: "Leung"
       given-names: "Victor Pok Yin"
+    - family-names: "Saral"
+      given-names: "Begüm"
