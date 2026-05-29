@@ -7,56 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Changed
-
-* Changed the default HTTP file server port used by `RosClient.load_robot_cell` (and `HttpFileServerLoader`) from `9091` to `9190`. The previous default collided with the rosbridge port `9091` commonly used when remapping a ROS 2 stack to coexist with a ROS 1 stack (rosbridge `9090` + ROS 2 rosbridge `9091`), causing HTTP 404s when the loader hit the bridge instead of the file server. `9190` stays clear of the 909x cluster while remaining mnemonic. The `docker-compose-ros2.yml` test stack and the `ros2-ur10e-demo` reference stack both default `ROS2_HTTP_PORT` and the container-internal port to `9190` to match.
-
 ### Added
 
 * New backend page [Analytical IK + PyBullet](backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner`, the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.
 * `docs/backends/pybullet.md` now flags that free-space `plan_motion` is not yet implemented for `PyBulletPlanner` (Cartesian motion via `plan_cartesian_motion` works).
-
-### Fixed (examples)
-
-* Fixed three analytical/PyBullet examples that crashed at startup due to cell-state desync after objects were added to the cell:
-  * `docs/backends/analytical_kinematics/files/02_inverse_kinematics with_tools.py`: now refreshes the state from the cell after adding the cone tool.
-  * `docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py`: rewritten to use the pre-configured `RobotCellLibrary.abb_irb4600_40_255_printing_tool()` cell (which has the correct `touch_links` semantics) and derives its target frame via FK from a chosen seed pose. Was previously crashing on `KeyError: 'cone'` and then yielding 0 IK solutions even after that.
-  * `docs/backends/pybullet/files/04_ik_semi_constrained.py`: now creates the `target_marker` rigid body state explicitly (was crashing on `KeyError: 'target_marker'`).
-* `docs/backends/analytical_kinematics/files/03_iter_ik_pybullet.py` (already covered above) now derives its target via FK for clarity.
-* `docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py` now has a comment noting that `matplotlib` is an optional dependency that must be installed separately.
-* All analytical-backend examples now import solver classes (`UR5Kinematics`, `ABB_IRB4600_40_255Kinematics`) from `compas_fab.backends` (the public top-level path), not the private `compas_fab.backends.kinematics.solvers`.
-
-### Changed
-
-* Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
-* Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
-* Split `docs/installation.md` into a focused library-install page (uv/pip/conda + verify) and a new `docs/frontends.md` covering CAD environment setup (Rhino 8, Grasshopper, Blender, COMPAS Viewer, headless). The new front-ends page also documents which CAD environments work with which backends, surfacing the limitation that PyBullet cannot run inside Rhino's interpreter.
-* Rebranded the old `tutorial.md` as `concepts.md`: a backend-agnostic walkthrough of the data model (`RobotCell`, `RobotCellState`, `Target`/`Waypoints`, `TargetMode`). No planner calls, the concepts page now reads as "this is the data; backends are how you execute it" and links out to the backends section for the actual planning calls.
-* Rewrote `docs/index.md` as a real landing page (was a 1-paragraph blurb): leads with the five-backend table, "I want to..." quick links, and a four-step what's-next list. Updated MkDocs nav to surface the new structure (Home → Installation → CAD front-ends → Concepts → Backends → API → Developer guide).
-
-### Fixed
-
-* `AnalyticalPybulletInverseKinematics._iter_inverse_kinematics_frame_target` was silently dropping every collision-free IK candidate. The `try`/`except CollisionCheckError` block had no `else` branch — when the collision check passed (no exception), the configuration was never yielded. Added the missing `else: yield configuration`. Verified end-to-end with the `03_iter_ik_pybullet.py` example, which now returns 6 valid + 2 colliding configurations (was: 0 valid + all 8 reported as colliding).
-* `AnalyticalInverseKinematics.iter_inverse_kinematics` and its `_iter_inverse_kinematics_frame_target` helper had `group: Optional[str]` declared without a default, while the parent `InverseKinematics` interface and all example usages treat `group` as optional. Added `= None` so calls like `planner.iter_inverse_kinematics(target, start_state)` work as documented.
-* Cleared stale docstring parameters across `compas_fab.backends` interfaces and backend feature implementations (`robot`, `client`, `solver`, `planner_type`) that no longer matched their signatures, plus a confusingly-indented continuation line in `RigidBodyState.attached_to_link`. `invoke docs` now builds with zero warnings.
-
-### Changed
-
-* Bumped `compas_robots` requirement from `>=0.6,<1` to `>=1,<2`.
-* Migrated packaging to `pyproject.toml`.
-* Cleaned up `requirements-dev.txt`.
-* Python classifiers trimmed to 3.9 (minimum, required for Rhino 8) and 3.13 (latest).
-* Unpinned `roslibpy` from `1.8.1` to `>=2.0,<3` in preparation for ROS 2 support.
-* Updated `ActionClient` and `Goal` imports from `roslibpy.actionlib` to `roslibpy.ros1.actionlib` following the breaking namespace change in `roslibpy` 2.x.
-
-### Removed
-
-* All Sphinx-era documentation sources: every `docs/**/*.rst`, the `docs/conf.py` Sphinx config, the `docs/_static/` and `docs/_images/` asset folders, the `docs/developer/generated/` autosummary output, `docs/spelling_wordlist.txt` and `docs/doc_versions.txt` (the latter superseded by `mike`'s gh-pages versioning).
-* `.. autosummary::`, `.. toctree::` and `.. currentmodule::` directives from all module-level `__init__.py` docstrings (replaced with prose + intra-doc Markdown links resolved by `mkdocstrings`).
-* Removed `DirectUrActionClient` and associated `direct_ur` messages module since this UR-specific action client was outdated and unused.
-
-### Added
-
 * New `ros2-ur10e-demo` docker reference backend (ROS 2 Jazzy + MoveIt 2 + UR10e) with a `ur-sim` service running the official `universalrobots/ursim_e-series` Polyscope simulator, a `zenoh-router` service running `rmw_zenohd` as the RMW transport (replaces DDS, no more multicast discovery issues on Docker Desktop), a `ur-driver` service running the real `ur_robot_driver` against the simulator (with the ros2_control + RTDE update rate lowered from the default 500 Hz to 100 Hz via a baked-in `update_rate.yaml`, to stop the controller manager from spamming "Overrun detected!" warnings under Docker virtualisation), `moveit-demo` running `ur_moveit.launch.py`, rosbridge on `9090`, an HTTP file server on `9091` for serving meshes from `/opt/ros/jazzy/share/`, and a `theasp/novnc` web GUI on `8080` for viewing RViz.
 * New `compas_fab.backends.HttpFileServerLoader` that mirrors `RosFileServerLoader`'s interface but fetches meshes over plain HTTP and reads URDF/SRDF from rosbridge topics (the ROS 2 convention) instead of ROS parameters.
 * Migrated documentation from Sphinx to MkDocs Material, matching the structure used in `compas_robots`. New `mkdocs.yml` at the repository root; documentation sources are now Markdown (`docs/*.md`) with API pages driven by `mkdocstrings`. Backlinks are disabled. `inventories` includes `compas`, `compas_robots`, and `compas_viewer`. Sphinx config (`docs/conf.py`) and Sphinx-only `docs/requirements.txt` have been removed; `tasks.py` now invokes `compas_invocations2.mkdocs.docs` so `invoke docs` builds the MkDocs site.
@@ -196,6 +150,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Changed the default HTTP file server port used by `RosClient.load_robot_cell` (and `HttpFileServerLoader`) from `9091` to `9190`. The previous default collided with the rosbridge port `9091` commonly used when remapping a ROS 2 stack to coexist with a ROS 1 stack (rosbridge `9090` + ROS 2 rosbridge `9091`), causing HTTP 404s when the loader hit the bridge instead of the file server. `9190` stays clear of the 909x cluster while remaining mnemonic. The `docker-compose-ros2.yml` test stack and the `ros2-ur10e-demo` reference stack both default `ROS2_HTTP_PORT` and the container-internal port to `9190` to match.
+* Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
+* Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
+* Split `docs/installation.md` into a focused library-install page (uv/pip/conda + verify) and a new `docs/frontends.md` covering CAD environment setup (Rhino 8, Grasshopper, Blender, COMPAS Viewer, headless). The new front-ends page also documents which CAD environments work with which backends, surfacing the limitation that PyBullet cannot run inside Rhino's interpreter.
+* Rebranded the old `tutorial.md` as `concepts.md`: a backend-agnostic walkthrough of the data model (`RobotCell`, `RobotCellState`, `Target`/`Waypoints`, `TargetMode`). No planner calls, the concepts page now reads as "this is the data; backends are how you execute it" and links out to the backends section for the actual planning calls.
+* Rewrote `docs/index.md` as a real landing page (was a 1-paragraph blurb): leads with the five-backend table, "I want to..." quick links, and a four-step what's-next list. Updated MkDocs nav to surface the new structure (Home → Installation → CAD front-ends → Concepts → Backends → API → Developer guide).
+* Bumped `compas_robots` requirement from `>=0.6,<1` to `>=1,<2`.
+* Migrated packaging to `pyproject.toml`.
+* Cleaned up `requirements-dev.txt`.
+* Python classifiers trimmed to 3.9 (minimum, required for Rhino 8) and 3.13 (latest).
+* Unpinned `roslibpy` from `1.8.1` to `>=2.0,<3` in preparation for ROS 2 support.
+* Updated `ActionClient` and `Goal` imports from `roslibpy.actionlib` to `roslibpy.ros1.actionlib` following the breaking namespace change in `roslibpy` 2.x.
 * Changed CI workflow for IronPython.
 * Updated compas requirement to > 2.3
 * Changed `client` parameter in `PlannerInterface(client)` to default to `None`.
@@ -234,8 +200,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Changed `PyBulletClient.connect()` and `PyBulletClient.disconnect()` to take a `verbose` parameter.
 * Changed `PyBulletClient._handle_concavity()` to ignore the `redirect_stdout` context manager to avoid the mysterious `WinError 6: The handle is invalid.` error.
 
+### Fixed
+
+* `AnalyticalPybulletInverseKinematics._iter_inverse_kinematics_frame_target` was silently dropping every collision-free IK candidate. The `try`/`except CollisionCheckError` block had no `else` branch — when the collision check passed (no exception), the configuration was never yielded. Added the missing `else: yield configuration`. Verified end-to-end with the `03_iter_ik_pybullet.py` example, which now returns 6 valid + 2 colliding configurations (was: 0 valid + all 8 reported as colliding).
+* `AnalyticalInverseKinematics.iter_inverse_kinematics` and its `_iter_inverse_kinematics_frame_target` helper had `group: Optional[str]` declared without a default, while the parent `InverseKinematics` interface and all example usages treat `group` as optional. Added `= None` so calls like `planner.iter_inverse_kinematics(target, start_state)` work as documented.
+* Cleared stale docstring parameters across `compas_fab.backends` interfaces and backend feature implementations (`robot`, `client`, `solver`, `planner_type`) that no longer matched their signatures, plus a confusingly-indented continuation line in `RigidBodyState.attached_to_link`. `invoke docs` now builds with zero warnings.
+* Fixed three analytical/PyBullet examples that crashed at startup due to cell-state desync after objects were added to the cell:
+  * `docs/backends/analytical_kinematics/files/02_inverse_kinematics with_tools.py`: now refreshes the state from the cell after adding the cone tool.
+  * `docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py`: rewritten to use the pre-configured `RobotCellLibrary.abb_irb4600_40_255_printing_tool()` cell (which has the correct `touch_links` semantics) and derives its target frame via FK from a chosen seed pose. Was previously crashing on `KeyError: 'cone'` and then yielding 0 IK solutions even after that.
+  * `docs/backends/pybullet/files/04_ik_semi_constrained.py`: now creates the `target_marker` rigid body state explicitly (was crashing on `KeyError: 'target_marker'`).
+* `docs/backends/analytical_kinematics/files/03_iter_ik_pybullet.py` (already covered above) now derives its target via FK for clarity.
+* `docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py` now has a comment noting that `matplotlib` is an optional dependency that must be installed separately.
+* All analytical-backend examples now import solver classes (`UR5Kinematics`, `ABB_IRB4600_40_255Kinematics`) from `compas_fab.backends` (the public top-level path), not the private `compas_fab.backends.kinematics.solvers`.
+
 ### Removed
 
+* All Sphinx-era documentation sources: every `docs/**/*.rst`, the `docs/conf.py` Sphinx config, the `docs/_static/` and `docs/_images/` asset folders, the `docs/developer/generated/` autosummary output, `docs/spelling_wordlist.txt` and `docs/doc_versions.txt` (the latter superseded by `mike`'s gh-pages versioning).
+* `.. autosummary::`, `.. toctree::` and `.. currentmodule::` directives from all module-level `__init__.py` docstrings (replaced with prose + intra-doc Markdown links resolved by `mkdocstrings`).
+* Removed `DirectUrActionClient` and associated `direct_ur` messages module since this UR-specific action client was outdated and unused.
 * Removed support for Python '3.8'.
 * Removed `compas_fab.backends.CollisionError`.
 * Removed `compas_fab.backends.AddCollisionMesh` from backend features.
