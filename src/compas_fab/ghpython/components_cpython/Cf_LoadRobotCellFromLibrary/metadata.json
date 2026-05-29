@@ -11,7 +11,7 @@
         "inputParameters": [
             {
                 "name": "name",
-                "description": "Name of the RobotCellLibrary classmethod to call (e.g. 'ur5', 'ur10e', 'abb_irb4600_40_255', 'abb_irb120_3_58', 'panda', 'rfl', 'ur5_cone_tool', 'abb_irb4600_40_255_printing_tool').",
+                "description": "Name of the RobotCellLibrary classmethod to call. A dropdown is auto-created on first use with every available cell (e.g. 'ur5', 'ur10e', 'abb_irb4600_40_255', 'panda', 'rfl', 'ur5_cone_tool', 'abb_irb4600_40_255_printing_tool').",
                 "typeHintID": "str"
             },
             {

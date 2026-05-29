@@ -80,15 +80,16 @@ class ToolLibrary:
         """
         tool_frame = Frame([length, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
 
+        tool_model = ToolModel(visual=None, frame_in_tool0_frame=tool_frame, name="cone")
+        meshes = []
         if load_geometry:
             cone = Cone(radius, length, Frame.worldYZ())
-            tool_mesh = Mesh.from_shape(cone)
+            meshes.append(Mesh.from_shape(cone))
             # Do not use the cone.stl because it points towards the Z axis
             # tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
-        else:
-            tool_mesh = None
+        tool_model.add_link("cone_link", visual_meshes=meshes, collision_meshes=meshes)
 
-        return ToolModel(visual=tool_mesh, frame_in_tool0_frame=tool_frame, name="cone")
+        return tool_model
 
     @classmethod
     def printing_tool(cls, load_geometry: bool = True, tool_size: float = 1.0) -> ToolModel:

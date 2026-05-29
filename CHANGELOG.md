@@ -147,6 +147,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added `pragma: no cover` to all type-checking imports for better coverage report accuracy.
 * Added support for python '3.11'.
 * Added tests for `PyBulletClient` and `PyBulletPlanner` backend features, including Ik and FK agreement tests.
+* Redesigned the Grasshopper component library (CPython / Rhino 8) for the new stateless planning model. The legacy IronPython `components/` set was retired; all components now live under `src/compas_fab/ghpython/components_cpython/` and target Rhino 8 CPython exclusively. New categories under "COMPAS FAB":
+  * *Backends* — `Cf_RosClient`, `Cf_MoveItPlanner`, `Cf_AnalyticalKinematicsPlanner`.
+  * *Robot Cell* — `Cf_LoadRobotCellFromLibrary` (with an auto-created dropdown listing every `RobotCellLibrary` entry), `Cf_LoadRobotCellFromRos`, `Cf_LoadRobotCellFromUrdfSrdf`, `Cf_AddToolToCell`, `Cf_AddRigidBodyToCell`, `Cf_RigidBodyFromMesh`, `Cf_ToolFromLibrary`, `Cf_RigidBodyFromLibrary`.
+  * *Cell State* — `Cf_DefaultCellState`, `Cf_SetRobotConfiguration`, `Cf_AttachToolToRobot`, `Cf_AttachRigidBodyToTool`, `Cf_AttachRigidBodyToLink`, `Cf_SetRigidBodyFrame`, `Cf_SetTouchLinks`.
+  * *Targets* — `Cf_FrameTarget`, `Cf_PointAxisTarget`, `Cf_ConfigurationTarget`, `Cf_FrameWaypoints`, `Cf_PointAxisWaypoints`, `Cf_Configuration`.
+  * *Planning* — `Cf_ForwardKinematics`, `Cf_InverseKinematics`, `Cf_PlanMotion`, `Cf_PlanCartesianMotion`.
+  * *Display* — `Cf_VisualizeRobotCell` (uses the `RobotCellObject` scene object with native-geometry caching for smooth slider scrubbing).
+  * *ROS* — `Cf_RosTopicPublish`, `Cf_RosTopicSubscribe` (ported to the new `RosClient`).
+  * Planner calls take a `RobotCell` + `RobotCellState` + `Target` / `Waypoints` triple. Long-lived clients/planners use `scriptcontext.sticky`; user messages flow through `compas_ghpython.error`/`warning`/`remark`. Loader errors are caught and surfaced via clean error messages rather than letting tracebacks reach the GH canvas.
+* Added `compas_fab.ghpython.ensure_value_list`, a reusable helper for components that want to auto-create a Grasshopper `Value List` on an unconnected input (used by `Cf_LoadRobotCellFromLibrary` and intended for follow-on components like `Cf_FrameTarget`'s `target_mode` and solver-name pickers).
 
 ### Changed
 
@@ -212,6 +222,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `docs/backends/analytical_kinematics/files/03_iter_ik_pybullet.py` (already covered above) now derives its target via FK for clarity.
 * `docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py` now has a comment noting that `matplotlib` is an optional dependency that must be installed separately.
 * All analytical-backend examples now import solver classes (`UR5Kinematics`, `ABB_IRB4600_40_255Kinematics`) from `compas_fab.backends` (the public top-level path), not the private `compas_fab.backends.kinematics.solvers`.
+* `ToolLibrary.cone()` was not initializing a link on the underlying `ToolModel` when `load_geometry=False`, which left the tool's robot tree malformed and made any downstream `iter_joints()` / `get_configurable_joints()` call raise `AttributeError: 'NoneType' object has no attribute 'joints'`. As a result `RobotCellLibrary.ur5_cone_tool(load_geometry=False)` always crashed. The factory now calls `add_link("cone_link", visual_meshes=[...], collision_meshes=[...])` (mirroring `ToolLibrary.printing_tool()`) so the model is structurally valid in both geometry modes.
 
 ### Removed
 
