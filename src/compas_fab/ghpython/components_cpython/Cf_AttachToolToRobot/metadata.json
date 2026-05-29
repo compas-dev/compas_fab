@@ -19,8 +19,12 @@
                 "typeHintID": "str"
             },
             {
+                "name": "robot_cell",
+                "description": "Optional RobotCell — used to resolve the main planning group when `group` is left empty."
+            },
+            {
                 "name": "group",
-                "description": "Planning group to attach the tool to.",
+                "description": "Planning group to attach the tool to. If empty, the main planning group is taken from `robot_cell`.",
                 "typeHintID": "str"
             },
             {

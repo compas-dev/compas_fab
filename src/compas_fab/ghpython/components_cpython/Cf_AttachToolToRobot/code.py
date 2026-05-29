@@ -5,7 +5,9 @@ Attach a tool to a robot planning group inside a RobotCellState.
 Passthrough builder: the input state is copied, the attachment is set, and
 the new state is returned.
 
-Any tool already attached to the same group is automatically detached.
+If `group` is left empty, the cell's main planning group is used (requires
+`robot_cell` to be wired in). Any tool already attached to the same group is
+automatically detached.
 
 COMPAS FAB v1.1.0
 """
@@ -23,12 +25,20 @@ class AttachToolToRobot(Grasshopper.Kernel.GH_ScriptInstance):
         self,
         cell_state,
         tool_id: str,
+        robot_cell,
         group: str,
         attachment_plane,
         touch_links: System.Collections.Generic.List[str],
     ):
-        if cell_state is None or not tool_id or not group:
+        if cell_state is None or not tool_id:
             return cell_state
+
+        if not group:
+            if robot_cell is None:
+                raise ValueError(
+                    "`group` is empty and no `robot_cell` was wired in — provide one or the other so the tool's planning group can be resolved."
+                )
+            group = robot_cell.main_group_name
 
         attachment_frame = None
         if attachment_plane is not None:
