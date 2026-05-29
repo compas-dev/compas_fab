@@ -8,8 +8,9 @@ class AnalyticalSetRobotCellState(SetRobotCellState):
         the robot cell state. This function simply serves as the landing point for other BackendFeature to
         safely call `planner.set_robot_cell_state` without having to check if the planner actually supports it.
 
-        A copy of the RobotCellState object is stored in the client in case it is needed.
+        The given RobotCellState object is stored on the client by reference.
+        Pass ``robot_cell_state.copy()`` if you intend to mutate the object after this call.
 
         """
         # Update the robot cell in the client
-        self.client._robot_cell_state = robot_cell_state.copy()
+        self.client._robot_cell_state = robot_cell_state

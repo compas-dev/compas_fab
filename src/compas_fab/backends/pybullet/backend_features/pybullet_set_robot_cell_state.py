@@ -22,6 +22,9 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         This function is typically called by planning functions that accepts a start state as input.
         The user should not need to call this function directly.
 
+        The passed ``robot_cell_state`` is stored by reference on the client.
+        Pass ``robot_cell_state.copy()`` if you intend to mutate it after this call.
+
         The robot cell state must match the robot cell set earlier by :meth:`set_robot_cell`.
 
         If the robot_configuration is provided, the robot's configuration is updated and the
@@ -45,8 +48,12 @@ class PyBulletSetRobotCellState(SetRobotCellState):
         if robot_cell:
             robot_cell.assert_cell_state_match(robot_cell_state)
 
-        robot_cell_state = robot_cell_state.copy()
-
+        # NOTE: We intentionally do NOT copy `robot_cell_state` here. A deep copy via `Data.copy()` is expensive
+        # (full serialize / deserialize) and dominated the cost of `set_robot_cell_state` in profiling.
+        # The method only reads from the state; the only observable side effect of skipping the copy is that
+        # `client._robot_cell_state` aliases the object the caller passed in, so later mutations by the caller
+        # are visible on the client. Callers that need isolation must copy themselves (the PyBullet IK already
+        # does this for its own loop).
         # TODO: Check for modified object states and change those only
 
         # Sanity check to ensure that rigid bodies are not attached to hidden tools

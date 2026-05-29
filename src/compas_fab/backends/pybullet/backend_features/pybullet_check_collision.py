@@ -30,6 +30,8 @@ class PyBulletCheckCollision(CheckCollision):
         In each of the above steps, the collision check is skipped if the collision is allowed
         by the semantics of the robot, tool, or rigid body. For details, see in-line comments in code.
 
+        The passed ``state`` is stored by reference on the client while this function updates the planner
+        state. Pass ``state.copy()`` if you intend to mutate it after this call.
 
         A collision report is returned with the CollisionCheckError exception message.
         Following the fail-fast principle, the exception is raised when the first collision is detected.
