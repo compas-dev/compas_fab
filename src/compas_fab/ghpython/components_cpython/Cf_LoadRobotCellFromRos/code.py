@@ -69,7 +69,7 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                 if "404" in msg or "Not Found" in msg:
                     error(  # noqa: F821
                         ghenv.Component,  # noqa: F821
-                        "ROS load failed with HTTP 404. Detected ROS distro: '{}'. If your ROS is ROS 1, the client may be falling back to the ROS 2 HTTP loader. Either set the '/rosdistro' ROS parameter on the master, install rosapi, or uncheck load_geometry and use Cf_LoadRobotCellFromLibrary for visualization.".format(detected_distro),
+                        f"ROS load failed with HTTP 404. Detected ROS distro: '{detected_distro}'.",
                     )
                 else:
                     error(ghenv.Component, "ROS load failed: {}".format(e))  # noqa: F821
