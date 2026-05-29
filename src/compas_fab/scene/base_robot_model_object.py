@@ -40,9 +40,7 @@ class BaseRobotModelObject(SceneObject):
 
     MESH_JOIN_PRECISION = 12
 
-    def __init__(
-        self, draw_visual: bool = True, draw_collision: bool = False, native_scale: float = 1.0, *args, **kwargs
-    ):
+    def __init__(self, draw_visual: bool = True, draw_collision: bool = False, native_scale: float = 1.0, *args, **kwargs):
         super(BaseRobotModelObject, self).__init__(*args, **kwargs)
         self._draw_visual = draw_visual
         self._draw_collision = draw_collision
@@ -60,9 +58,7 @@ class BaseRobotModelObject(SceneObject):
         """The robot model this object is associated with."""
         return self.item
 
-    def draw(
-        self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None
-    ) -> list[object]:
+    def draw(self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None) -> list[object]:
         """Draw the robot model object in the respective CAD environment.
 
         This function conforms to `SceneObject.draw()` Interface and will return

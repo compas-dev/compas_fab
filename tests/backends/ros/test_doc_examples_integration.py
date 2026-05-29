@@ -28,11 +28,7 @@ from compas_fab.robots import ToolLibrary
 def ur5_robot_cell(ros2_client):
     robot_cell = ros2_client.load_robot_cell(load_geometry=False)
     if robot_cell.robot_model.name != "ur5":
-        pytest.skip(
-            "The ROS docs examples target the ROS 2 Jazzy UR5 stack; connected to {!r} instead.".format(
-                robot_cell.robot_model.name
-            )
-        )
+        pytest.skip("The ROS docs examples target the ROS 2 Jazzy UR5 stack; connected to {!r} instead.".format(robot_cell.robot_model.name))
     return robot_cell
 
 
@@ -360,8 +356,7 @@ def test_06_cartesian_motion_target_mode_example(ros2_client, ur5_robot_cell, pl
     # the foreign group name. Skip when running against ROS 2.
     if ros_loaded_cell.main_group_name != robot_cell.main_group_name:
         pytest.skip(
-            "Library cell and ROS-loaded cell disagree on planning group name "
-            "({!r} vs {!r}); WORKPIECE-mode cartesian motion needs them aligned.".format(
+            "Library cell and ROS-loaded cell disagree on planning group name ({!r} vs {!r}); WORKPIECE-mode cartesian motion needs them aligned.".format(
                 robot_cell.main_group_name, ros_loaded_cell.main_group_name
             )
         )

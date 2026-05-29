@@ -60,9 +60,7 @@ JointInfo = namedtuple(
         "parentIndex",
     ],
 )
-JointState = namedtuple(
-    "JointState", ["jointPosition", "jointVelocity", "jointReactionForces", "appliedJointMotorTorque"]
-)
+JointState = namedtuple("JointState", ["jointPosition", "jointVelocity", "jointReactionForces", "appliedJointMotorTorque"])
 LinkState = namedtuple(
     "LinkState",
     [

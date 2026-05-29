@@ -24,11 +24,7 @@ class AttachRigidBodyToTool(Grasshopper.Kernel.GH_ScriptInstance):
 
         attachment_frame = None
         if attachment_plane is not None:
-            attachment_frame = (
-                attachment_plane
-                if isinstance(attachment_plane, Frame)
-                else plane_to_compas_frame(attachment_plane)
-            )
+            attachment_frame = attachment_plane if isinstance(attachment_plane, Frame) else plane_to_compas_frame(attachment_plane)
 
         new_state = deepcopy(cell_state)
         new_state.set_rigid_body_attached_to_tool(

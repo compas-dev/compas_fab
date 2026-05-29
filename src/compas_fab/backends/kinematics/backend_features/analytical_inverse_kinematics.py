@@ -44,9 +44,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         """
         if isinstance(target, FrameTarget):
-            return self._iter_inverse_kinematics_frame_target(
-                target, start_state=start_state, group=group, options=options
-            )
+            return self._iter_inverse_kinematics_frame_target(target, start_state=start_state, group=group, options=options)
         else:
             raise BackendTargetNotSupportedError()
 
@@ -81,15 +79,11 @@ class AnalyticalInverseKinematics(InverseKinematics):
         target = target.normalized_to_meters()
         target_frame = target.target_frame
 
-        target_frame = planner.client.robot_cell.target_frames_to_pcf(
-            start_state, target_frame, target.target_mode, group=robot_cell.main_group_name
-        )
+        target_frame = planner.client.robot_cell.target_frames_to_pcf(start_state, target_frame, target.target_mode, group=robot_cell.main_group_name)
 
         return self.inverse_kinematics_ordered(target_frame, group=group, options=options)
 
-    def inverse_kinematics_ordered(
-        self, frame_WCF: Frame, group: Optional[str] = None, options: Optional[dict] = None
-    ) -> Generator[Optional[Configuration], None, None]:
+    def inverse_kinematics_ordered(self, frame_WCF: Frame, group: Optional[str] = None, options: Optional[dict] = None) -> Generator[Optional[Configuration], None, None]:
         """Calculate the robot's inverse kinematic (IK) for a given frame.
 
         The IK for 6-axis industrial robots returns by default 8 possible solutions.

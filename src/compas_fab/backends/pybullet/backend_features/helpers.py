@@ -57,9 +57,7 @@ def check_max_jump(
             difference = abs(v1 - v2)
             if difference > max_jump_revolute:
                 raise MPMaxJumpError(
-                    message="_check_max_jump(): Joint {} (REVOLUTE) jump {} is too large, exceeds 'max_jump_revolute' of {}".format(
-                        joint_name, difference, max_jump_revolute
-                    ),
+                    message="_check_max_jump(): Joint {} (REVOLUTE) jump {} is too large, exceeds 'max_jump_revolute' of {}".format(joint_name, difference, max_jump_revolute),
                     joint_name=joint_name,
                     joint_type=joint_type,
                     joint_values_a=start_joint_values,
@@ -74,9 +72,7 @@ def check_max_jump(
                 diff = 2 * pi - diff
             if diff > max_jump_revolute:
                 raise MPMaxJumpError(
-                    message="_check_max_jump(): Joint {} (CONTINUOUS) jump {} is too large, exceeds 'max_jump_revolute' of {}".format(
-                        joint_name, diff, max_jump_revolute
-                    ),
+                    message="_check_max_jump(): Joint {} (CONTINUOUS) jump {} is too large, exceeds 'max_jump_revolute' of {}".format(joint_name, diff, max_jump_revolute),
                     joint_name=joint_name,
                     joint_type=joint_type,
                     joint_values_a=start_joint_values,
@@ -89,9 +85,7 @@ def check_max_jump(
             diff = abs(v1 - v2)
             if diff > max_jump_prismatic:
                 raise MPMaxJumpError(
-                    message="_check_max_jump(): Joint {} (PRISMATIC/PLANAR) jump {} is too large, exceeds 'max_jump_prismatic' of {}".format(
-                        joint_name, diff, max_jump_prismatic
-                    ),
+                    message="_check_max_jump(): Joint {} (PRISMATIC/PLANAR) jump {} is too large, exceeds 'max_jump_prismatic' of {}".format(joint_name, diff, max_jump_prismatic),
                     joint_name=joint_name,
                     joint_type=joint_type,
                     joint_values_a=start_joint_values,

@@ -46,9 +46,7 @@ class MoveItInverseKinematics(InverseKinematics):
         # Initialize the super class
         super(MoveItInverseKinematics, self).__init__()
 
-    GET_POSITION_IK = ServiceDescription(
-        "/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response
-    )
+    GET_POSITION_IK = ServiceDescription("/compute_ik", "GetPositionIK", GetPositionIKRequest, GetPositionIKResponse, validate_response)
 
     def inverse_kinematics(
         self,
@@ -109,9 +107,7 @@ class MoveItInverseKinematics(InverseKinematics):
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
-        configuration = super(MoveItInverseKinematics, self).inverse_kinematics(
-            target, robot_cell_state, group, options
-        )
+        configuration = super(MoveItInverseKinematics, self).inverse_kinematics(target, robot_cell_state, group, options)
 
         # After the caching, it calls the iter_inverse_kinematics method below.
 
@@ -222,9 +218,7 @@ class MoveItInverseKinematics(InverseKinematics):
             # Insert any checks needed here. No checks at the moment.
             yield configuration
 
-    def _iter_inverse_kinematics_frame_target(
-        self, target: FrameTarget, robot_cell_state: "RobotCellState", group: str, options: Optional[dict] = None
-    ):
+    def _iter_inverse_kinematics_frame_target(self, target: FrameTarget, robot_cell_state: "RobotCellState", group: str, options: Optional[dict] = None):
         """Calculate the robot's inverse kinematic for a given frame target.
 
         This function is not exposed to the user and therefore docstrings
@@ -253,9 +247,7 @@ class MoveItInverseKinematics(InverseKinematics):
         planner.set_robot_cell_state(robot_cell_state)
 
         # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
-        target_pcf = client.robot_cell.target_frames_to_pcf(
-            robot_cell_state, target.target_frame, target.target_mode, group
-        )
+        target_pcf = client.robot_cell.target_frames_to_pcf(robot_cell_state, target.target_frame, target.target_mode, group)
 
         # ===================================================================================
         # Formatting input for ROS MoveIt
@@ -302,9 +294,7 @@ class MoveItInverseKinematics(InverseKinematics):
             # If result is unique, we yield it back to the user
             if result_is_unique:
                 return_full_configuration = options.get("return_full_configuration", False)
-                configuration = planner._build_configuration(
-                    joint_positions, joint_names, group, return_full_configuration, start_configuration
-                )
+                configuration = planner._build_configuration(joint_positions, joint_names, group, return_full_configuration, start_configuration)
                 yield configuration
                 all_yielded_joint_positions.append(joint_positions)
 
@@ -336,9 +326,7 @@ class MoveItInverseKinematics(InverseKinematics):
         # TODO: Implement support for FrameTarget.tolerance_position and FrameTarget.tolerance_orientation
         # Probably with constraints
 
-        joint_state = JointState(
-            name=start_configuration.joint_names, position=start_configuration.joint_values, header=header
-        )
+        joint_state = JointState(name=start_configuration.joint_names, position=start_configuration.joint_values, header=header)
 
         # The start state being in diff mode allows it to keep previously set Attached Collision Objects
         robot_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)

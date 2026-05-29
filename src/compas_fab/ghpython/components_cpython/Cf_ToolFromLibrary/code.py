@@ -21,13 +21,8 @@ class ToolFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
         name = name.strip().lower()
         loader = getattr(ToolLibrary, name, None)
         if loader is None:
-            available = [
-                attr for attr in dir(ToolLibrary)
-                if not attr.startswith("_") and callable(getattr(ToolLibrary, attr))
-            ]
-            raise ValueError(
-                "Unknown ToolLibrary entry '{}'. Available: {}".format(name, ", ".join(available))
-            )
+            available = [attr for attr in dir(ToolLibrary) if not attr.startswith("_") and callable(getattr(ToolLibrary, attr))]
+            raise ValueError("Unknown ToolLibrary entry '{}'. Available: {}".format(name, ", ".join(available)))
 
         load_geometry = True if load_geometry is None else load_geometry
         return loader(load_geometry=load_geometry)

@@ -115,9 +115,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
 
         # now select the path that is closest to the start configuration.
         first_configurations = [path[0] for path in paths]
-        diffs = [
-            sum([abs(d) for d in start_state.robot_configuration.iter_differences(c)]) for c in first_configurations
-        ]
+        diffs = [sum([abs(d) for d in start_state.robot_configuration.iter_differences(c)]) for c in first_configurations]
         idx = argmin(diffs)
 
         path = paths[idx]
@@ -139,9 +137,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         options: Optional[dict] = None,
     ) -> JointTrajectory:
         """Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."""
-        raise NotImplementedError(
-            "Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend."
-        )
+        raise NotImplementedError("Planning Cartesian motion with PointAxisWaypoints is not yet implemented in the Analytical backend.")
 
     def smooth_configurations(self, configurations: list[Configuration]) -> list[Configuration]:
         joint_values_corrected = []

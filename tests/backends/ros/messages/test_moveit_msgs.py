@@ -56,9 +56,7 @@ def test_cartesian_path_request_serializes_header_as_ros2_header():
 
 
 def test_motion_plan_request_serializes_workspace_header_as_ros2_header():
-    request = MotionPlanRequest(
-        workspace_parameters=WorkspaceParameters(header=Header(seq=10, stamp=Time(80, 20), frame_id="base_link"))
-    )
+    request = MotionPlanRequest(workspace_parameters=WorkspaceParameters(header=Header(seq=10, stamp=Time(80, 20), frame_id="base_link")))
 
     request.filter_fields_for_distro(RosDistro.JAZZY)
 

@@ -103,9 +103,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # The caching mechanism is implemented in the iter_inverse_kinematics method
         # located in InverseKinematics class. This method is just a wrapper around it
         # so that Intellisense and Docs can point here.
-        configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(
-            target, robot_cell_state, group, options
-        )
+        configuration = super(PyBulletInverseKinematics, self).inverse_kinematics(target, robot_cell_state, group, options)
 
         # After the caching, it calls the iter_inverse_kinematics method below.
 
@@ -189,9 +187,7 @@ class PyBulletInverseKinematics(InverseKinematics):
             self._check_configuration_match_group(initial_start_configuration, configuration, group)
             yield configuration
 
-    def _iter_inverse_kinematics_frame_target(
-        self, target: FrameTarget, robot_cell_state: RobotCellState, group: str, options: Optional[dict] = None
-    ):
+    def _iter_inverse_kinematics_frame_target(self, target: FrameTarget, robot_cell_state: RobotCellState, group: str, options: Optional[dict] = None):
         """Calculate the robot's inverse kinematic for a given FrameTarget.
 
         The PyBullet inverse kinematics solver make use of the gradient descent IK solver
@@ -285,9 +281,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         options["check_collision"] = options.get("check_collision", True)
         options["return_full_configuration"] = options.get("return_full_configuration", False)
-        options["solution_uniqueness_threshold_prismatic"] = options.get(
-            "solution_uniqueness_threshold_prismatic", 3e-4
-        )
+        options["solution_uniqueness_threshold_prismatic"] = options.get("solution_uniqueness_threshold_prismatic", 3e-4)
         options["solution_uniqueness_threshold_revolute"] = options.get("solution_uniqueness_threshold_revolute", 1e-3)
         options["verbose"] = options.get("verbose", False)
 
@@ -297,9 +291,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # TODO: Implement a fail fast mechanism to check if the attached tool and objects are in collision
 
         # Transform the Target.target_frame to Planner Coordinate Frame depending on target.target_mode
-        target_pcf = client.robot_cell.target_frames_to_pcf(
-            robot_cell_state, target.target_frame, target.target_mode, group
-        )
+        target_pcf = client.robot_cell.target_frames_to_pcf(robot_cell_state, target.target_frame, target.target_mode, group)
 
         # ===================================================================================
         # Formatting input for PyBullet
@@ -385,9 +377,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 set_random_config()
                 continue
 
-            assert len(joint_positions) == len(
-                joint_names_and_puids
-            ), "Number of returned joint positions from pybullet does not match number of joint ids"
+            assert len(joint_positions) == len(joint_names_and_puids), "Number of returned joint positions from pybullet does not match number of joint ids"
 
             # Setting the robot configuration so we can perform collision checking
             # This also updates the robot's pose in the client
@@ -414,9 +404,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                     continue
             # Construct the configuration
             return_full_configuration = options.get("return_full_configuration")
-            configuration = self._build_configuration(
-                joint_positions, joint_names_sorted, group, return_full_configuration, start_configuration
-            )
+            configuration = self._build_configuration(joint_positions, joint_names_sorted, group, return_full_configuration, start_configuration)
 
             # Unique solution checking
             if not uniqueness_checker.check(configuration, options):
@@ -438,9 +426,7 @@ class PyBulletInverseKinematics(InverseKinematics):
                 target_pcf=target_pcf,
             )
 
-    def _iter_inverse_kinematics_point_axis_target(
-        self, target: PointAxisTarget, robot_cell_state: RobotCellState, group: str, options: Optional[dict] = None
-    ):
+    def _iter_inverse_kinematics_point_axis_target(self, target: PointAxisTarget, robot_cell_state: RobotCellState, group: str, options: Optional[dict] = None):
         """Calculate the robot's inverse kinematic for a given PointAxisTarget.
 
         class:`~compas_fab.robots.PointAxisTarget` specify a target point and an axis in 3D space.
@@ -561,9 +547,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         # That one will set the max_results to 1 for the FrameTarget function
         options["max_descend_iterations"] = options.get("max_descend_iterations", 20)
 
-        options["solution_uniqueness_threshold_prismatic"] = options.get(
-            "solution_uniqueness_threshold_prismatic", 3e-4
-        )
+        options["solution_uniqueness_threshold_prismatic"] = options.get("solution_uniqueness_threshold_prismatic", 3e-4)
         options["solution_uniqueness_threshold_revolute"] = options.get("solution_uniqueness_threshold_revolute", 1e-3)
         options["check_collision"] = options.get("check_collision", True)
         options["return_full_configuration"] = options.get("return_full_configuration", False)
@@ -647,14 +631,10 @@ class PyBulletInverseKinematics(InverseKinematics):
                 rotated_frame = initial_frame.rotated(theta, initial_frame.zaxis, initial_frame.point)
                 if options["verbose"]:
                     print("Rotated Frame: {}, theta: {}".format(rotated_frame, theta))
-                frame_target = FrameTarget(
-                    rotated_frame, target.target_mode, target.tolerance_position, target.tolerance_orientation
-                )
+                frame_target = FrameTarget(rotated_frame, target.target_mode, target.tolerance_position, target.tolerance_orientation)
 
                 # Call underlying FrameTarget function to get IK solutions
-                ik_frame_target = self._iter_inverse_kinematics_frame_target(
-                    frame_target, robot_cell_state, group, frame_ik_options
-                )
+                ik_frame_target = self._iter_inverse_kinematics_frame_target(frame_target, robot_cell_state, group, frame_ik_options)
                 # We will only get one result from the FrameTarget function, if that result is None, we skip to the next rotation
                 try:
                     configuration = next(ik_frame_target)
@@ -676,9 +656,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         # If no solution is found after everything is exhausted, raise an error
         if len(uniqueness_checker.results) == 0:
-            raise InverseKinematicsError(
-                "No solution found after {} attempts (max_random_restart).".format(options.get("max_random_restart"))
-            )
+            raise InverseKinematicsError("No solution found after {} attempts (max_random_restart).".format(options.get("max_random_restart")))
 
     def _accurate_inverse_kinematics(
         self,
@@ -771,9 +749,7 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         return None
 
-    def _check_configuration_match_group(
-        self, start_configuration: Configuration, configuration: Configuration, group: str
-    ):
+    def _check_configuration_match_group(self, start_configuration: Configuration, configuration: Configuration, group: str):
         """Check if the configuration changed only the joints in the group.
 
         We assume that if a joint value is changed inadvertently, it is because
@@ -800,9 +776,7 @@ class PyBulletInverseKinematics(InverseKinematics):
         configurable_joints = robot_cell.get_configurable_joint_names(group)
         for joint_name, joint_value in configuration.items():
             if joint_name not in start_configuration:
-                raise KeyError(
-                    "Configuration has joint '{}' that is not in the start configuration.".format(joint_name)
-                )
+                raise KeyError("Configuration has joint '{}' that is not in the start configuration.".format(joint_name))
             if joint_name in configurable_joints:
                 continue
             if not TOL.is_close(joint_value, start_configuration[joint_name]):
@@ -872,9 +846,7 @@ class UniqueResultChecker:
             # Only if all joints are same, we consider the solution as not unique
             if all(
                 TOL.is_close(joint_position, past_joint_position, atol=threshold)
-                for joint_position, past_joint_position, threshold in zip(
-                    configuration.joint_values, past_configuration.joint_values, self.sorted_uniqueness_thresholds
-                )
+                for joint_position, past_joint_position, threshold in zip(configuration.joint_values, past_configuration.joint_values, self.sorted_uniqueness_thresholds)
             ):
                 return False
         self.results.append(configuration)
@@ -890,11 +862,7 @@ class UniqueResultChecker:
         """
         joint_types = configuration.joint_types
         sorted_uniqueness_thresholds = [
-            (
-                options["solution_uniqueness_threshold_prismatic"]
-                if joint_type in [Joint.PRISMATIC, Joint.PLANAR]
-                else options["solution_uniqueness_threshold_revolute"]
-            )
+            (options["solution_uniqueness_threshold_prismatic"] if joint_type in [Joint.PRISMATIC, Joint.PLANAR] else options["solution_uniqueness_threshold_revolute"])
             for joint_type in joint_types
         ]
         self.sorted_uniqueness_thresholds = sorted_uniqueness_thresholds

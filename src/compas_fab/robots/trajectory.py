@@ -115,9 +115,7 @@ class JointTrajectoryPoint(Configuration):
     @accelerations.setter
     def accelerations(self, accelerations: list[float]):
         if len(self.joint_values) != len(accelerations):
-            raise ValueError(
-                "Must have {} accelerations, but {} given.".format(len(self.joint_values), len(accelerations))
-            )
+            raise ValueError("Must have {} accelerations, but {} given.".format(len(self.joint_values), len(accelerations)))
 
         self._accelerations = FixedLengthList(accelerations)
 
@@ -235,9 +233,7 @@ class JointTrajectoryPoint(Configuration):
         accelerations = [_acceleration_dict[name] for name in joint_names]
         effort = [_effort_dict[name] for name in joint_names]
 
-        return JointTrajectoryPoint(
-            joint_values, joint_types, velocities, accelerations, effort, joint_names=joint_names
-        )
+        return JointTrajectoryPoint(joint_values, joint_types, velocities, accelerations, effort, joint_names=joint_names)
 
 
 class Trajectory(Data):

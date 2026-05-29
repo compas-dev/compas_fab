@@ -35,9 +35,7 @@ def test_planner(analytical_pybullet_client):
     assert planner.kinematics_solver is not None
 
 
-def forward_inverse_agreement(
-    planner: AnalyticalPyBulletClient, start_state: RobotCellState, options: Optional[dict] = None
-) -> None:
+def forward_inverse_agreement(planner: AnalyticalPyBulletClient, start_state: RobotCellState, options: Optional[dict] = None) -> None:
     """Helper function to test forward and inverse kinematics agreement"""
 
     # First perform forward kinematics to find the frame
@@ -49,9 +47,7 @@ def forward_inverse_agreement(
     # Because there are 8 possible solutions, we can break early if we find a close solution
 
     start_state = RobotCellState.from_robot_cell(planner.client.robot_cell)
-    ik_configurations = list(
-        planner.iter_inverse_kinematics(FrameTarget(frame, TargetMode.ROBOT), start_state, group=None, options=options)
-    )
+    ik_configurations = list(planner.iter_inverse_kinematics(FrameTarget(frame, TargetMode.ROBOT), start_state, group=None, options=options))
     for configuration in ik_configurations:
         if configuration.close_to(starting_configuration):
             print("Found a close solution: {}".format(configuration))

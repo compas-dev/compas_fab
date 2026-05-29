@@ -10,9 +10,7 @@ if TYPE_CHECKING:
 
 
 class PyBulletSetRobotCell(SetRobotCell):
-    def set_robot_cell(
-        self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None
-    ):
+    def set_robot_cell(self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None):
         """Pass the models in the robot cell to the Pybullet client.
 
         The client keeps the robot cell models in memory and uses them for planning.
@@ -35,9 +33,7 @@ class PyBulletSetRobotCell(SetRobotCell):
         """
 
         if not isinstance(robot_cell, RobotCell):
-            raise TypeError(
-                "robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__)
-            )
+            raise TypeError("robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__))
 
         client: PyBulletClient = self.client
 

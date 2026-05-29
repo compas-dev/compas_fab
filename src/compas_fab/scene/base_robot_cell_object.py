@@ -114,9 +114,7 @@ class BaseRobotCellObject(SceneObject):
 
         # Update the child scene objects if a configuration is provided
         if robot_cell_state:
-            self._robot_model_scene_object.update(
-                robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame
-            )
+            self._robot_model_scene_object.update(robot_cell_state.robot_configuration, robot_cell_state.robot_base_frame)
             for id, rigid_body_scene_object in self._rigid_body_scene_objects.items():
                 rigid_body_state = robot_cell_state.rigid_body_states[id]
                 rigid_body_scene_object.update(rigid_body_state)

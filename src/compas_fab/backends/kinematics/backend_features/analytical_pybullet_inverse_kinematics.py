@@ -55,9 +55,7 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
         group = group or client.robot_cell.main_group_name
 
         if isinstance(target, FrameTarget):
-            return self._iter_inverse_kinematics_frame_target(
-                target, start_state=start_state, group=group, options=options
-            )
+            return self._iter_inverse_kinematics_frame_target(target, start_state=start_state, group=group, options=options)
         else:
             raise BackendTargetNotSupportedError()
 

@@ -14,9 +14,7 @@ __all__ = [
 class MoveItPlanningScene(BackendFeature):
     """Callable to retrieve the planning scene."""
 
-    GET_PLANNING_SCENE = ServiceDescription(
-        "/get_planning_scene", "GetPlanningScene", GetPlanningSceneRequest, GetPlanningSceneResponse
-    )
+    GET_PLANNING_SCENE = ServiceDescription("/get_planning_scene", "GetPlanningScene", GetPlanningSceneRequest, GetPlanningSceneResponse)
 
     def get_planning_scene(self, options=None):
         """Retrieve the planning scene.

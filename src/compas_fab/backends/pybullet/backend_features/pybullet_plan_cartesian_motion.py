@@ -365,9 +365,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         all_targets: list[PointAxisTarget] = [starting_target]
         for i in range(len(waypoints.target_points_and_axes)):
-            start_point_axis = (
-                waypoints.target_points_and_axes[i - 1] if i > 0 else (start_frame.point, start_frame.zaxis)
-            )
+            start_point_axis = waypoints.target_points_and_axes[i - 1] if i > 0 else (start_frame.point, start_frame.zaxis)
             end_point_axis = waypoints.target_points_and_axes[i]
             interpolator = PointAxisInterpolator(start_point_axis, end_point_axis, options)
 
@@ -395,9 +393,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
             for planned_configuration in configurations:
                 joint_values = [planned_configuration[joint_name] for joint_name in joint_names]
-                trajectory.points.append(
-                    JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
-                )
+                trajectory.points.append(JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names))
             return trajectory
 
         # Perform Depth First Search (DFS) over the targets to plan the trajectory
@@ -411,21 +407,15 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         planned_configurations = [start_configuration]  # This list holds the planned configurations for each step
         ik_generators = [zip()]  # This list holds the iterative ik generators for each step
         ik_option_indices = [0]  # This is only used for debugging
-        longest_list_of_planned_configurations = (
-            []
-        )  # This is used to store the longest trajectory found and return it when search fails
+        longest_list_of_planned_configurations = []  # This is used to store the longest trajectory found and return it when search fails
         comprehensively_checked = []  # This stores the target indices that have been checked for IK solutions
 
         while True:
             # Create a generator if the current step does not have one
             if current_step >= len(ik_generators):
-                intermediate_state = deepcopy(
-                    start_state
-                )  # Deep copy because we will have multiple generators in the stack
+                intermediate_state = deepcopy(start_state)  # Deep copy because we will have multiple generators in the stack
                 intermediate_state.robot_configuration = planned_configurations[-1]
-                ik_generator = planner._iter_inverse_kinematics_point_axis_target(
-                    all_targets[current_step], intermediate_state, group, ik_options
-                )
+                ik_generator = planner._iter_inverse_kinematics_point_axis_target(all_targets[current_step], intermediate_state, group, ik_options)
                 ik_generators.append(ik_generator)
                 ik_option_indices.append(-1)
                 if options["verbose"]:
@@ -447,9 +437,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         print("Performing comprehensive IK check for step {}".format(current_step))
                     checking_ik_options = deepcopy(ik_options)
                     checking_ik_options["max_random_restart"] = 10
-                    checking_ik_generator = planner._iter_inverse_kinematics_point_axis_target(
-                        all_targets[current_step], intermediate_state, group, ik_options
-                    )
+                    checking_ik_generator = planner._iter_inverse_kinematics_point_axis_target(all_targets[current_step], intermediate_state, group, ik_options)
                     try:
                         next(checking_ik_generator, None)
                     except InverseKinematicsError:
@@ -687,10 +675,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 # Note: This is using the CheckCollision Backend Feature
                 planner.check_collision(start_state, options)
             except CollisionCheckError as e:
-                message = (
-                    "plan_cartesian_motion_frame_waypoints: The start_state for plan_cartesian_motion is in collision. \n  - "
-                    + e.message
-                )
+                message = "plan_cartesian_motion_frame_waypoints: The start_state for plan_cartesian_motion is in collision. \n  - " + e.message
                 raise MPStartStateInCollisionError(message, start_state=start_state, collision_pairs=e.collision_pairs)
 
         # Checking the attached tool and workpiece for collision at every target
@@ -698,9 +683,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
             intermediate_state = deepcopy(start_state)
             intermediate_state.robot_configuration = None
             # Convert the targets to PCFs for collision checking
-            pcf_frames = client.robot_cell.target_frames_to_pcf(
-                start_state, waypoints.target_frames, waypoints.target_mode, group
-            )
+            pcf_frames = client.robot_cell.target_frames_to_pcf(start_state, waypoints.target_frames, waypoints.target_mode, group)
 
             for pcf_frame in pcf_frames:
                 try:
@@ -711,10 +694,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                         options,
                     )
                 except CollisionCheckError as e:
-                    message = (
-                        "plan_cartesian_motion_frame_waypoints: The target frame for plan_cartesian_motion is in collision. \n  - "
-                        + e.message
-                    )
+                    message = "plan_cartesian_motion_frame_waypoints: The target frame for plan_cartesian_motion is in collision. \n  - " + e.message
                     raise MPTargetInCollisionError(message, target=pcf_frame, collision_pairs=e.collision_pairs)
 
         # Options for Inverse Kinematics
@@ -741,9 +721,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         # Add the start configuration as the first point
         joint_values = [start_configuration[joint_name] for joint_name in joint_names]
-        trajectory.points.append(
-            JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names)
-        )
+        trajectory.points.append(JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names))
 
         # Echo target_mode
         if options["verbose"]:
@@ -807,11 +785,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                 # intermediate_state.robot_configuration.joint_values = trajectory.points[-1].joint_values
                 intermediate_state.robot_configuration.merge(trajectory.points[-1])
                 if options["verbose"]:
-                    print(
-                        "Segment {} of {}, j={}, t = {}, Interpolated Frame = {}".format(
-                            i + 1, len(waypoints.target_frames), j, interpolation_ts[j], current_frame
-                        )
-                    )
+                    print("Segment {} of {}, j={}, t = {}, Interpolated Frame = {}".format(i + 1, len(waypoints.target_frames), j, interpolation_ts[j], current_frame))
 
                 # Call Inverse Kinematics function from planner
                 try:
@@ -821,37 +795,23 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
                 # Catch the InverseKinematicsError and CollisionCheckError and re-raise them with additional information
                 except InverseKinematicsError as e:
-                    message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(
-                        i, interpolation_ts[j]
-                    )
+                    message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(i, interpolation_ts[j])
                     message = message + e.message
                     raise MPNoIKSolutionError(message=message, target=target, partial_trajectory=trajectory)
 
                 except CollisionCheckError as e:
-                    message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(
-                        i, interpolation_ts[j]
-                    )
+                    message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(i, interpolation_ts[j])
                     message = message + e.message
-                    raise MPInterpolationInCollisionError(
-                        message=message, target=target, collision_pairs=e.collision_pairs, partial_trajectory=trajectory
-                    )
+                    raise MPInterpolationInCollisionError(message=message, target=target, collision_pairs=e.collision_pairs, partial_trajectory=trajectory)
                 if options["verbose"]:
-                    print(
-                        "Segment {} of {}, j={}, t={}, joint_values={}".format(
-                            i + 1, len(waypoints.target_frames), j, interpolation_ts[j], new_joint_positions
-                        )
-                    )
+                    print("Segment {} of {}, j={}, t={}, joint_values={}".format(i + 1, len(waypoints.target_frames), j, interpolation_ts[j], new_joint_positions))
 
                 # Check `joint_jump` between the current and previous point's configuration
                 try:
-                    check_max_jump(
-                        joint_names, joint_types, trajectory.points[-1].joint_values, new_joint_positions, options
-                    )
+                    check_max_jump(joint_names, joint_types, trajectory.points[-1].joint_values, new_joint_positions, options)
                 except MPMaxJumpError as e:
                     # Check if further subdivision is possible
-                    delta_distance, delta_angle, subdivision_possible = interpolator.check_if_subdivision_possible(
-                        interpolation_ts[j - 1], interpolation_ts[j]
-                    )
+                    delta_distance, delta_angle, subdivision_possible = interpolator.check_if_subdivision_possible(interpolation_ts[j - 1], interpolation_ts[j])
 
                     #  If it is not possible to subdivide, raise an error and stop planning
                     if not subdivision_possible:
@@ -876,27 +836,15 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     subdivided_t = interpolation_ts[j - 1] + (interpolation_ts[j] - interpolation_ts[j - 1]) / 2
                     interpolation_ts.insert(j, subdivided_t)
                     if options["verbose"]:
-                        print(
-                            "Segment {} of {}, j={}, subdivision added due to joint jump, new t={:.5f} .".format(
-                                i + 1, len(waypoints.target_frames), j, subdivided_t
-                            )
-                        )
+                        print("Segment {} of {}, j={}, subdivision added due to joint jump, new t={:.5f} .".format(i + 1, len(waypoints.target_frames), j, subdivided_t))
                         print()
                     # Try again with the new t value
                     continue
 
                 # This point is successful, add the JointTrajectoryPoint to the trajectory
-                trajectory.points.append(
-                    JointTrajectoryPoint(
-                        joint_values=new_joint_positions, joint_types=joint_types, joint_names=joint_names
-                    )
-                )
+                trajectory.points.append(JointTrajectoryPoint(joint_values=new_joint_positions, joint_types=joint_types, joint_names=joint_names))
                 if options["verbose"]:
-                    print(
-                        "Segment {} of {}, JointTrajectoryPoint [{}] added: {}".format(
-                            i + 1, len(waypoints.target_frames), j, new_joint_positions
-                        )
-                    )
+                    print("Segment {} of {}, JointTrajectoryPoint [{}] added: {}".format(i + 1, len(waypoints.target_frames), j, new_joint_positions))
                 if options.get("step_pause"):
                     input("Press Enter to continue...")
                 j += 1

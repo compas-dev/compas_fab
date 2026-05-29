@@ -70,9 +70,7 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                         "ROS load failed with HTTP 404. Detected ROS distro: '{}'. "
                         "If your ROS is ROS 1, the client may be falling back to the ROS 2 HTTP loader. "
                         "Either set the '/rosdistro' ROS parameter on the master, install rosapi, or "
-                        "uncheck load_geometry and use Cf_LoadRobotCellFromLibrary for visualization.".format(
-                            detected_distro
-                        )
+                        "uncheck load_geometry and use Cf_LoadRobotCellFromLibrary for visualization.".format(detected_distro)
                     )
                 else:
                     print("ROS load failed: {}".format(e))

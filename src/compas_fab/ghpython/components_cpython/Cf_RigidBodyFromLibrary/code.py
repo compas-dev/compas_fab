@@ -21,13 +21,8 @@ class RigidBodyFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
         name = name.strip().lower()
         loader = getattr(RigidBodyLibrary, name, None)
         if loader is None:
-            available = [
-                attr for attr in dir(RigidBodyLibrary)
-                if not attr.startswith("_") and callable(getattr(RigidBodyLibrary, attr))
-            ]
-            raise ValueError(
-                "Unknown RigidBodyLibrary entry '{}'. Available: {}".format(name, ", ".join(available))
-            )
+            available = [attr for attr in dir(RigidBodyLibrary) if not attr.startswith("_") and callable(getattr(RigidBodyLibrary, attr))]
+            raise ValueError("Unknown RigidBodyLibrary entry '{}'. Available: {}".format(name, ", ".join(available)))
 
         size = size if size else 1.0
         return loader(size)

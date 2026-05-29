@@ -27,11 +27,7 @@ class AnalyticalKinematicsPlannerComponent(Grasshopper.Kernel.GH_ScriptInstance)
 
         solver = solver.strip().lower()
         if solver not in PLANNER_BACKENDS:
-            raise ValueError(
-                "Unknown analytical solver '{}'. Available: {}".format(
-                    solver, ", ".join(sorted(PLANNER_BACKENDS.keys()))
-                )
-            )
+            raise ValueError("Unknown analytical solver '{}'. Available: {}".format(solver, ", ".join(sorted(PLANNER_BACKENDS.keys()))))
 
         verbose = bool(verbose)
 

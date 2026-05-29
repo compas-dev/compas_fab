@@ -104,9 +104,7 @@ def test_rbs_init_with_transformation():
     assert rbs.attachment_frame == frame
 
 
-def test_rbs_copy(
-    rbs_stationary: RigidBodyState, rbs_attached_to_tool: RigidBodyState, rbs_attached_to_link: RigidBodyState
-):
+def test_rbs_copy(rbs_stationary: RigidBodyState, rbs_attached_to_tool: RigidBodyState, rbs_attached_to_link: RigidBodyState):
     """Test to make sure the RigidBodyState object is copyable"""
 
     def _copy_test(rbs: RigidBodyState):
@@ -119,9 +117,7 @@ def test_rbs_copy(
     _copy_test(rbs_attached_to_link)
 
 
-def test_rbs_deepcopy(
-    rbs_stationary: RigidBodyState, rbs_attached_to_tool: RigidBodyState, rbs_attached_to_link: RigidBodyState
-):
+def test_rbs_deepcopy(rbs_stationary: RigidBodyState, rbs_attached_to_tool: RigidBodyState, rbs_attached_to_link: RigidBodyState):
     """Test to make sure the RigidBodyState object is copyable"""
 
     def _copy_test(rbs: RigidBodyState):
@@ -167,9 +163,7 @@ def ts_with_configuration() -> ToolState:
         frame=None,
         attachment_frame=Frame([1, 2, 3], [0.1, 0.2, 0.3]),
         attached_to_group="group0",
-        configuration=Configuration.from_prismatic_and_revolute_values(
-            [1, 2, 3], [0.1, 0.2, 0.3], ["j0", "j1", "j2", "j3", "j4", "j5"]
-        ),
+        configuration=Configuration.from_prismatic_and_revolute_values([1, 2, 3], [0.1, 0.2, 0.3], ["j0", "j1", "j2", "j3", "j4", "j5"]),
     )
     return ts
 
@@ -347,9 +341,7 @@ def test_rcs_get_ids(rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellSt
     assert rcs.get_attached_workpiece_ids(group) == [beam_id]
 
 
-def test_rcs_set_attach_functions(
-    rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState], ts_stationary: ToolState
-) -> None:
+def test_rcs_set_attach_functions(rc_rcs_ur10e_gripper_one_beam: tuple[RobotCell, RobotCellState], ts_stationary: ToolState) -> None:
     """Testing the set attach functions."""
     rc, rcs = rc_rcs_ur10e_gripper_one_beam
     rcs = deepcopy(rcs)

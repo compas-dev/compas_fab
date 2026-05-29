@@ -41,13 +41,9 @@ class MoveItPlanMotion(PlanMotion):
     DEFAULT_TOLERANCE_POSITION = 0.001
     DEFAULT_TOLERANCE_JOINT = 0.01
 
-    GET_MOTION_PLAN = ServiceDescription(
-        "/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response
-    )
+    GET_MOTION_PLAN = ServiceDescription("/plan_kinematic_path", "GetMotionPlan", MotionPlanRequest, MotionPlanResponse, validate_response)
 
-    def plan_motion(
-        self, target: Target, start_state: RobotCellState, group: Optional[str] = None, options: Optional[dict] = None
-    ):
+    def plan_motion(self, target: Target, start_state: RobotCellState, group: Optional[str] = None, options: Optional[dict] = None):
         """Calculates a motion path.
 
         The PyBullet Planner supports ConstraintSetTarget, ConfigurationTarget and FrameTarget.
@@ -150,14 +146,10 @@ class MoveItPlanMotion(PlanMotion):
             configuration = target.target_configuration
             tolerance_above = target.tolerance_above or self.DEFAULT_TOLERANCE_JOINT
             tolerance_below = target.tolerance_below or self.DEFAULT_TOLERANCE_JOINT
-            goal_constraints = JointConstraint.joint_constraints_from_configuration(
-                configuration, tolerance_above, tolerance_below
-            )
+            goal_constraints = JointConstraint.joint_constraints_from_configuration(configuration, tolerance_above, tolerance_below)
 
         elif isinstance(target, FrameTarget):
-            target_pcf = client.robot_cell.target_frames_to_pcf(
-                start_state, target.target_frame, target.target_mode, group
-            )
+            target_pcf = client.robot_cell.target_frames_to_pcf(start_state, target.target_frame, target.target_mode, group)
             tolerance_position = target.tolerance_position or self.DEFAULT_TOLERANCE_POSITION
             tolerance_orientation = target.tolerance_orientation or self.DEFAULT_TOLERANCE_ORIENTATION
             pc = PositionConstraint.from_frame(target_pcf, tolerance_position, ee_link_name)
@@ -182,15 +174,11 @@ class MoveItPlanMotion(PlanMotion):
         # Preprocess trajectory constraints
         trajectory_constraints = options.get("trajectory_constraints")
         if trajectory_constraints is not None:
-            trajectory_constraints = TrajectoryConstraints(
-                constraints=convert_constraints_to_rosmsg(options["trajectory_constraints"], header)
-            )
+            trajectory_constraints = TrajectoryConstraints(constraints=convert_constraints_to_rosmsg(options["trajectory_constraints"], header))
 
         # Convert start state to ROS JointState and RobotState
         start_configuration = start_state.robot_configuration
-        ros_joint_state = JointState(
-            header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
-        )
+        ros_joint_state = JointState(header=header, name=start_configuration.joint_names, position=start_configuration.joint_values)
         ros_start_state = RobotState(ros_joint_state, MultiDOFJointState(header=header), is_diff=True)
         ros_start_state.filter_fields_for_distro(self.client.ros_distro)
 
@@ -209,9 +197,7 @@ class MoveItPlanMotion(PlanMotion):
 
         def response_handler(response):
             try:
-                trajectory = convert_trajectory(
-                    joints, response.trajectory, response.trajectory_start, 1.0, response.planning_time, response
-                )
+                trajectory = convert_trajectory(joints, response.trajectory, response.trajectory_start, 1.0, response.planning_time, response)
                 callback(trajectory)
             except Exception as e:
                 errback(e)

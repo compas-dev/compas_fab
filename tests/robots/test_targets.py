@@ -33,9 +33,7 @@ def tool_coordinate_frame():
 
 @pytest.fixture
 def target_configuration():
-    return Configuration.from_prismatic_and_revolute_values(
-        [10.0, 20.0], [1.0, 2.0, 3.0, 4.0, 5.0, 6.0], ["J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8"]
-    )
+    return Configuration.from_prismatic_and_revolute_values([10.0, 20.0], [1.0, 2.0, 3.0, 4.0, 5.0, 6.0], ["J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8"])
 
 
 @pytest.fixture
@@ -177,9 +175,7 @@ def test_serialization_constraint_sets(target_frame, target_configuration, tool_
     name = "my testing name"
 
     # ConstraintSetTarget with JointConstraint
-    constraint_set = JointConstraint.joint_constraints_from_configuration(
-        target_configuration, tolerance_above, tolerance_below
-    )
+    constraint_set = JointConstraint.joint_constraints_from_configuration(target_configuration, tolerance_above, tolerance_below)
     target = ConstraintSetTarget(constraint_set, name)
     nt = ConstraintSetTarget.__from_data__(target.__data__)
     assert target.constraint_set == nt.constraint_set
@@ -191,14 +187,10 @@ def test_serialization_constraint_sets(target_frame, target_configuration, tool_
     link_name = "tool0"
     tolerances_orientation = [0.0123] * 3
     orientation_constraint_weight = 0.789
-    orientation_constraint = OrientationConstraint.from_frame(
-        target_frame, tolerances_orientation, link_name, orientation_constraint_weight
-    )
+    orientation_constraint = OrientationConstraint.from_frame(target_frame, tolerances_orientation, link_name, orientation_constraint_weight)
     position_constraint_weight = 0.456
     tolerances_position = 0.567
-    position_constraint = PositionConstraint.from_frame(
-        target_frame, tolerances_position, link_name, position_constraint_weight
-    )
+    position_constraint = PositionConstraint.from_frame(target_frame, tolerances_position, link_name, position_constraint_weight)
     target = ConstraintSetTarget([orientation_constraint, position_constraint], name)
     nt = ConstraintSetTarget.__from_data__(target.__data__)
     assert target.constraint_set == nt.constraint_set

@@ -177,9 +177,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         def response_handler(response):
             try:
-                trajectory = convert_trajectory(
-                    joints, response.solution, response.start_state, response.fraction, None, response
-                )
+                trajectory = convert_trajectory(joints, response.solution, response.start_state, response.fraction, None, response)
                 if response.fraction < 1:
                     errback(MotionPlanningError("Motion planning failed", trajectory))
                 callback(trajectory)

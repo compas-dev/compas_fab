@@ -4,9 +4,7 @@ from typing import Optional
 __all__ = ["list_files_in_directory"]
 
 
-def list_files_in_directory(
-    directory: str, fullpath: bool = False, extensions: Optional[list[str]] = None
-) -> list[str]:
+def list_files_in_directory(directory: str, fullpath: bool = False, extensions: Optional[list[str]] = None) -> list[str]:
     """This function lists just the files in a directory, not sub-directories.
 
     Parameters
@@ -42,9 +40,7 @@ def list_files_in_directory(
 
 
 if __name__ == "__main__":
-    path = os.path.join(
-        os.path.dirname(__file__), "..", "data", "robot_library", "rfl", "rfl_description", "meshes", "visual"
-    )
+    path = os.path.join(os.path.dirname(__file__), "..", "data", "robot_library", "rfl", "rfl_description", "meshes", "visual")
     os.listdir(path)
     for file in list_files_in_directory(path, fullpath=True, extensions=["stl"]):
         print(file)

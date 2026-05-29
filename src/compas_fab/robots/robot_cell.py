@@ -137,15 +137,11 @@ class RobotCell(Data):
         robot_model = RobotModel.__from_data__(data["robot_model"]) if data["robot_model"] else None
         robot_semantics = RobotSemantics.__from_data__(data["robot_semantics"]) if data["robot_semantics"] else None
         tool_models = {id: ToolModel.__from_data__(tool_data) for id, tool_data in data["tool_models"].items()}
-        rigid_body_models = {
-            id: RigidBody.__from_data__(rigid_body_data) for id, rigid_body_data in data["rigid_body_models"].items()
-        }
+        rigid_body_models = {id: RigidBody.__from_data__(rigid_body_data) for id, rigid_body_data in data["rigid_body_models"].items()}
         return cls(robot_model, robot_semantics, tool_models, rigid_body_models)
 
     @classmethod
-    def from_urdf_and_srdf(
-        cls, urdf_filename: str, srdf_filename: Optional[str], local_package_mesh_folder: Optional[str] = None
-    ) -> "RobotCell":
+    def from_urdf_and_srdf(cls, urdf_filename: str, srdf_filename: Optional[str], local_package_mesh_folder: Optional[str] = None) -> "RobotCell":
         """Create a robot cell from URDF and SRDF files.
         Optionally, a local package mesh folder to load mesh geometry.
 
@@ -188,16 +184,10 @@ class RobotCell(Data):
         """Assert that the number of tools and rigid bodies in the cell state match the number of tools and workpieces in the robot cell."""
         symmetric_difference = set(robot_cell_state.tool_ids) ^ set(self.tool_ids)
         if symmetric_difference != set():
-            raise ValueError(
-                "The tools in the cell state do not match the tools in the robot cell. Mismatch: %s"
-                % symmetric_difference
-            )
+            raise ValueError("The tools in the cell state do not match the tools in the robot cell. Mismatch: %s" % symmetric_difference)
         symmetric_difference = set(robot_cell_state.rigid_body_ids) ^ set(self.rigid_body_ids)
         if symmetric_difference != set():
-            raise ValueError(
-                "The workpieces in the cell state do not match the workpieces in the robot cell. Mismatch: %s"
-                % symmetric_difference
-            )
+            raise ValueError("The workpieces in the cell state do not match the workpieces in the robot cell. Mismatch: %s" % symmetric_difference)
 
     def ensure_semantics(self) -> None:
         """Check if semantics is set.
@@ -694,9 +684,7 @@ class RobotCell(Data):
 
         return Configuration(joint_values, joint_types, joint_names)
 
-    def configuration_to_full_configuration(
-        self, configuration: Configuration, full_configuration: Optional[Configuration] = None
-    ) -> Configuration:
+    def configuration_to_full_configuration(self, configuration: Configuration, full_configuration: Optional[Configuration] = None) -> Configuration:
         """Create a new Configuration object from a given configuration
         and fill in the missing joints from a given full_configuration.
         The joint values in the configuration takes precedence over the full_configuration.
@@ -747,9 +735,7 @@ class RobotCell(Data):
 
         return Configuration(joint_values, joint_types, joint_names)
 
-    def fill_configuration_with_joint_names(
-        self, configuration: Configuration, group: Optional[str] = None
-    ) -> Configuration:
+    def fill_configuration_with_joint_names(self, configuration: Configuration, group: Optional[str] = None) -> Configuration:
         """Create a new configuration object from the given configuration and to fill in the joint_types and joint_names if they are missing.
 
         -   If the supplied configuration has joint_names and joint_types,
@@ -951,9 +937,7 @@ class RobotCell(Data):
             raise ValueError("Workpiece with id '{}' is not attached to any tool.".format(workpiece_id))
         tool_id = workpiece_state.attached_to_tool
         if tool_id not in self.tool_models:
-            raise ValueError(
-                "Workpiece is attached to a Tool with id '{}', but the tool is not found in robot cell.".format(tool_id)
-            )
+            raise ValueError("Workpiece is attached to a Tool with id '{}', but the tool is not found in robot cell.".format(tool_id))
         tool_state = robot_cell_state.tool_states[tool_id]
         if not tool_state.attached_to_group:
             raise ValueError("Tool with id '{}' is not attached to the robot.".format(tool_id))
@@ -1050,9 +1034,7 @@ class RobotCell(Data):
 
         return tool_coordinate_frames
 
-    def from_ocf_to_pcf(
-        self, robot_cell_state: RobotCellState, ocf_frames: list[Frame], workpiece_id: str
-    ) -> list[Frame]:
+    def from_ocf_to_pcf(self, robot_cell_state: RobotCellState, ocf_frames: list[Frame], workpiece_id: str) -> list[Frame]:
         """Converts a frame describing the object coordinate frame (OCF) relative to WCF
         to a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF.
         The transformation goes from the workpiece's base frame,
@@ -1101,9 +1083,7 @@ class RobotCell(Data):
 
         return pcfs
 
-    def from_pcf_to_ocf(
-        self, robot_cell_state: RobotCellState, pcf_frames: list[Frame], workpiece_id: str
-    ) -> list[Frame]:
+    def from_pcf_to_ocf(self, robot_cell_state: RobotCellState, pcf_frames: list[Frame], workpiece_id: str) -> list[Frame]:
         """Converts a frame describing the planner coordinate frame (PCF) (also T0CF) relative to WCF
         to a frame describing the object coordinate frame (OCF) relative to WCF.
 
@@ -1191,9 +1171,7 @@ class RobotCell(Data):
             pcf_frames = self.from_tcf_to_pcf(robot_cell_state, frames, tool_id)
         elif target_mode == TargetMode.WORKPIECE:
             workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
-            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
-                group
-            )
+            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(group)
             pcf_frames = self.from_ocf_to_pcf(robot_cell_state, frames, workpiece_ids[0])
         elif target_mode == TargetMode.ROBOT:
             pcf_frames = frames
@@ -1250,9 +1228,7 @@ class RobotCell(Data):
             target_frames = self.from_pcf_to_tcf(robot_cell_state, frames, tool_id)
         elif target_mode == TargetMode.WORKPIECE:
             workpiece_ids = robot_cell_state.get_attached_workpiece_ids(group)
-            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(
-                group
-            )
+            assert len(workpiece_ids) == 1, "Only one workpiece should be attached to the robot in group '{}'.".format(group)
             target_frames = self.from_pcf_to_ocf(robot_cell_state, frames, workpiece_ids[0])
         elif target_mode == TargetMode.ROBOT:
             target_frames = frames
@@ -1355,11 +1331,7 @@ class RobotCell(Data):
             link_name = rb_state.attached_to_link
             tool_id = rb_state.attached_to_tool
             if link_name and tool_id:
-                raise ValueError(
-                    "Rigid body '{}' is attached to both a link and a tool. This is not a consistent state.".format(
-                        rb_id
-                    )
-                )
+                raise ValueError("Rigid body '{}' is attached to both a link and a tool. This is not a consistent state.".format(rb_id))
             if link_name:
                 # RigidBody attached to a link is attached via an `attachment_frame`
                 link_frame = self.robot_model.forward_kinematics(robot_configuration, link_name=link_name)
@@ -1386,11 +1358,7 @@ class RobotCell(Data):
                 group_link_name = self.robot_semantics.get_end_effector_link_name(group)
                 link_frame = self.robot_model.forward_kinematics(robot_configuration, link_name=group_link_name)
                 t_rcf_pcf = Transformation.from_frame(link_frame)
-                t_pcf_tbcf = (
-                    Transformation.from_frame(tool_state.attachment_frame)
-                    if tool_state.attachment_frame
-                    else Transformation()
-                )
+                t_pcf_tbcf = Transformation.from_frame(tool_state.attachment_frame) if tool_state.attachment_frame else Transformation()
                 t_wcf_tcf = t_wcf_rcf * t_rcf_pcf * t_pcf_tbcf
                 tool_state.frame = Frame.from_transformation(t_wcf_tcf)
 

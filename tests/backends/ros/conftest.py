@@ -21,6 +21,7 @@ docker-compose files (see ``tests/integration_setup/README.md``):
 Both fixtures require ``COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS=1`` to opt in;
 otherwise every test that uses them is skipped.
 """
+
 import os
 
 import pytest
@@ -81,9 +82,7 @@ def _make_ros_client(distro_label, port_env, default_port, legacy_port_env=None)
     try:
         client.run(timeout=5)
     except Exception as e:
-        pytest.skip(
-            "Could not connect to {0} rosbridge at {1}:{2}: {3}".format(distro_label, host, port, e)
-        )
+        pytest.skip("Could not connect to {0} rosbridge at {1}:{2}: {3}".format(distro_label, host, port, e))
 
     return client
 

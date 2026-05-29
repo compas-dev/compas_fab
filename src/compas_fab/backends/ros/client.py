@@ -309,10 +309,7 @@ class RosClient(Ros, ClientInterface):
 
     def follow_configurations(self, callback, joint_names, configurations, timesteps, timeout=60000):
         if len(configurations) != len(timesteps):
-            raise ValueError(
-                "%d configurations must have %d timesteps, but %d given."
-                % (len(configurations), len(timesteps), len(timesteps))
-            )
+            raise ValueError("%d configurations must have %d timesteps, but %d given." % (len(configurations), len(timesteps), len(timesteps)))
 
         if not timeout:
             timeout = timesteps[-1] * 1000 * 2
@@ -320,9 +317,7 @@ class RosClient(Ros, ClientInterface):
         points = []
         num_joints = len(configurations[0].joint_values)
         for config, time in zip(configurations, timesteps):
-            pt = RosMsgJointTrajectoryPoint(
-                positions=config.joint_values, velocities=[0] * num_joints, time_from_start=Time(secs=(time))
-            )
+            pt = RosMsgJointTrajectoryPoint(positions=config.joint_values, velocities=[0] * num_joints, time_from_start=Time(secs=(time)))
             points.append(pt)
 
         joint_trajectory = RosMsgJointTrajectory(Header(), joint_names, points)  # specify header necessary?

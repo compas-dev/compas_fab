@@ -191,12 +191,7 @@ def inverse_kinematics_offset_wrist(frame: Frame, params: list[float], q6_des: f
             s6 = sin(q6)
             x04x = -s5 * (T02 * c1 + T12 * s1) - c5 * (s6 * (T01 * c1 + T11 * s1) - c6 * (T00 * c1 + T10 * s1))
             x04y = c5 * (T20 * c6 - T21 * s6) - T22 * s5
-            p13x = (
-                d5 * (s6 * (T00 * c1 + T10 * s1) + c6 * (T01 * c1 + T11 * s1))
-                - d6 * (T02 * c1 + T12 * s1)
-                + T03 * c1
-                + T13 * s1
-            )
+            p13x = d5 * (s6 * (T00 * c1 + T10 * s1) + c6 * (T01 * c1 + T11 * s1)) - d6 * (T02 * c1 + T12 * s1) + T03 * c1 + T13 * s1
             p13y = T23 - d1 - d6 * T22 + d5 * (T21 * c6 + T20 * s6)
 
             c3 = (p13x * p13x + p13y * p13y - a2 * a2 - a3 * a3) / (2.0 * a2 * a3)

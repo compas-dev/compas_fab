@@ -32,11 +32,7 @@ class AttachToolToRobot(Grasshopper.Kernel.GH_ScriptInstance):
 
         attachment_frame = None
         if attachment_plane is not None:
-            attachment_frame = (
-                attachment_plane
-                if isinstance(attachment_plane, Frame)
-                else plane_to_compas_frame(attachment_plane)
-            )
+            attachment_frame = attachment_plane if isinstance(attachment_plane, Frame) else plane_to_compas_frame(attachment_plane)
 
         touch_links_list = list(touch_links) if touch_links else None
 

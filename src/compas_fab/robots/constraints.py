@@ -28,19 +28,17 @@ class BoundingVolume(Data):
     ----------
     volume_type
         The type of bounding volume, one of `BoundingVolume.VOLUME_TYPES`.
-    volume : [`Mesh`][compas.datastructures.Mesh] or [`Primitive`][compas.geometry.Primitive]
-        The volume can be either a [`Box`][compas.geometry.Box], a
-        [`Sphere`][compas.geometry.Sphere], or a
-        [`Mesh`][compas.datastructures.Mesh].
+    volume
+        The volume can be either a [Box][], a
+        [Sphere][], or a [Mesh][].
 
     Attributes
     ----------
     volume_type
         The type of bounding volume, one of `BoundingVolume.VOLUME_TYPES`.
-    volume : [`Mesh`][compas.datastructures.Mesh] or [`Primitive`][compas.geometry.Primitive]
-        The volume can be either a [`Box`][compas.geometry.Box], a
-        [`Sphere`][compas.geometry.Sphere], or a
-        [`Mesh`][compas.datastructures.Mesh].
+    volume
+        The volume can be either a [Box][], a
+        [Sphere][], or a [Mesh][].
 
     Notes
     -----
@@ -335,9 +333,7 @@ class JointConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of `JointConstraint`."""
-        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(
-            self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight
-        )
+        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
     def copy(self) -> "JointConstraint":
         """Create a copy of this `JointConstraint`.
@@ -350,9 +346,7 @@ class JointConstraint(Constraint):
         return cls(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
     @classmethod
-    def joint_constraints_from_configuration(
-        cls, configuration: Configuration, tolerances_above: list[float], tolerances_below: list[float]
-    ) -> list["JointConstraint"]:
+    def joint_constraints_from_configuration(cls, configuration: Configuration, tolerances_above: list[float], tolerances_below: list[float]) -> list["JointConstraint"]:
         """Create joint constraints for all joints of the configuration.
         One constraint is created for each joint.
 
@@ -395,11 +389,7 @@ class JointConstraint(Constraint):
             raise ValueError("The passed configuration has no joint_names")
 
         if len(joint_names) != len(configuration.joint_values):
-            raise ValueError(
-                "The passed configuration has {} joint_names but {} joint_values".format(
-                    len(joint_names), len(joint_values)
-                )
-            )
+            raise ValueError("The passed configuration has {} joint_names but {} joint_values".format(len(joint_names), len(joint_values)))
         if not isinstance(tolerances_above, list):
             tolerances_above = [tolerances_above]
         if not isinstance(tolerances_below, list):
@@ -423,9 +413,7 @@ class JointConstraint(Constraint):
             )
 
         constraints = []
-        for name, value, tolerance_above, tolerance_below in zip(
-            joint_names, configuration.joint_values, tolerances_above, tolerances_below
-        ):
+        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.joint_values, tolerances_above, tolerances_below):
             constraints.append(JointConstraint(name, value, tolerance_above, tolerance_below))
         return constraints
 
@@ -478,9 +466,7 @@ class OrientationConstraint(Constraint):
 
     """
 
-    def __init__(
-        self, link_name: str, quaternion: list[float], tolerances: list[float] = None, weight: list[float] = 1.0
-    ) -> None:
+    def __init__(self, link_name: str, quaternion: list[float], tolerances: list[float] = None, weight: list[float] = 1.0) -> None:
         super(OrientationConstraint, self).__init__(self.ORIENTATION, weight)
         self.link_name = link_name
         self.quaternion = [float(a) for a in list(quaternion)]
@@ -513,9 +499,7 @@ class OrientationConstraint(Constraint):
 
     def __repr__(self):
         """Printable representation of `OrientationConstraint`."""
-        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(
-            self.link_name, self.quaternion, self.tolerances, self.weight
-        )
+        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
 
     def copy(self) -> "OrientationConstraint":
         """Create a copy of this `OrientationConstraint`.
@@ -528,9 +512,7 @@ class OrientationConstraint(Constraint):
         return cls(self.link_name, self.quaternion[:], self.tolerances[:], self.weight)
 
     @classmethod
-    def from_frame(
-        cls, pcf_frame: Frame, tolerances_orientation: list[float], link_name: str, weight: Optional[float] = 1.0
-    ) -> "OrientationConstraint":
+    def from_frame(cls, pcf_frame: Frame, tolerances_orientation: list[float], link_name: str, weight: Optional[float] = 1.0) -> "OrientationConstraint":
         """Create an `OrientationConstraint` from a frame on the group's end-effector link.
         Only the orientation of the frame is considered for the constraint, expressed
         as a quaternion.
@@ -625,9 +607,7 @@ class PositionConstraint(Constraint):
         }
 
     @classmethod
-    def from_frame(
-        cls, pcf_frame: Frame, tolerance_position: float, link_name: str, weight: Optional[float] = 1.0
-    ) -> "PositionConstraint":
+    def from_frame(cls, pcf_frame: Frame, tolerance_position: float, link_name: str, weight: Optional[float] = 1.0) -> "PositionConstraint":
         """Create a `PositionConstraint` from a frame on the group's end-effector link.
         Only the position of the frame is considered for the constraint.
 
@@ -717,9 +697,7 @@ class PositionConstraint(Constraint):
         return cls(link_name, bounding_volume, weight)
 
     @classmethod
-    def from_point(
-        cls, link_name: str, point: Point, tolerance_position: float, weight: Optional[float] = 1.0
-    ) -> "PositionConstraint":
+    def from_point(cls, link_name: str, point: Point, tolerance_position: float, weight: Optional[float] = 1.0) -> "PositionConstraint":
         """Create a `PositionConstraint` from a point.
 
         Parameters

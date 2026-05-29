@@ -27,7 +27,5 @@ class SetTouchLinks(Grasshopper.Kernel.GH_ScriptInstance):
             return cell_state
 
         new_state = deepcopy(cell_state)
-        new_state.rigid_body_states[rigid_body_id.strip()].touch_links = (
-            list(touch_links) if touch_links else []
-        )
+        new_state.rigid_body_states[rigid_body_id.strip()].touch_links = list(touch_links) if touch_links else []
         return new_state

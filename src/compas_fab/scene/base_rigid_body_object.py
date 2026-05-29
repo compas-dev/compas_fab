@@ -110,16 +110,12 @@ class BaseRigidBodyObject(SceneObject):
         delta_transformation = new_transformation * previous_transformation.inverse()
 
         if self._draw_visual:
-            new_native_geometry = [
-                self._transform(geo, delta_transformation) for geo in self._visual_mesh_native_geometry
-            ]
+            new_native_geometry = [self._transform(geo, delta_transformation) for geo in self._visual_mesh_native_geometry]
             # In case the _transform method returns a new object, we need to update the cache
             assert len(new_native_geometry) == len(self._visual_mesh_native_geometry)
             self._visual_mesh_native_geometry = new_native_geometry
         if self._draw_collision:
-            new_native_geometry = [
-                self._transform(geo, delta_transformation) for geo in self._collision_mesh_native_geometry
-            ]
+            new_native_geometry = [self._transform(geo, delta_transformation) for geo in self._collision_mesh_native_geometry]
             # In case the _transform method returns a new object, we need to update the cache
             assert len(new_native_geometry) == len(self._collision_mesh_native_geometry)
             self._collision_mesh_native_geometry = new_native_geometry

@@ -92,9 +92,7 @@ class RobotCellState(Data):
         return True
 
     @classmethod
-    def from_robot_cell(
-        cls, robot_cell: "RobotCell", robot_configuration: Optional[Configuration] = None
-    ) -> "RobotCellState":
+    def from_robot_cell(cls, robot_cell: "RobotCell", robot_configuration: Optional[Configuration] = None) -> "RobotCellState":
         """Creates a default `RobotCellState` from a `RobotCell`.
 
         This function ensures that all the tools and workpieces in the robot cell are represented in the robot cell state.
@@ -230,9 +228,7 @@ class RobotCellState(Data):
             if id != tool_id and tool_state.attached_to_group == group:
                 self.set_tool_detached(id)
 
-    def set_tool_detached(
-        self, tool_id: str, frame: Optional[Frame] = None, touch_links: Optional[list[str]] = None
-    ) -> None:
+    def set_tool_detached(self, tool_id: str, frame: Optional[Frame] = None, touch_links: Optional[list[str]] = None) -> None:
         """Sets the tool to be detached from the planning group.
 
         Parameters
@@ -296,9 +292,7 @@ class RobotCellState(Data):
         self.rigid_body_states[rigid_body_id].attachment_frame = attachment_frame
         self.rigid_body_states[rigid_body_id].touch_links = touch_links or []
 
-    def set_rigid_body_attached_to_tool(
-        self, rigid_body_id: str, tool_id: str, attachment_frame: Optional[Frame] = None
-    ):
+    def set_rigid_body_attached_to_tool(self, rigid_body_id: str, tool_id: str, attachment_frame: Optional[Frame] = None):
         """Sets the rigid body attached to the tool.
 
         Notes
@@ -369,23 +363,15 @@ class RobotCellState(Data):
         tool_id = self.get_attached_tool_id(group)
         if target_mode == TargetMode.TOOL:
             if tool_id is None:
-                raise TargetModeMismatchError(
-                    "Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group)
-                )
+                raise TargetModeMismatchError("Target mode is 'TOOL', but no tool is attached to the robot in group '{}'.".format(group))
 
         # Checks for Workpiece Mode
         workpiece_ids = self.get_attached_workpiece_ids(group)
         if target_mode == TargetMode.WORKPIECE:
             if not workpiece_ids:
-                raise TargetModeMismatchError(
-                    "Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group)
-                )
+                raise TargetModeMismatchError("Target mode is 'WORKPIECE', but no workpiece is attached to the robot in group '{}'.".format(group))
             if len(workpiece_ids) > 1:
-                raise TargetModeMismatchError(
-                    "Target mode is 'WORKPIECE', but more than one workpiece is attached to the robot in group '{}'.".format(
-                        group
-                    )
-                )
+                raise TargetModeMismatchError("Target mode is 'WORKPIECE', but more than one workpiece is attached to the robot in group '{}'.".format(group))
 
 
 class ToolState(Data):

@@ -101,9 +101,7 @@ class BackendFeature:
 class SetRobotCell(BackendFeature):
     """Mix-in interface for implementing a planner's set robot cell feature."""
 
-    def set_robot_cell(
-        self, robot_cell: RobotCell, robot_cell_state: Optional[RobotCellState] = None, options: Optional[dict] = None
-    ):
+    def set_robot_cell(self, robot_cell: RobotCell, robot_cell_state: Optional[RobotCellState] = None, options: Optional[dict] = None):
         """Pass the models in the robot cell to the planning client.
 
         The client keeps the robot cell models in memory and uses them for planning.
@@ -402,9 +400,7 @@ class InverseKinematics(BackendFeature):
 class PlanMotion(BackendFeature):
     """Mix-in interface for implementing a planner's plan motion feature."""
 
-    def plan_motion(
-        self, target: Target, start_state: RobotCellState, group: Optional[str] = None, options: Optional[dict] = None
-    ) -> JointTrajectory:
+    def plan_motion(self, target: Target, start_state: RobotCellState, group: Optional[str] = None, options: Optional[dict] = None) -> JointTrajectory:
         """Calculates a motion path.
 
         Parameters

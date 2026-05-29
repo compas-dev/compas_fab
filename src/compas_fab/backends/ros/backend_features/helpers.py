@@ -41,9 +41,7 @@ def validate_response(response):
         elif response.error_code == MoveItErrorCodes.INVALID_GROUP_NAME:
             raise PlanningGroupNotExistsError("INVALID_GROUP_NAME -15 INVALID_GROUP_NAME")
         elif response.error_code == MoveItErrorCodes.NO_IK_SOLUTION:
-            raise InverseKinematicsError(
-                "MoveItErrorCodes -31 NO_IK_SOLUTION (Can be caused by reachability or collision issues)"
-            )
+            raise InverseKinematicsError("MoveItErrorCodes -31 NO_IK_SOLUTION (Can be caused by reachability or collision issues)")
         else:
             raise RosError(
                 "MoveItErrorCodes {}, {}".format(response.error_code.human_readable, int(response.error_code)),

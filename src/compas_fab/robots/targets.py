@@ -302,14 +302,8 @@ class FrameTarget(Target):
             TOL.is_allclose(other.target_frame, self.target_frame)
             and self.target_mode == other.target_mode
             and (self.native_scale == other.native_scale or TOL.is_close(other.native_scale, self.native_scale))
-            and (
-                self.tolerance_position == other.tolerance_position
-                or TOL.is_close(other.tolerance_position, self.tolerance_position)
-            )
-            and (
-                self.tolerance_orientation == other.tolerance_orientation
-                or TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
-            )
+            and (self.tolerance_position == other.tolerance_position or TOL.is_close(other.tolerance_position, self.tolerance_position))
+            and (self.tolerance_orientation == other.tolerance_orientation or TOL.is_close(other.tolerance_orientation, self.tolerance_orientation))
             and other.name == self.name
         )
 
@@ -460,14 +454,8 @@ class PointAxisTarget(Target):
             and TOL.is_allclose(other.target_z_axis, self.target_z_axis)
             and self.target_mode == other.target_mode
             and (other.native_scale == self.native_scale or TOL.is_close(other.native_scale, self.native_scale))
-            and (
-                other.tolerance_position == self.tolerance_position
-                or TOL.is_close(other.tolerance_position, self.tolerance_position)
-            )
-            and (
-                other.tolerance_orientation == self.tolerance_orientation
-                or TOL.is_close(other.tolerance_orientation, self.tolerance_orientation)
-            )
+            and (other.tolerance_position == self.tolerance_position or TOL.is_close(other.tolerance_position, self.tolerance_position))
+            and (other.tolerance_orientation == self.tolerance_orientation or TOL.is_close(other.tolerance_orientation, self.tolerance_orientation))
             and other.name == self.name
         )
 
@@ -538,9 +526,7 @@ class ConfigurationTarget(Target):
         return "ConfigurationTarget({})".format(self.target_configuration)
 
     @classmethod
-    def generate_default_tolerances(
-        cls, configuration: Configuration, tolerance_prismatic: float, tolerance_revolute: float
-    ) -> tuple[list[float], list[float]]:
+    def generate_default_tolerances(cls, configuration: Configuration, tolerance_prismatic: float, tolerance_revolute: float) -> tuple[list[float], list[float]]:
         """Generates tolerances values for the target configuration based on the joint types.
 
         The parameters `tolerance_prismatic` and `tolerance_revolute` are used to generate the
@@ -572,9 +558,7 @@ class ConfigurationTarget(Target):
         >>> configuration = Configuration.from_revolute_values([0, 3.14, 0, 0, 3.14, 0])
         >>> tolerance_prismatic = 0.001
         >>> tolerance_revolute = math.radians(1)
-        >>> tolerances_above, tolerances_below = ConfigurationTarget.generate_default_tolerances(
-        ...     configuration, tolerance_prismatic, tolerance_revolute
-        ... )
+        >>> tolerances_above, tolerances_below = ConfigurationTarget.generate_default_tolerances(configuration, tolerance_prismatic, tolerance_revolute)
         >>> target = ConfigurationTarget(configuration, tolerances_above, tolerances_below)
 
         """
@@ -651,14 +635,8 @@ class ConfigurationTarget(Target):
         # NOTE: Some attributes are optional, so we need to check if they are equally None
         return (
             self.target_configuration.close_to(other.target_configuration)
-            and (
-                other.tolerance_above == self.tolerance_above
-                or TOL.is_allclose(other.tolerance_above, self.tolerance_above)
-            )
-            and (
-                other.tolerance_below == self.tolerance_below
-                or TOL.is_allclose(other.tolerance_below, self.tolerance_below)
-            )
+            and (other.tolerance_above == self.tolerance_above or TOL.is_allclose(other.tolerance_above, self.tolerance_above))
+            and (other.tolerance_below == self.tolerance_below or TOL.is_allclose(other.tolerance_below, self.tolerance_below))
             and other.name == self.name
         )
 
@@ -884,10 +862,7 @@ class FrameWaypoints(Waypoints):
         """
         return (
             len(self.target_frames) == len(other.target_frames)
-            and all(
-                TOL.is_allclose(other_frame, self_frame)
-                for other_frame, self_frame in zip(other.target_frames, self.target_frames)
-            )
+            and all(TOL.is_allclose(other_frame, self_frame) for other_frame, self_frame in zip(other.target_frames, self.target_frames))
             and self.target_mode == other.target_mode
             and TOL.is_close(other.native_scale, self.native_scale)
             and TOL.is_close(other.tolerance_position, self.tolerance_position)
@@ -995,9 +970,7 @@ class PointAxisWaypoints(Waypoints):
             len(self.target_points_and_axes) == len(other.target_points_and_axes)
             and all(
                 TOL.is_allclose(other_point, self_point) and TOL.is_allclose(other_axis, self_axis)
-                for (other_point, other_axis), (self_point, self_axis) in zip(
-                    other.target_points_and_axes, self.target_points_and_axes
-                )
+                for (other_point, other_axis), (self_point, self_axis) in zip(other.target_points_and_axes, self.target_points_and_axes)
             )
             and self.target_mode == other.target_mode
             and TOL.is_close(other.native_scale, self.native_scale)

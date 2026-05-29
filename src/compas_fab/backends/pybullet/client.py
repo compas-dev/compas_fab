@@ -116,9 +116,7 @@ class PyBulletBase:
             self._configure_debug_visualizer(shadows, enable_debug_gui)
 
     @staticmethod
-    def _compose_options(
-        color: Optional[tuple[float, float, float]] = None, width: Optional[int] = None, height: Optional[int] = None
-    ) -> str:
+    def _compose_options(color: Optional[tuple[float, float, float]] = None, width: Optional[int] = None, height: Optional[int] = None) -> str:
         options = ""
         if color is not None:
             options += "--background_color_red={} --background_color_green={} --background_color_blue={}".format(*color)
@@ -133,12 +131,8 @@ class PyBulletBase:
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, enable_debug_gui, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-        pybullet.configureDebugVisualizer(
-            pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id
-        )
-        pybullet.configureDebugVisualizer(
-            pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id
-        )
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
     def disconnect(self, verbose: bool = False):
@@ -356,9 +350,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pybullet.removeBody(self.tools_puids[name], physicsClientId=self.client_id)
         del self.tools_puids[name]
 
-    def _add_rigid_body(
-        self, name: str, rigid_body: RigidBody, concavity: bool = False, mass: float = const.STATIC_MASS
-    ) -> int:
+    def _add_rigid_body(self, name: str, rigid_body: RigidBody, concavity: bool = False, mass: float = const.STATIC_MASS) -> int:
         # Each Mesh in `collision_meshes` / `visual_meshes` becomes its own PyBullet body so
         # disjoint sub-meshes are not lumped into one convex hull (which produces false-positive
         # collisions). All sub-bodies share the same parent rigid-body name and are kept in
@@ -380,17 +372,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for idx, (v_mesh, c_mesh) in enumerate(zip(_padded(visual_meshes), _padded(collision_meshes))):
             visual_path = None
             if v_mesh is not None:
-                visual_path = os.path.join(
-                    self._cache_dir.name, "{}_visual_{}.obj".format(rigid_body.guid, idx)
-                )
+                visual_path = os.path.join(self._cache_dir.name, "{}_visual_{}.obj".format(rigid_body.guid, idx))
                 v_mesh.to_obj(visual_path)
                 visual_path = self._handle_concavity(visual_path, self._cache_dir.name, concavity, mass)
 
             collision_path = None
             if c_mesh is not None:
-                collision_path = os.path.join(
-                    self._cache_dir.name, "{}_collision_{}.obj".format(rigid_body.guid, idx)
-                )
+                collision_path = os.path.join(self._cache_dir.name, "{}_collision_{}.obj".format(rigid_body.guid, idx))
                 c_mesh.to_obj(collision_path)
                 collision_path = self._handle_concavity(collision_path, self._cache_dir.name, concavity, mass)
 
@@ -638,11 +626,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                     mimicked_joint_position = configuration[mimic.joint]
                     joint_values.append(mimic.calculate_position(mimicked_joint_position))
                 else:
-                    raise ValueError(
-                        "Joint value for '{}' is needed for Pybullet but not found in the provided configuration.".format(
-                            joint_name
-                        )
-                    )
+                    raise ValueError("Joint value for '{}' is needed for Pybullet but not found in the provided configuration.".format(joint_name))
         return joint_values
 
     def _get_base_frame(self, body_id):
@@ -653,17 +637,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return self._get_body_info(body_id).base_name.decode(encoding="UTF-8")
 
     def _get_link_state(self, link_id, body_id):
-        return const.LinkState(
-            *pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id)
-        )
+        return const.LinkState(*pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id))
 
     def _get_joint_state(self, joint_id, body_id):
         return const.JointState(*pybullet.getJointState(body_id, joint_id, physicsClientId=self.client_id))
 
     def _get_joint_states(self, joint_ids, body_id):
-        return [
-            const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)
-        ]
+        return [const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)]
 
     def _get_body_info(self, body_id):
         return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
@@ -743,13 +723,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         """
         # Check if the robot has been loaded, careful, puid can be zero
-        assert (
-            self.robot_puid is not None
-        ), "PyBulletClient.robot_puid is None. Robot must be loaded before setting configuration."
+        assert self.robot_puid is not None, "PyBulletClient.robot_puid is None. Robot must be loaded before setting configuration."
 
-        assert (
-            configuration.joint_names != []
-        ), "Joint names must be provided in the configuration passed to set_robot_configuration."
+        assert configuration.joint_names != [], "Joint names must be provided in the configuration passed to set_robot_configuration."
 
         # Iterate through all joints that are considered free by PyBullet
         for joint_name, joint_puid in self._get_pose_joint_names_and_puids():
@@ -763,9 +739,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
                 if mimic:
                     if mimic.joint in configuration:
                         mimicked_joint_position = configuration[mimic.joint]
-                        self._set_joint_position(
-                            joint_puid, mimic.calculate_position(mimicked_joint_position), self.robot_puid
-                        )
+                        self._set_joint_position(joint_puid, mimic.calculate_position(mimicked_joint_position), self.robot_puid)
                     # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
                     # This search and replace can be more elaborate in the future if needed.
 
@@ -784,9 +758,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         """
         # Check if the tool has been loaded
-        assert (
-            tool_name in self.tools_puids
-        ), f"Tool '{tool_name}' must be loaded before setting configuration."
+        assert tool_name in self.tools_puids, f"Tool '{tool_name}' must be loaded before setting configuration."
 
         tool_id = self.tools_puids[tool_name]
 

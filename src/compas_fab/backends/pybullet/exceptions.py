@@ -23,9 +23,7 @@ class PlanningGroupNotSupported(PyBulletError):
     """
 
     def __init__(self, group_name, joint_names, link_names):
-        super(PlanningGroupNotSupported, self).__init__(
-            "Planning group '{}' not supported by PyBullet".format(group_name)
-        )
+        super(PlanningGroupNotSupported, self).__init__("Planning group '{}' not supported by PyBullet".format(group_name))
         self.group_name = group_name
         self.joint_names = joint_names
         self.link_names = link_names

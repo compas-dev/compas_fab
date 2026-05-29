@@ -160,9 +160,7 @@ class PyBulletCheckCollision(CheckCollision):
                         verbose_print(cc_pair_info + " - SKIPPED (ALLOWED TOUCH LINK)")
                         continue
                     try:
-                        client._check_collision(
-                            client.robot_puid, "robot_" + link_name, tool_id, tool_name, link_index_1=link_id
-                        )
+                        client._check_collision(client.robot_puid, "robot_" + link_name, tool_id, tool_name, link_index_1=link_id)
                         verbose_print(cc_pair_info + " - PASS")
 
                     except CollisionCheckError:
@@ -194,9 +192,7 @@ class PyBulletCheckCollision(CheckCollision):
                     # Perform collision check
                     for body_id in body_ids:
                         try:
-                            client._check_collision(
-                                client.robot_puid, "robot_" + link_name, body_id, body_name, link_id
-                            )
+                            client._check_collision(client.robot_puid, "robot_" + link_name, body_id, body_name, link_id)
                             verbose_print(cc_pair_info + " (body_id '{}') - PASS".format(body_id))
                         except CollisionCheckError:
                             verbose_print(cc_pair_info + " (body_id '{}') - COLLISION".format(body_id))
@@ -219,10 +215,7 @@ class PyBulletCheckCollision(CheckCollision):
                     verbose_print(cc_pair_info + " - SKIPPED (HIDDEN)")
                     continue
                 # Skip over non-attached bodies because there is no need to check between two static bodies
-                if not (
-                    client.robot_cell_state.rigid_body_states[body_name].attached_to_tool
-                    or client.robot_cell_state.rigid_body_states[body_name].attached_to_link
-                ):
+                if not (client.robot_cell_state.rigid_body_states[body_name].attached_to_tool or client.robot_cell_state.rigid_body_states[body_name].attached_to_link):
                     verbose_print(cc_pair_info + " - SKIPPED (NOT ATTACHED TO LINK)")
                     continue
                 for other_body_name, other_body_ids in client.rigid_bodies_puids.items():
@@ -242,9 +235,7 @@ class PyBulletCheckCollision(CheckCollision):
                     # Perform collision check
                     for body_id in body_ids:
                         for other_body_id in other_body_ids:
-                            cc_pair_info = "CC.4 between attached rigid body '{}' and rigid body '{}'".format(
-                                body_name, other_body_name
-                            )
+                            cc_pair_info = "CC.4 between attached rigid body '{}' and rigid body '{}'".format(body_name, other_body_name)
                             try:
                                 client._check_collision(body_id, body_name, other_body_id, other_body_name)
                                 verbose_print(cc_pair_info + " - PASS")
@@ -304,9 +295,7 @@ class PyBulletCheckCollision(CheckCollision):
         if collision_messages:
             raise CollisionCheckError("\n".join(collision_messages), collision_pairs)
 
-    def check_collision_for_attached_objects_in_planning_group(
-        self, state: RobotCellState, group: str, planner_coordinate_frame: Frame, options=None
-    ):
+    def check_collision_for_attached_objects_in_planning_group(self, state: RobotCellState, group: str, planner_coordinate_frame: Frame, options=None):
         """A highly specific function for checking whether the attached tool and workpiece(s) for a particular target is in collision
         with stationary objects.
         This function is typically called by planning functions as part of a input sanity check or for checking whether targets are
@@ -375,9 +364,7 @@ class PyBulletCheckCollision(CheckCollision):
 
             if rb_state.attached_to_tool is None:
                 # Just an extra sanity check here
-                assert (
-                    rb_state.frame is not None
-                ), "Rigid body frame must be set for this stationary rigid body:{}.".format(rb_name)
+                assert rb_state.frame is not None, "Rigid body frame must be set for this stationary rigid body:{}.".format(rb_name)
                 continue
 
             if rb_state.attached_to_tool is not None and rb_state.attached_to_tool != attached_tool_name:

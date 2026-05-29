@@ -174,9 +174,7 @@ class MotionPlanRequest(ROSmsg):
         self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
         self.goal_constraints = goal_constraints or []  # moveit_msgs/Constraints[]
         self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
-        self.trajectory_constraints = (
-            trajectory_constraints or TrajectoryConstraints()
-        )  # moveit_msgs/TrajectoryConstraints
+        self.trajectory_constraints = trajectory_constraints or TrajectoryConstraints()  # moveit_msgs/TrajectoryConstraints
         self.planner_id = planner_id  # string
         self.group_name = group_name  # string
         self.num_planning_attempts = int(num_planning_attempts)  # int32

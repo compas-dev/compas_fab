@@ -58,11 +58,7 @@ def cache_scene_object(model, kwargs, components, sceneobject_type=None, debug=F
         scene_object = cached_scene_object
         # Double check if the item is the same
         if scene_object.item is model:
-            debug_print(
-                "Retrieved SceneObject '{}' from cache for '{}'".format(
-                    type(scene_object).__name__, type(model).__name__
-                )
-            )
+            debug_print("Retrieved SceneObject '{}' from cache for '{}'".format(type(scene_object).__name__, type(model).__name__))
     # Create New SceneObject
     else:
         if sceneobject_type:

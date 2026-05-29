@@ -501,9 +501,7 @@ def planner_with_test_cell(pybullet_client):
     planner.set_robot_cell(robot_cell, robot_cell_state)
 
     # Modify the beam attachment frame slightly so that the TCP is not the same as OCF
-    robot_cell_state.rigid_body_states["beam"].attachment_frame = Frame(
-        [0.1, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]
-    )
+    robot_cell_state.rigid_body_states["beam"].attachment_frame = Frame([0.1, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
 
     return planner, robot_cell, robot_cell_state
 

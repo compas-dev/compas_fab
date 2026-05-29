@@ -33,9 +33,7 @@ class PointAxisWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if not points or not axes:
             return None
         if len(points) != len(axes):
-            raise ValueError(
-                "Number of points ({}) and axes ({}) must match".format(len(points), len(axes))
-            )
+            raise ValueError("Number of points ({}) and axes ({}) must match".format(len(points), len(axes)))
 
         pairs = []
         for p, a in zip(points, axes):

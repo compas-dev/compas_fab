@@ -40,9 +40,7 @@ class MoveItSetRobotCell(SetRobotCell):
     )
     ATTACHED_OBJECTS_WEIGHT = 1.0
 
-    def set_robot_cell(
-        self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None
-    ):
+    def set_robot_cell(self, robot_cell: RobotCell, robot_cell_state: RobotCellState = None, options: Optional[dict] = None):
         """Pass the models in the robot cell to the planning client.
 
         The client keeps the robot cell models in memory and uses them for planning.
@@ -72,9 +70,7 @@ class MoveItSetRobotCell(SetRobotCell):
         kwargs["errback_name"] = "errback"
 
         if not isinstance(robot_cell, RobotCell):
-            raise TypeError(
-                "robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__)
-            )
+            raise TypeError("robot_cell should be an instance of RobotCell instead of: {}".format(type(robot_cell).__name__))
 
         # The first step is to remove all the ACO because we cannot remove a CO if it is attached
         step_1_result = await_callback(self._set_robot_cell_remove_aco_async, **kwargs)
@@ -148,9 +144,7 @@ class MoveItSetRobotCell(SetRobotCell):
         request = scene.to_request(client.ros_distro)
         self.APPLY_PLANNING_SCENE(client, request, callback, errback)
 
-    def _set_robot_cell_modify_co_async(
-        self, callback: Callable, errback: Callable, new_robot_cell: RobotCell, options: Optional[dict] = None
-    ):
+    def _set_robot_cell_modify_co_async(self, callback: Callable, errback: Callable, new_robot_cell: RobotCell, options: Optional[dict] = None):
         """
         This function is responsible for creating moveit_msgs/CollisionObject messages
         for each RigidBody in the robot cell with the ADD operation.
@@ -203,11 +197,7 @@ class MoveItSetRobotCell(SetRobotCell):
             # Compare the hash of the rigid body with the previous one
             if rigid_body_id in planner._current_rigid_body_hashes:
                 if rigid_body_hash == planner._current_rigid_body_hashes[rigid_body_id]:
-                    verbose_print(
-                        "SET_RC_2: Rigid body '{}' skipped because is already in the planning scene".format(
-                            rigid_body_id
-                        )
-                    )
+                    verbose_print("SET_RC_2: Rigid body '{}' skipped because is already in the planning scene".format(rigid_body_id))
                     continue
 
             # Create new CollisionObject to be passed to backend
@@ -267,20 +257,14 @@ class MoveItSetRobotCell(SetRobotCell):
                 # Skip links that are already in the backend
                 if collision_object_id in planner._current_tool_hashes:
                     if link_hash == planner._current_tool_hashes[collision_object_id]:
-                        verbose_print(
-                            "SET_RC_2: Link '{}' skipped because it is already in the planning scene".format(
-                                collision_object_id
-                            )
-                        )
+                        verbose_print("SET_RC_2: Link '{}' skipped because it is already in the planning scene".format(collision_object_id))
                         continue
 
                 # NOTE: There can be multiple Collision objects in a link, we put them all into the same CollisionObject
                 collision_meshes = tool_model.get_link_collision_meshes(link)
                 # Skip links that have no collision geometry
                 if not collision_meshes:
-                    verbose_print(
-                        "SET_RC_2: Link '{}' skipped because it has no collision geometry".format(collision_object_id)
-                    )
+                    verbose_print("SET_RC_2: Link '{}' skipped because it has no collision geometry".format(collision_object_id))
                     continue
 
                 # For each mesh in the link, create a CollisionMesh

@@ -31,9 +31,7 @@ __all__ = [
 class MoveItForwardKinematics(ForwardKinematics):
     """Callable to calculate the robot's forward kinematic."""
 
-    GET_POSITION_FK = ServiceDescription(
-        "/compute_fk", "GetPositionFK", GetPositionFKRequest, GetPositionFKResponse, validate_response
-    )
+    GET_POSITION_FK = ServiceDescription("/compute_fk", "GetPositionFK", GetPositionFKRequest, GetPositionFKResponse, validate_response)
 
     def forward_kinematics(
         self,

@@ -102,10 +102,7 @@ class ReachabilityMap(Data):
                     # Tolerance settings in the target is left as default
                     target = FrameTarget(frame, target_mode)
                     # TODO: Test to make sure the IK uses TCF when tools are attached
-                    configurations = [
-                        config
-                        for config in planner.iter_inverse_kinematics(target, robot_cell_state, options=ik_options)
-                    ]
+                    configurations = [config for config in planner.iter_inverse_kinematics(target, robot_cell_state, options=ik_options)]
                 except InverseKinematicsError:
                     if "keep_order" in ik_options:
                         configurations = [None] * 8

@@ -49,9 +49,7 @@ class CollisionObject(ROSmsg):
         self.header = header or Header()  # a header, used for interpreting the poses
         self.id = id  # the id of the object (name used in MoveIt)
         self.type = type or ObjectType()  # The object type in a database of known objects
-        self.pose = (
-            pose or Pose()
-        )  # currently not actively used in FAB, but needed to be present otherwise ROS Noetic complains about empty quaternion
+        self.pose = pose or Pose()  # currently not actively used in FAB, but needed to be present otherwise ROS Noetic complains about empty quaternion
 
         # solid geometric primitives
         self.primitives = primitives or []
@@ -166,9 +164,7 @@ class RobotState(ROSmsg):
     def from_msg(cls, msg):
         joint_state = JointState.from_msg(msg["joint_state"])
         multi_dof_joint_state = MultiDOFJointState.from_msg(msg["multi_dof_joint_state"])
-        attached_collision_objects = [
-            AttachedCollisionObject.from_msg(item) for item in msg["attached_collision_objects"]
-        ]
+        attached_collision_objects = [AttachedCollisionObject.from_msg(item) for item in msg["attached_collision_objects"]]
         return cls(joint_state, multi_dof_joint_state, attached_collision_objects, msg["is_diff"])
 
     def filter_fields_for_distro(self, ros_distro):
