@@ -62,16 +62,33 @@ def _create_slider(joint, lower, upper, default, pivot):
     return slider
 
 
+def _is_number_slider(obj):
+    """Robust slider check.
+
+    ``isinstance(obj, Grasshopper.Kernel.Special.GH_NumberSlider)`` is unreliable
+    in Rhino 8 CPython because of .NET interface interop quirks — `type(obj)`
+    often reports the interface (``IGH_DocumentObject``) rather than the
+    concrete class, and `isinstance` against the concrete class then fails.
+    Comparing the .NET type name is reliable.
+    """
+    return obj.GetType().Name == "GH_NumberSlider"
+
+
 def _strip_slider_sources(target_param, doc):
     """Remove every `GH_NumberSlider` currently feeding ``target_param`` and
-    delete the slider objects from ``doc``. Non-slider sources are left alone."""
-    for source in list(target_param.Sources):
-        if isinstance(source, Grasshopper.Kernel.Special.GH_NumberSlider):
-            target_param.RemoveSource(source)
-            try:
-                doc.RemoveObject(source, True)
-            except Exception:
-                pass
+    delete the slider objects from ``doc``. Non-slider sources are left alone.
+
+    Uses the ``RemoveSource(Guid)`` overload: the ``RemoveSource(IGH_Param)``
+    overload is a silent no-op in Rhino 8 CPython (presumably a marshalling
+    quirk), which previously let sliders accumulate +8 per re-build cycle.
+    """
+    slider_objs = [s for s in list(target_param.Sources) if _is_number_slider(s)]
+    for slider in slider_objs:
+        target_param.RemoveSource(slider.InstanceGuid)
+        try:
+            doc.RemoveObject(slider, True)
+        except Exception:
+            pass
 
 
 def ensure_joint_sliders(component, robot_model, input_name="joints", signature_key="joint_signature"):
@@ -125,34 +142,54 @@ def ensure_joint_sliders(component, robot_model, input_name="joints", signature_
 
     signature = _joint_signature(robot_model)
     sig_sticky_key = create_id(component, signature_key)
+    busy_sticky_key = create_id(component, signature_key + "__busy")
     last_signature = st.get(sig_sticky_key)
 
     configurable_joints = list(robot_model.get_configurable_joints())
 
+    # Re-entrance guard. `doc.AddObject` and `Params.OnParametersChanged`
+    # below trigger nested solves of this same component. Without this
+    # guard, each nested call sees the still-stale sticky signature, enters
+    # the rebuild branch again, and adds another N sliders per joint per
+    # nesting level — slider counts explode (6 joints × 9 nested calls = 54).
+    if st.get(busy_sticky_key):
+        return [(j.name, j.type, _resolve_limits(j)[2]) for j in configurable_joints]
+
     # Rebuild whenever the joint signature changes OR no sliders are currently
     # wired (covers the fresh-drop case after the script has cached a
     # signature in sticky from a previous session/state).
-    has_any_slider_source = any(
-        isinstance(s, Grasshopper.Kernel.Special.GH_NumberSlider) for s in target_param.Sources
-    )
+    has_any_slider_source = any(_is_number_slider(s) for s in target_param.Sources)
     if signature != last_signature or not has_any_slider_source:
-        _strip_slider_sources(target_param, doc)
+        st[busy_sticky_key] = True
+        try:
+            _strip_slider_sources(target_param, doc)
 
-        param_pivot = target_param.Attributes.Pivot
-        row_height = 32
-        slider_x = param_pivot.X - 260
-        slider_y_top = param_pivot.Y - (len(configurable_joints) - 1) * row_height / 2
+            param_pivot = target_param.Attributes.Pivot
+            row_height = 32
+            slider_x = param_pivot.X - 260
+            slider_y_top = param_pivot.Y - (len(configurable_joints) - 1) * row_height / 2
 
-        for index, joint in enumerate(configurable_joints):
-            lower, upper, default = _resolve_limits(joint)
-            slider_pivot = System.Drawing.PointF(slider_x, slider_y_top + index * row_height)
-            slider = _create_slider(joint, lower, upper, default, slider_pivot)
-            doc.AddObject(slider, False)
-            target_param.AddSource(slider)
+            for index, joint in enumerate(configurable_joints):
+                lower, upper, default = _resolve_limits(joint)
+                slider_pivot = System.Drawing.PointF(slider_x, slider_y_top + index * row_height)
+                slider = _create_slider(joint, lower, upper, default, slider_pivot)
+                doc.AddObject(slider, False)
+                target_param.AddSource(slider)
 
-        st[sig_sticky_key] = signature
-        component.Params.OnParametersChanged()
-        # Sliders are now wired but their values only flow on the next solve.
-        doc.ScheduleSolution(5)
+            st[sig_sticky_key] = signature
+            component.Params.OnParametersChanged()
+            # Calling `ExpireSolution` from inside our own `SolveInstance`
+            # doesn't stick — GH resets the expiration state when the solve
+            # unwinds. The reliable pattern is `ScheduleSolution(delay,
+            # callback)`: the callback fires *right before* the scheduled
+            # solve, which is the correct moment to expire ourselves so the
+            # deferred solve actually re-runs this component (with the
+            # freshly-wired sliders flowing in).
+            def _expire_for_next_solve(_doc):
+                component.ExpireSolution(False)
+
+            doc.ScheduleSolution(5, _expire_for_next_solve)
+        finally:
+            st[busy_sticky_key] = False
 
     return [(j.name, j.type, _resolve_limits(j)[2]) for j in configurable_joints]
