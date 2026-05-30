@@ -1,3 +1,7 @@
 compas >= 2.3, < 3
 compas_robots >= 1, < 2
-roslibpy >= 2.0, < 3
+# TEMPORARY: pinning to gramaziokohler/roslibpy#lifecycle-fixes to validate the
+# 2.1 lifecycle fixes (singleton log observer, close() blocks until disconnect)
+# against the integration CI before merging upstream. Revert to
+# `roslibpy >= 2.0, < 3` once the fixes are released as roslibpy 2.1.
+roslibpy @ git+https://github.com/gramaziokohler/roslibpy.git@lifecycle-fixes
