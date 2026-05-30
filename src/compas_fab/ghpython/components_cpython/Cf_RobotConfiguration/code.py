@@ -15,6 +15,7 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import System
 from compas_ghpython import error
 from compas_robots import Configuration
 
@@ -22,7 +23,7 @@ from compas_fab.ghpython import ensure_joint_sliders
 
 
 class RobotConfigurationComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, robot_cell, joints):
+    def RunScript(self, robot_cell, joints: System.Collections.Generic.List[float]):
         if robot_cell is None:
             return None
 
@@ -46,6 +47,6 @@ class RobotConfigurationComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if not joints or len(joints) < len(metadata):
             values = defaults
         else:
-            values = [float(v) for v in joints[: len(metadata)]]
+            values = [float(v) for v in joints]
 
         return Configuration(joint_values=values, joint_types=types, joint_names=names)
