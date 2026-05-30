@@ -45,6 +45,9 @@ jobs:
         # doctests embedded in `src/compas_fab/` modules.
         env:
           COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS: "1"
+          # Opt the whole suite into roslibpy's new asyncio transport
+          # (websockets-based) instead of the historical twisted reactor.
+          ROSLIBPY_TRANSPORT: asyncio
         run: |
           pytest --doctest-modules
 

@@ -159,7 +159,7 @@ class RosClient(Ros, ClientInterface):
 
     Examples
     --------
-    >>> with RosClient() as client:  # doctest: +SKIP
+    >>> with RosClient() as client:
     ...     print("Connected:", client.is_connected)
     Connected: True
     """
@@ -254,7 +254,7 @@ class RosClient(Ros, ClientInterface):
 
         Examples
         --------
-        >>> with RosClient() as client:  # doctest: +SKIP
+        >>> with RosClient() as client:
         ...     robot_cell = client.load_robot_cell()
         ...     print(robot_cell.robot_model.name)
         ur5_robot
