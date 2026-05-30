@@ -38,35 +38,6 @@ jobs:
           python -m pip install --upgrade pip wheel
           python -m pip install --no-cache-dir -e ".[dev]"
 
-      - name: Wait for rosbridge endpoints
-        # rosbridge containers come up asynchronously after `docker compose
-        # up -d --build` returns. Without this gate the `--doctest-modules`
-        # pass occasionally hits `client.py:162` (the `>>> with RosClient()`
-        # example) before the websocket is accepting connections, and
-        # roslibpy's 10s connection timeout fires. The dedicated
-        # `tests/backends/ros/test_ros_client.py` cases usually pass because
-        # they run later in the session, by which point the bridge is warm.
-        # 120s is well above the worst observed cold-start; reaching it
-        # means the container itself is unhealthy.
-        run: |
-          for port in 9090 9091; do
-            echo "Waiting for rosbridge on localhost:$port..."
-            ready=0
-            for i in $(seq 1 120); do
-              if (echo > /dev/tcp/localhost/$port) 2>/dev/null; then
-                echo "  ready after ${i}s"
-                ready=1
-                break
-              fi
-              sleep 1
-            done
-            if [ "$ready" -ne 1 ]; then
-              echo "  TIMED OUT after 120s waiting for port $port"
-              docker ps -a
-              exit 1
-            fi
-          done
-
       - name: Run tests + doctests
         # `COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS=1` opts the `ros1_client` /
         # `ros2_client` fixtures into actually connecting (otherwise every
