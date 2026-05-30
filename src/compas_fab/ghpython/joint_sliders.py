@@ -1,8 +1,11 @@
-"""Helper for auto-creating per-joint Number Sliders and dynamic input params.
+"""Helper for auto-creating per-joint Number Sliders wired into one list input.
 
-Mirrors the spirit of `ensure_value_list` but for the more involved case where
-the input set itself depends on runtime data (the number, names, and limits of
-configurable joints in a `RobotModel`).
+The hosting component declares a single `joints` input with list access. This
+helper auto-creates one `GH_NumberSlider` per configurable joint and wires
+them all to that input in canonical joint order. Because the input is part
+of the script signature, GH collects its data via the normal solve path and
+the script receives `joints` as a plain Python list of floats — no
+`VolatileData` dance required.
 """
 
 import math
@@ -14,7 +17,6 @@ if compas.RHINO:
     import System
 
 
-_JOINT_INPUT_PREFIX = "j_"
 _DEFAULT_CONTINUOUS_RANGE = 2 * math.pi
 _DEFAULT_PRISMATIC_RANGE = 1.0
 
@@ -49,27 +51,10 @@ def _resolve_limits(joint):
     return lower, upper, default
 
 
-def _remove_joint_inputs(component, doc):
-    """Tear down every existing `j_*` input parameter and the auto-created
-    sliders feeding them."""
-    to_remove = [p for p in component.Params.Input if p.Name.startswith(_JOINT_INPUT_PREFIX)]
-    for param in to_remove:
-        for source in list(param.Sources):
-            param.RemoveSource(source)
-            if isinstance(source, Grasshopper.Kernel.Special.GH_NumberSlider):
-                try:
-                    doc.RemoveObject(source, True)
-                except Exception:
-                    pass
-        component.Params.UnregisterInputParameter(param, True)
-    if to_remove:
-        component.Params.OnParametersChanged()
-
-
 def _create_slider(joint, lower, upper, default, pivot):
     slider = Grasshopper.Kernel.Special.GH_NumberSlider()
     slider.CreateAttributes()
-    # SetInitCode "min<value<max" is the documented shortcut to configure range + value in one shot.
+    # SetInitCode "min<value<max" is the documented shortcut for range+value.
     slider.SetInitCode("{:.6f}<{:.6f}<{:.6f}".format(lower, default, upper))
     slider.NickName = joint.name
     slider.Attributes.Pivot = pivot
@@ -77,47 +62,30 @@ def _create_slider(joint, lower, upper, default, pivot):
     return slider
 
 
-def _create_input_param(joint, description):
-    param = Grasshopper.Kernel.Parameters.Param_Number()
-    param.Name = "{}{}".format(_JOINT_INPUT_PREFIX, joint.name)
-    param.NickName = joint.name
-    param.Description = description
-    param.Access = Grasshopper.Kernel.GH_ParamAccess.item
-    param.Optional = True
-    return param
-
-
-def _read_input_value(param, default):
-    """Pull a single float out of an input parameter's volatile data."""
-    data = param.VolatileData
-    if data.PathCount == 0:
-        return default
-    for path_index in range(data.PathCount):
-        branch = data.get_Branch(path_index)
-        for item in branch:
-            if item is None:
-                continue
+def _strip_slider_sources(target_param, doc):
+    """Remove every `GH_NumberSlider` currently feeding ``target_param`` and
+    delete the slider objects from ``doc``. Non-slider sources are left alone."""
+    for source in list(target_param.Sources):
+        if isinstance(source, Grasshopper.Kernel.Special.GH_NumberSlider):
+            target_param.RemoveSource(source)
             try:
-                return float(item.Value)
-            except (AttributeError, TypeError, ValueError):
-                try:
-                    return float(item)
-                except (TypeError, ValueError):
-                    continue
-    return default
+                doc.RemoveObject(source, True)
+            except Exception:
+                pass
 
 
-def ensure_joint_sliders(component, robot_model, signature_key="joint_signature"):
-    """Sync per-joint inputs and sliders to a `RobotModel`.
+def ensure_joint_sliders(component, robot_model, input_name="joints", signature_key="joint_signature"):
+    """Wire one Number Slider per configurable joint into the named list input.
 
-    On first call (or when the model's joint signature changes) the helper
-    registers one `Param_Number` input per configurable joint, auto-creates
-    a `GH_NumberSlider` feeding each input with the joint's limits, and
-    schedules a follow-up solve so the freshly wired values reach the
-    component right away.
+    On first call (or when the model's joint signature changes), this helper
+    deletes any previously auto-wired sliders on the target input and creates
+    a fresh bank — one `GH_NumberSlider` per configurable joint, in canonical
+    order, with ranges set to each joint's limits. All sliders are wired to
+    a single list-access input named ``input_name``.
 
-    Subsequent calls with the same model are no-ops aside from reading the
-    current slider values.
+    No reading of slider values is necessary: the calling script declares
+    ``input_name`` in its `RunScript` signature and receives the values as a
+    plain Python list of floats via the standard GH solve path.
 
     Parameters
     ----------
@@ -125,6 +93,9 @@ def ensure_joint_sliders(component, robot_model, signature_key="joint_signature"
         Pass `ghenv.Component`.
     robot_model : compas_robots.RobotModel
         The model to derive joint metadata from.
+    input_name : str, optional
+        Name of the static list-access input the sliders are wired into.
+        Must exist on the component. Defaults to ``"joints"``.
     signature_key : str, optional
         Sticky key suffix used to remember the last installed joint signature
         on this component. Override if the same component manages multiple
@@ -132,7 +103,10 @@ def ensure_joint_sliders(component, robot_model, signature_key="joint_signature"
 
     Returns
     -------
-    list of (joint_name, joint_type, value) tuples in `robot_model.get_configurable_joints()` order.
+    list of (joint_name, joint_type, default_value) tuples in canonical
+    joint order. Use this for the configuration's `joint_names` /
+    `joint_types`, and as a fallback when the `joints` list isn't yet
+    populated (e.g. the very first solve before the scheduled follow-up).
     """
     from compas_ghpython import create_id
     from scriptcontext import sticky as st
@@ -141,43 +115,44 @@ def ensure_joint_sliders(component, robot_model, signature_key="joint_signature"
     if doc is None:
         return []
 
+    target_param = None
+    for p in component.Params.Input:
+        if p.Name == input_name:
+            target_param = p
+            break
+    if target_param is None:
+        return []
+
     signature = _joint_signature(robot_model)
-    sticky_key = create_id(component, signature_key)
-    last_signature = st.get(sticky_key)
+    sig_sticky_key = create_id(component, signature_key)
+    last_signature = st.get(sig_sticky_key)
 
-    if signature != last_signature:
-        _remove_joint_inputs(component, doc)
+    configurable_joints = list(robot_model.get_configurable_joints())
 
-        component_pivot = component.Attributes.Pivot
-        slider_x = component_pivot.X - 280
-        slider_y_top = component_pivot.Y + 20
+    # Rebuild whenever the joint signature changes OR no sliders are currently
+    # wired (covers the fresh-drop case after the script has cached a
+    # signature in sticky from a previous session/state).
+    has_any_slider_source = any(
+        isinstance(s, Grasshopper.Kernel.Special.GH_NumberSlider) for s in target_param.Sources
+    )
+    if signature != last_signature or not has_any_slider_source:
+        _strip_slider_sources(target_param, doc)
+
+        param_pivot = target_param.Attributes.Pivot
         row_height = 32
+        slider_x = param_pivot.X - 260
+        slider_y_top = param_pivot.Y - (len(configurable_joints) - 1) * row_height / 2
 
-        configurable_joints = robot_model.get_configurable_joints()
         for index, joint in enumerate(configurable_joints):
             lower, upper, default = _resolve_limits(joint)
-            description = "{} [{:.3f} .. {:.3f}]".format(joint.name, lower, upper)
-            param = _create_input_param(joint, description)
-            insert_index = len(component.Params.Input)
-            component.Params.RegisterInputParam(param, insert_index)
-
             slider_pivot = System.Drawing.PointF(slider_x, slider_y_top + index * row_height)
             slider = _create_slider(joint, lower, upper, default, slider_pivot)
             doc.AddObject(slider, False)
-            param.AddSource(slider)
+            target_param.AddSource(slider)
 
+        st[sig_sticky_key] = signature
         component.Params.OnParametersChanged()
-        st[sticky_key] = signature
+        # Sliders are now wired but their values only flow on the next solve.
         doc.ScheduleSolution(5)
-        # Sliders are wired but won't deliver values until the scheduled solve runs.
-        return [(j.name, j.type, _resolve_limits(j)[2]) for j in configurable_joints]
 
-    # Same signature — read current values from the existing inputs.
-    values = []
-    inputs_by_name = {p.Name: p for p in component.Params.Input}
-    for joint in robot_model.get_configurable_joints():
-        param = inputs_by_name.get("{}{}".format(_JOINT_INPUT_PREFIX, joint.name))
-        _, _, default = _resolve_limits(joint)
-        value = _read_input_value(param, default) if param is not None else default
-        values.append((joint.name, joint.type, value))
-    return values
+    return [(j.name, j.type, _resolve_limits(j)[2]) for j in configurable_joints]

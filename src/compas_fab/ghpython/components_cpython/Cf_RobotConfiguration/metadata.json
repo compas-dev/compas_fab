@@ -12,6 +12,12 @@
             {
                 "name": "robot_cell",
                 "description": "The RobotCell to derive joint metadata from. Wiring a new cell rebuilds the slider bank to match its configurable joints."
+            },
+            {
+                "name": "joints",
+                "description": "Joint values in canonical joint order. Auto-populated by the per-joint sliders the component creates; wire your own values to override.",
+                "typeHintID": "float",
+                "scriptParamAccess": 1
             }
         ],
         "outputParameters": [
