@@ -1,0 +1,24 @@
+{
+    "name": "Robot Configuration",
+    "nickname": "Robot Config",
+    "category": "COMPAS FAB",
+    "subcategory": "Targets",
+    "description": "Build a Configuration from per-joint sliders auto-created from a RobotCell. One slider per configurable joint, ranges set to the joint's limits. Drop and wire a robot_cell — the slider bank appears automatically.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "The RobotCell to derive joint metadata from. Wiring a new cell rebuilds the slider bank to match its configurable joints."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "configuration",
+                "description": "Configuration with joint_names and joint_types extracted from the cell."
+            }
+        ]
+    }
+}

@@ -14,6 +14,7 @@ if compas.RHINO:
         RobotCellObject,
         RobotModelObject,
     )
+    from .joint_sliders import ensure_joint_sliders
     from .sticky_cache import cache_scene_object
     from .value_list import ensure_value_list
 
@@ -23,5 +24,6 @@ if compas.RHINO:
         "RobotCellObject",
         "RobotModelObject",
         "cache_scene_object",
+        "ensure_joint_sliders",
         "ensure_value_list",
     ]

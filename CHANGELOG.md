@@ -151,7 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * *Backends* — `Cf_RosClient`, `Cf_MoveItPlanner`, `Cf_AnalyticalKinematicsPlanner`.
   * *Robot Cell* — `Cf_LoadRobotCellFromLibrary` (with an auto-created dropdown listing every `RobotCellLibrary` entry), `Cf_LoadRobotCellFromRos`, `Cf_LoadRobotCellFromUrdfSrdf`, `Cf_AddToolToCell`, `Cf_AddRigidBodyToCell`, `Cf_RigidBodyFromMesh`, `Cf_ToolFromLibrary`, `Cf_RigidBodyFromLibrary`.
   * *Cell State* — `Cf_DefaultCellState`, `Cf_SetRobotConfiguration`, `Cf_AttachToolToRobot`, `Cf_AttachRigidBodyToTool`, `Cf_AttachRigidBodyToLink`, `Cf_SetRigidBodyFrame`, `Cf_SetTouchLinks`.
-  * *Targets* — `Cf_FrameTarget`, `Cf_PointAxisTarget`, `Cf_ConfigurationTarget`, `Cf_FrameWaypoints`, `Cf_PointAxisWaypoints`, `Cf_Configuration`.
+  * *Targets* — `Cf_FrameTarget`, `Cf_PointAxisTarget`, `Cf_ConfigurationTarget`, `Cf_FrameWaypoints`, `Cf_PointAxisWaypoints`, `Cf_Configuration`, `Cf_RobotConfiguration` (cell-aware variant that auto-creates one `GH_NumberSlider` per configurable joint with the joint's limits — drop and wire a `robot_cell` and the slider bank appears).
   * *Planning* — `Cf_ForwardKinematics`, `Cf_InverseKinematics`, `Cf_PlanMotion`, `Cf_PlanCartesianMotion`.
   * *Display* — `Cf_VisualizeRobotCell` (uses the `RobotCellObject` scene object with native-geometry caching for smooth slider scrubbing).
   * *ROS* — `Cf_RosTopicPublish`, `Cf_RosTopicSubscribe` (ported to the new `RosClient`).
