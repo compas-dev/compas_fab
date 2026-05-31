@@ -40,7 +40,15 @@ from compas_fab.robots import TargetMode
 
 class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, planner, target, start_state, group: str):
-        if not (planner and target):
+        if planner is None or target is None:
+            # Warn only when the input *is* wired but the upstream returned
+            # None (i.e. upstream silently failed). If nothing is wired, the
+            # user is still building the canvas — staying quiet keeps it clean.
+            for name, value in (("planner", planner), ("target", target)):
+                if value is None:
+                    param = next(p for p in ghenv.Component.Params.Input if p.Name == name)  # noqa: F821
+                    if param.SourceCount > 0:
+                        warning(ghenv.Component, "{} input is wired but received None; check the upstream component for errors.".format(name))  # noqa: F821
             return None
 
         if not isinstance(target, Target):
