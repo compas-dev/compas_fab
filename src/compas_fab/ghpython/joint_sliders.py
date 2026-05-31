@@ -160,36 +160,43 @@ def ensure_joint_sliders(component, robot_model, input_name="joints", signature_
     # signature in sticky from a previous session/state).
     has_any_slider_source = any(_is_number_slider(s) for s in target_param.Sources)
     if signature != last_signature or not has_any_slider_source:
-        st[busy_sticky_key] = True
-        try:
-            _strip_slider_sources(target_param, doc)
+        # IMPORTANT: defer ALL mutation (strip, create, wire,
+        # OnParametersChanged, expire self) to a `ScheduleSolution(delay,
+        # callback)` callback — the callback fires from GH's timer thread
+        # between solves, NOT inside an active solve. Doing this work inline
+        # in `RunScript` (we used to) mutates the document mid-solve and
+        # expires every already-queued downstream consumer, popping a
+        # "X expired during a solution" breakpoint per consumer (6–8 times
+        # on a robot switch). Deferring the work absorbs the cascade into
+        # the upcoming solve rather than disrupting the current one.
+        def _rebuild(_doc):
+            if st.get(busy_sticky_key):
+                return
+            st[busy_sticky_key] = True
+            try:
+                _strip_slider_sources(target_param, doc)
 
-            param_pivot = target_param.Attributes.Pivot
-            row_height = 32
-            slider_x = param_pivot.X - 260
-            slider_y_top = param_pivot.Y - (len(configurable_joints) - 1) * row_height / 2
+                param_pivot = target_param.Attributes.Pivot
+                row_height = 32
+                slider_x = param_pivot.X - 260
+                slider_y_top = param_pivot.Y - (len(configurable_joints) - 1) * row_height / 2
 
-            for index, joint in enumerate(configurable_joints):
-                lower, upper, default = _resolve_limits(joint)
-                slider_pivot = System.Drawing.PointF(slider_x, slider_y_top + index * row_height)
-                slider = _create_slider(joint, lower, upper, default, slider_pivot)
-                doc.AddObject(slider, False)
-                target_param.AddSource(slider)
+                for index, joint in enumerate(configurable_joints):
+                    lower, upper, default = _resolve_limits(joint)
+                    slider_pivot = System.Drawing.PointF(slider_x, slider_y_top + index * row_height)
+                    slider = _create_slider(joint, lower, upper, default, slider_pivot)
+                    doc.AddObject(slider, False)
+                    target_param.AddSource(slider)
 
-            st[sig_sticky_key] = signature
-            component.Params.OnParametersChanged()
-            # Calling `ExpireSolution` from inside our own `SolveInstance`
-            # doesn't stick — GH resets the expiration state when the solve
-            # unwinds. The reliable pattern is `ScheduleSolution(delay,
-            # callback)`: the callback fires *right before* the scheduled
-            # solve, which is the correct moment to expire ourselves so the
-            # deferred solve actually re-runs this component (with the
-            # freshly-wired sliders flowing in).
-            def _expire_for_next_solve(_doc):
+                st[sig_sticky_key] = signature
+                component.Params.OnParametersChanged()
+                # The callback fires right before the scheduled solve, so
+                # expiring here causes that solve to re-run this component
+                # with the freshly-wired sliders flowing in.
                 component.ExpireSolution(False)
+            finally:
+                st[busy_sticky_key] = False
 
-            doc.ScheduleSolution(5, _expire_for_next_solve)
-        finally:
-            st[busy_sticky_key] = False
+        doc.ScheduleSolution(5, _rebuild)
 
     return [(j.name, j.type, _resolve_limits(j)[2]) for j in configurable_joints]
