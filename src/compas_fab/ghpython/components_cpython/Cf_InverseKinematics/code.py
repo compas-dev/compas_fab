@@ -7,6 +7,12 @@ attached tools/workpieces (which affect what 'TOOL'/'WORKPIECE' target modes
 resolve to). The resulting Configuration is returned; the input state is not
 mutated.
 
+If `start_state` is left unwired, a zero-configuration default state is
+derived from the planner's robot_cell and used as the seed; a warning is
+surfaced on the component so the user knows attachments aren't being
+considered. Wire an explicit `start_state` to pose the robot mid-process
+or to use a state with attached tools / workpieces.
+
 If no IK solution is found, the component is flagged with an error message
 (visible in the component balloon) and returns None.
 
@@ -15,14 +21,23 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 from compas_ghpython import error
+from compas_ghpython import warning
 
 from compas_fab.backends.exceptions import InverseKinematicsError
+from compas_fab.robots import RobotCellState
 
 
 class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, planner, target, start_state, group: str):
-        if not (planner and target and start_state):
+        if not (planner and target):
             return None
+
+        if start_state is None:
+            if planner.robot_cell is None:
+                error(ghenv.Component, "No start_state wired and the planner has no robot_cell to derive one from.")  # noqa: F821
+                return None
+            start_state = planner.robot_cell_state or RobotCellState.from_robot_cell(planner.robot_cell)
+            warning(ghenv.Component, "No start_state wired; using zero-configuration default from planner.robot_cell. Wire a state explicitly to seed from a different configuration or to keep tool/workpiece attachments.")  # noqa: F821
 
         try:
             return planner.inverse_kinematics(
