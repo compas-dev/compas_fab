@@ -149,7 +149,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         try:
             solutions = solver.inverse(frame_RCF)
         except ValueError:
-            raise InverseKinematicsError()
+            raise InverseKinematicsError("No IK solution found for the given frame.")
         configurations = []
         for solution in solutions:
             if solution is not None:
@@ -163,7 +163,7 @@ class AnalyticalInverseKinematics(InverseKinematics):
         configurations = try_to_fit_configurations_between_bounds(robot_cell, configurations, group=group)
 
         if not any(configurations):
-            raise InverseKinematicsError()
+            raise InverseKinematicsError("No IK solution found for the given frame.")
 
         for config in configurations:
             # if keep_order is False, remove None solutions
