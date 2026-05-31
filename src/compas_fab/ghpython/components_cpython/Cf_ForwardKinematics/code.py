@@ -3,9 +3,9 @@
 Compute forward kinematics from a RobotCellState using a stateless planner.
 
 The returned frame depends on the `target_mode`:
-  - 'ROBOT'      : PCF (planner coordinate frame, last link of the planning group)
-  - 'TOOL'       : TCF of the attached tool
-  - 'WORKPIECE'  : OCF of the attached workpiece
+* 'ROBOT'      : PCF (planner coordinate frame, last link of the planning group)
+* 'TOOL'       : TCF of the attached tool
+* 'WORKPIECE'  : OCF of the attached workpiece
 
 The Configuration to evaluate is taken from `cell_state.robot_configuration`;
 use the SetRobotConfiguration helper upstream to override it.
