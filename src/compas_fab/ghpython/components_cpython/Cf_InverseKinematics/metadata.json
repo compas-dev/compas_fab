@@ -31,6 +31,10 @@
             {
                 "name": "configuration",
                 "description": "Resulting Configuration, or None if no solution was found."
+            },
+            {
+                "name": "cell_state",
+                "description": "A copy of the start_state with `robot_configuration` set to the IK result. Wire straight into VisualizeRobotCell / ForwardKinematics / next planner step — no SetRobotConfiguration needed."
             }
         ]
     }

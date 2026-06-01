@@ -8,6 +8,10 @@ tool TCF.
 
 Passthrough builder: the input state is copied.
 
+If `touch_links` is left unwired, defaults to `[link_name]` (the link the
+body is attached to, which it inevitably overlaps). A warning is surfaced
+so the auto-pick isn't silent.
+
 COMPAS FAB v1.1.0
 """
 
@@ -16,6 +20,7 @@ from copy import deepcopy
 import Grasshopper
 import System
 from compas.geometry import Frame
+from compas_ghpython import warning
 from compas_rhino.conversions import plane_to_compas_frame
 
 
@@ -36,6 +41,10 @@ class AttachRigidBodyToLink(Grasshopper.Kernel.GH_ScriptInstance):
             attachment_frame = attachment_plane if isinstance(attachment_plane, Frame) else plane_to_compas_frame(attachment_plane)
 
         touch_links_list = list(touch_links) if touch_links else None
+
+        if touch_links_list is None:
+            touch_links_list = [link_name.strip()]
+            warning(ghenv.Component, "touch_links unwired; defaulted to {} (the link the body is attached to). Wire your own list to override.".format(touch_links_list))  # noqa: F821
 
         new_state = deepcopy(cell_state)
         new_state.set_rigid_body_attached_to_link(

@@ -10,7 +10,10 @@ warning. Wire a dedicated Target component for non-default settings.
 
 The starting RobotCellState provides the robot's seed configuration and any
 attached tools/workpieces (which affect what 'TOOL'/'WORKPIECE' target modes
-resolve to). The resulting Configuration is returned; the input state is not
+resolve to). The component returns both the resulting Configuration and a
+copy of the start_state with that Configuration applied (`cell_state`), so
+the next stage (Visualize / FK / next planner step) can wire directly
+without an intermediate SetRobotConfiguration. The input state is not
 mutated.
 
 If `start_state` is left unwired, a zero-configuration default state is
@@ -20,10 +23,12 @@ considered. Wire an explicit `start_state` to pose the robot mid-process
 or to use a state with attached tools / workpieces.
 
 If no IK solution is found, the component is flagged with an error message
-(visible in the component balloon) and returns None.
+(visible in the component balloon) and returns (None, None).
 
 COMPAS FAB v1.1.0
 """
+
+from copy import deepcopy
 
 import Grasshopper
 from compas.geometry import Frame
@@ -49,7 +54,7 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                     param = next(p for p in ghenv.Component.Params.Input if p.Name == name)  # noqa: F821
                     if param.SourceCount > 0:
                         warning(ghenv.Component, "{} input is wired but received None; check the upstream component for errors.".format(name))  # noqa: F821
-            return None
+            return (None, None)
 
         if not isinstance(target, Target):
             wrap_msg = "Wrapped a {} as FrameTarget(target_mode=ROBOT) with default tolerances. Wire a Target component for non-default settings."
@@ -64,14 +69,14 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                     frame = plane_to_compas_frame(target)
                 except Exception:
                     error(ghenv.Component, "target must be a Target, a COMPAS Frame or a Rhino Plane; got {}.".format(type(target).__name__))  # noqa: F821
-                    return None
+                    return (None, None)
                 target = FrameTarget(target_frame=frame, target_mode=TargetMode.ROBOT)
                 warning(ghenv.Component, wrap_msg.format("Rhino Plane"))  # noqa: F821
 
         if start_state is None:
             if planner.robot_cell is None:
                 error(ghenv.Component, "No start_state wired and the planner has no robot_cell to derive one from.")  # noqa: F821
-                return None
+                return (None, None)
             start_state = planner.robot_cell_state or RobotCellState.from_robot_cell(planner.robot_cell)
             warning(  # noqa: F821
                 ghenv.Component,  # noqa: F821
@@ -80,11 +85,18 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
             )
 
         try:
-            return planner.inverse_kinematics(
+            configuration = planner.inverse_kinematics(
                 target=target,
                 robot_cell_state=start_state,
                 group=group or None,
             )
         except InverseKinematicsError as e:
             error(ghenv.Component, "Inverse kinematics failed: {}".format(e))  # noqa: F821
-            return None
+            return (None, None)
+
+        if configuration is None:
+            return (None, None)
+
+        new_state = deepcopy(start_state)
+        new_state.robot_configuration = configuration
+        return (configuration, new_state)
