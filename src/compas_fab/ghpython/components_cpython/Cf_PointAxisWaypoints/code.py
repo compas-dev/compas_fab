@@ -10,7 +10,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
-import System
+import Rhino
+import System  # noqa: F401
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas_ghpython import error
@@ -24,8 +25,8 @@ from compas_fab.robots import TargetMode
 class PointAxisWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(
         self,
-        points: System.Collections.Generic.List[object],
-        axes: System.Collections.Generic.List[object],
+        points: list[Rhino.Geometry.Point3d],
+        axes: list[object],
         target_mode: str,
         tolerance_position: float,
         tolerance_orientation: float,

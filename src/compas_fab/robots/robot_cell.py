@@ -1,3 +1,4 @@
+import os
 import random
 from typing import Optional
 from typing import Union
@@ -169,7 +170,14 @@ class RobotCell(Data):
         robot_semantics = RobotSemantics.from_srdf_file(srdf_filename, robot_model)
 
         if local_package_mesh_folder:
-            loader = LocalPackageMeshLoader(compas_fab.get(local_package_mesh_folder), "")
+            # Absolute paths are used as-is; relative paths are resolved
+            # against `compas_fab.DATA` (so the existing shorthand for the
+            # bundled robot library — e.g. "robot_library/ur5_robot" — keeps
+            # working). Going through `compas_fab.get` blindly would mangle
+            # absolute paths because `_find_resource` strips the leading
+            # slash before joining.
+            mesh_root = local_package_mesh_folder if os.path.isabs(local_package_mesh_folder) else compas_fab.get(local_package_mesh_folder)
+            loader = LocalPackageMeshLoader(mesh_root, "")
             robot_model.load_geometry(loader)
 
         robot_cell = cls(robot_model, robot_semantics)
