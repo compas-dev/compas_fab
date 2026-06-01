@@ -124,7 +124,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         trajectory.fraction = len(path) / len(pcf_frames)
         # Technically trajectory.fraction should always be 1.0 because otherwise, the path would be rejected earlier
         trajectory.joint_names = path[0].joint_names
-        trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types) for config in path]
+        trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types, joint_names=config.joint_names) for config in path]
         first_configuration = robot_cell.fill_configuration_with_joint_names(path[0])
         trajectory.start_configuration = robot_cell.zero_full_configuration().merged(first_configuration)
         return trajectory

@@ -68,7 +68,7 @@ def convert_constraints_to_rosmsg(constraints, header):
     return ros_constraints
 
 
-def convert_trajectory_points(points, joint_types):
+def convert_trajectory_points(points, joint_types, joint_names=None):
     result = []
 
     for pt in points:
@@ -79,6 +79,7 @@ def convert_trajectory_points(points, joint_types):
             accelerations=pt.accelerations,
             effort=pt.effort,
             time_from_start=Duration(pt.time_from_start.secs, pt.time_from_start.nsecs),
+            joint_names=joint_names,
         )
 
         result.append(jtp)
@@ -94,7 +95,7 @@ def convert_trajectory(joints, solution, solution_start_state, fraction, plannin
     trajectory.planning_time = planning_time
 
     joint_types = [joints[name] for name in trajectory.joint_names]
-    trajectory.points = convert_trajectory_points(solution.joint_trajectory.points, joint_types)
+    trajectory.points = convert_trajectory_points(solution.joint_trajectory.points, joint_types, trajectory.joint_names)
 
     start_state = solution_start_state.joint_state
     start_state_types = [joints[name] for name in start_state.name]

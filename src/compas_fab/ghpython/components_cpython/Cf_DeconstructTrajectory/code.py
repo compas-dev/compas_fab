@@ -21,14 +21,16 @@ from copy import deepcopy
 import Grasshopper
 
 
-def _state_with_point(start_state, point):
+def _state_with_point(start_state, point, trajectory_joint_names):
     new_state = deepcopy(start_state)
     base = new_state.robot_configuration
-    if base is None or list(point.joint_names) == list(base.joint_names):
+    if base is None:
         new_state.robot_configuration = point
         return new_state
-    by_name = dict(zip(point.joint_names, point.joint_values))
-    base.joint_values = [by_name.get(name, val) for name, val in zip(base.joint_names, base.joint_values)]
+    if not point.joint_names and trajectory_joint_names:
+        point = deepcopy(point)
+        point.joint_names = list(trajectory_joint_names)
+    new_state.robot_configuration = base.merged(point)
     return new_state
 
 
@@ -41,5 +43,6 @@ class DeconstructTrajectory(Grasshopper.Kernel.GH_ScriptInstance):
         if start_state is None:
             return (configurations, [])
 
-        cell_states = [_state_with_point(start_state, pt) for pt in trajectory.points]
+        trajectory_joint_names = getattr(trajectory, "joint_names", None)
+        cell_states = [_state_with_point(start_state, pt, trajectory_joint_names) for pt in trajectory.points]
         return (configurations, cell_states)
