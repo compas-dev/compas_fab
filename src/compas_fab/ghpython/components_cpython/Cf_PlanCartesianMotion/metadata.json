@@ -54,6 +54,14 @@
             {
                 "name": "error",
                 "description": "Error message if planning failed; None on success."
+            },
+            {
+                "name": "planes",
+                "description": "List of Rhino planes — one per trajectory point — at the planning group's end-effector frame (target_mode=ROBOT). Computed via FK on the planner with the start_state's attachments preserved."
+            },
+            {
+                "name": "polyline",
+                "description": "Polyline connecting the plane origins in trajectory order. None when the trajectory has fewer than two points."
             }
         ]
     }

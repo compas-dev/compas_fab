@@ -16,6 +16,7 @@ if compas.RHINO:
     )
     from .joint_sliders import ensure_joint_sliders
     from .sticky_cache import cache_scene_object
+    from .trajectory_viz import trajectory_to_planes_and_polyline
     from .value_list import ensure_dynamic_value_list
     from .value_list import ensure_value_list
 
@@ -28,4 +29,5 @@ if compas.RHINO:
         "ensure_dynamic_value_list",
         "ensure_joint_sliders",
         "ensure_value_list",
+        "trajectory_to_planes_and_polyline",
     ]

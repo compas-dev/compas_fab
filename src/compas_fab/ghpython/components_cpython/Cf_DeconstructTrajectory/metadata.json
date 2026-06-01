@@ -1,0 +1,32 @@
+{
+    "name": "Deconstruct Trajectory",
+    "nickname": "Deconstruct Trajectory",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Expand a JointTrajectory into a list of Configurations and (optionally) a list of RobotCellStates ready to feed VisualizeRobotCell. Pair with a Stream Filter / Index slider to scrub through trajectory frames.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "trajectory",
+                "description": "A JointTrajectory (typically the output of PlanMotion or PlanCartesianMotion)."
+            },
+            {
+                "name": "start_state",
+                "description": "Optional RobotCellState used as the template for each per-point state. If unwired, the `cell_states` output is empty (only `configurations` is populated)."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "configurations",
+                "description": "One Configuration per trajectory point, in order."
+            },
+            {
+                "name": "cell_states",
+                "description": "One RobotCellState per trajectory point: a copy of `start_state` with `robot_configuration` set to the corresponding point. Empty when `start_state` is unwired."
+            }
+        ]
+    }
+}

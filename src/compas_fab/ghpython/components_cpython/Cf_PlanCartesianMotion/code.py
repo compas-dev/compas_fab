@@ -19,6 +19,7 @@ from compas_ghpython import warning as gh_warning
 from scriptcontext import sticky as st
 
 from compas_fab.backends import MotionPlanningError
+from compas_fab.ghpython import trajectory_to_planes_and_polyline
 
 
 class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
@@ -34,11 +35,16 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
     ):
         key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
+        def _viz(trajectory):
+            return trajectory_to_planes_and_polyline(planner, start_state, trajectory, group or None)
+
         if not (planner and waypoints and start_state and compute):
             cached = st.get(key)
             if cached is None:
-                return (None, None, None)
-            return cached
+                return (None, None, None, [], None)
+            trajectory, fraction, error_msg = cached
+            planes, polyline = _viz(trajectory)
+            return (trajectory, fraction, error_msg, planes, polyline)
 
         options = {}
         if max_step:
@@ -64,4 +70,5 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
 
         fraction = getattr(trajectory, "fraction", None) if trajectory is not None else None
         st[key] = (trajectory, fraction, error_msg)
-        return st[key]
+        planes, polyline = _viz(trajectory)
+        return (trajectory, fraction, error_msg, planes, polyline)
