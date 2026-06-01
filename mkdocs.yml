@@ -176,6 +176,7 @@ nav:
       - developer/index.md
       - Backend architecture: developer/architecture.md
       - Grasshopper components: developer/grasshopper.md
+      - Icon system: developer/icons/index.md
   - Changelog: changelog.md
   - Citing: citing.md
   - License: license.md
