@@ -36,6 +36,7 @@ from compas_ghpython import error
 from compas_ghpython import warning
 from compas_rhino.conversions import plane_to_compas_frame
 
+from compas_fab.backends.exceptions import BackendTargetNotSupportedError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellState
@@ -90,6 +91,17 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                 robot_cell_state=start_state,
                 group=group or None,
             )
+        except BackendTargetNotSupportedError:
+            # The exception is raised with no payload — surface something
+            # actionable: name the target type and the planner that rejected it.
+            error(  # noqa: F821
+                ghenv.Component,  # noqa: F821
+                "Planner '{}' does not support target type '{}'. "
+                "Use a target type supported by this backend (typically `FrameTarget` "
+                "for the Analytical planner) or switch backends.".format(
+                    type(planner).__name__, type(target).__name__),
+            )
+            return (None, None)
         except InverseKinematicsError as e:
             error(ghenv.Component, "Inverse kinematics failed: {}".format(e))  # noqa: F821
             return (None, None)
