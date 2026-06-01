@@ -79,6 +79,14 @@ const ICONS = {
     '<circle class="adot" cx="9" cy="12" r="1.5"/>' +
     '<path d="M6 13.5 H12 L9 20 Z"/>',
 
+  // add a tool to the cell AND attach it (shortcut)
+  addAttachTool:
+    '<circle cx="8" cy="6.4" r="2.2"/>' +
+    '<path d="M8 8.6 V10.2"/>' +
+    '<circle class="adot" cx="8" cy="11.6" r="1.4"/>' +
+    '<path d="M5 13 H11 L8 19.4 Z"/>' +
+    '<path class="ac" d="M17 6.2 V10.2 M15 8.2 H19"/>',
+
   // attach a rigid body to a robot link
   attachBodyLink:
     '<path d="M4 7 L11 11"/>' +
