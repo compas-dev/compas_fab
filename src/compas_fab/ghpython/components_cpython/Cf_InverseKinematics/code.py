@@ -52,9 +52,10 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
             return None
 
         if not isinstance(target, Target):
+            wrap_msg = "Wrapped a {} as FrameTarget(target_mode=ROBOT) with default tolerances. Wire a Target component for non-default settings."
             if isinstance(target, Frame):
                 target = FrameTarget(target_frame=target, target_mode=TargetMode.ROBOT)
-                warning(ghenv.Component, "Wrapped a bare COMPAS Frame as FrameTarget(target_mode=ROBOT) with default tolerances. Wire a Target component for non-default settings.")  # noqa: F821
+                warning(ghenv.Component, wrap_msg.format("bare COMPAS Frame"))  # noqa: F821
             else:
                 # Anything else (Rhino Plane, GH_Plane wrapper, ...) — try the
                 # plane-to-frame conversion. If it isn't plane-shaped, surface
@@ -65,14 +66,18 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                     error(ghenv.Component, "target must be a Target, a COMPAS Frame or a Rhino Plane; got {}.".format(type(target).__name__))  # noqa: F821
                     return None
                 target = FrameTarget(target_frame=frame, target_mode=TargetMode.ROBOT)
-                warning(ghenv.Component, "Wrapped a Rhino Plane as FrameTarget(target_mode=ROBOT) with default tolerances. Wire a Target component for non-default settings.")  # noqa: F821
+                warning(ghenv.Component, wrap_msg.format("Rhino Plane"))  # noqa: F821
 
         if start_state is None:
             if planner.robot_cell is None:
                 error(ghenv.Component, "No start_state wired and the planner has no robot_cell to derive one from.")  # noqa: F821
                 return None
             start_state = planner.robot_cell_state or RobotCellState.from_robot_cell(planner.robot_cell)
-            warning(ghenv.Component, "No start_state wired; using zero-configuration default from planner.robot_cell. Wire a state explicitly to seed from a different configuration or to keep tool/workpiece attachments.")  # noqa: F821
+            warning(  # noqa: F821
+                ghenv.Component,  # noqa: F821
+                "No start_state wired; using zero-configuration default from planner.robot_cell. "
+                "Wire a state explicitly to seed from a different configuration or to keep tool/workpiece attachments.",
+            )
 
         try:
             return planner.inverse_kinematics(
