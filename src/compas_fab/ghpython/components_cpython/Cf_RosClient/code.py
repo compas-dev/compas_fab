@@ -19,9 +19,10 @@ from compas_fab.backends import RosClient
 
 
 class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, host: str, port: int, connect: bool):
+    def RunScript(self, host: str, port: int, connect: bool, transport: str):
         host = host or "127.0.0.1"
         port = port or 9090
+        transport = transport.strip() if transport else None
 
         key = create_id(ghenv.Component, "ros_client")  # noqa: F821
         ros_client = st.get(key, None)
@@ -35,7 +36,7 @@ class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
             ros_client = None
 
         if connect:
-            ros_client = RosClient(host, port)
+            ros_client = RosClient(host, port, transport=transport)
             ros_client.run(5)
             st[key] = ros_client
 

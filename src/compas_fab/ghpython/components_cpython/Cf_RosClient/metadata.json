@@ -23,6 +23,11 @@
                 "name": "connect",
                 "description": "If True, (re)connects. If False, disconnects.",
                 "typeHintID": "bool"
+            },
+            {
+                "name": "transport",
+                "description": "Optional roslibpy transport: 'twisted' (default on most platforms), 'asyncio' (opt-in, requires roslibpy[asyncio]), or 'cli' (IronPython). When empty the choice falls through to ROSLIBPY_TRANSPORT and roslibpy.set_default_transport.",
+                "typeHintID": "str"
             }
         ],
         "outputParameters": [
