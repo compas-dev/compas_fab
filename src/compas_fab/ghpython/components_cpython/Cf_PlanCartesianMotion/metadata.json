@@ -45,15 +45,11 @@
         "outputParameters": [
             {
                 "name": "trajectory",
-                "description": "Resulting JointTrajectory (full or partial)."
+                "description": "Resulting JointTrajectory (full or partial). The component is flagged red (with the backend error) when planning fails outright."
             },
             {
                 "name": "fraction",
                 "description": "Fraction of the requested path that was achievable (0..1)."
-            },
-            {
-                "name": "error",
-                "description": "Error message if planning failed; None on success."
             },
             {
                 "name": "planes",

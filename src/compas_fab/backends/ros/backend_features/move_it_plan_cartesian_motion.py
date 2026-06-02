@@ -8,6 +8,7 @@ from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
 from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.exceptions import RosValidationError
 from compas_fab.backends.ros.messages import GetCartesianPathRequest
 from compas_fab.backends.ros.messages import GetCartesianPathResponse
 from compas_fab.backends.ros.messages import Header
@@ -112,12 +113,17 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
 
         # This function wraps multiple implementations depending on the type of waypoints
-        if isinstance(waypoints, FrameWaypoints):
-            return await_callback(self.plan_cartesian_motion_with_frame_waypoints_async, **kwargs)
-        elif isinstance(waypoints, PointAxisWaypoints):
-            return self.plan_cartesian_motion_with_point_axis_waypoints_async(**kwargs)
-        else:
-            raise TypeError("Unsupported waypoints type {} for MoveIt planning backend.".format(type(waypoints)))
+        try:
+            if isinstance(waypoints, FrameWaypoints):
+                return await_callback(self.plan_cartesian_motion_with_frame_waypoints_async, **kwargs)
+            elif isinstance(waypoints, PointAxisWaypoints):
+                return self.plan_cartesian_motion_with_point_axis_waypoints_async(**kwargs)
+            else:
+                raise TypeError("Unsupported waypoints type {} for MoveIt planning backend.".format(type(waypoints)))
+        except RosValidationError as e:
+            # Unwrap typed motion-planning errors raised by `validate_response`
+            # that `ServiceDescription.call` re-wraps before invoking the errback.
+            raise e.original_exception
 
     def plan_cartesian_motion_with_frame_waypoints_async(
         self,

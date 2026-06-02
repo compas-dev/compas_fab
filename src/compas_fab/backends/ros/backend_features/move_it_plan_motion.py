@@ -8,6 +8,7 @@ from compas_fab.backends.interfaces import PlanMotion
 from compas_fab.backends.ros.backend_features.helpers import convert_constraints_to_rosmsg
 from compas_fab.backends.ros.backend_features.helpers import convert_trajectory
 from compas_fab.backends.ros.backend_features.helpers import validate_response
+from compas_fab.backends.ros.exceptions import RosValidationError
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import MotionPlanRequest
@@ -114,7 +115,14 @@ class MoveItPlanMotion(PlanMotion):
         kwargs["options"] = options
         kwargs["errback_name"] = "errback"
 
-        return await_callback(self._plan_motion_async, **kwargs)
+        try:
+            return await_callback(self._plan_motion_async, **kwargs)
+        except RosValidationError as e:
+            # `validate_response` raises typed motion-planning errors that
+            # `ServiceDescription.call` wraps in `RosValidationError` before
+            # passing them back via the errback. Unwrap so callers can catch
+            # the documented `MotionPlanningError` subclasses directly.
+            raise e.original_exception
 
     def _plan_motion_async(
         self,

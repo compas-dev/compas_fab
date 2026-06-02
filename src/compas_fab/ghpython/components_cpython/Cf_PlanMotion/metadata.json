@@ -50,11 +50,7 @@
         "outputParameters": [
             {
                 "name": "trajectory",
-                "description": "Resulting JointTrajectory, or a partial trajectory on planning failure."
-            },
-            {
-                "name": "error",
-                "description": "Error message if planning failed; None on success."
+                "description": "Resulting JointTrajectory, or a partial trajectory on planning failure. The component is flagged red (with the backend error) when planning fails outright."
             },
             {
                 "name": "planes",

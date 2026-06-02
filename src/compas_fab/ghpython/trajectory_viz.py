@@ -18,42 +18,20 @@ if compas.RHINO:
     from Rhino.Geometry import Polyline
 
 from compas_rhino.conversions import frame_to_rhino_plane
+from compas_robots import Configuration
 
 from compas_fab.robots import TargetMode
-
-
-def _state_with_trajectory_point(start_state, point, trajectory_joint_names):
-    """Return a copy of ``start_state`` whose ``robot_configuration`` has
-    the point's joint values merged in.
-
-    Trajectory points only contain the planning group's joints, while
-    the cell state can carry additional configurable joints (Panda's
-    finger, dual-arm robots, etc.). Merging by name preserves those.
-
-    ROS `trajectory_msgs/JointTrajectoryPoint` carries no joint_names of
-    its own — names live on the parent `JointTrajectory`. Older
-    backends therefore yielded points with empty `joint_names`; for
-    those we fall back to the parent trajectory's names.
-    """
-    new_state = deepcopy(start_state)
-    base = new_state.robot_configuration
-    if base is None:
-        new_state.robot_configuration = point
-        return new_state
-    if not point.joint_names and trajectory_joint_names:
-        point = deepcopy(point)
-        point.joint_names = list(trajectory_joint_names)
-    new_state.robot_configuration = base.merged(point)
-    return new_state
 
 
 def trajectory_to_planes_and_polyline(planner, start_state, trajectory, group=None):
     """Compute Rhino planes and a connecting polyline from a trajectory.
 
-    For each trajectory point, the helper merges the point into a copy
-    of ``start_state`` and asks ``planner.forward_kinematics`` for the
-    PCF (`target_mode=ROBOT`, the planning group's end-effector link)
-    in WCF. The frames are converted to Rhino planes; the polyline is
+    For each trajectory point, the helper substitutes the point's joint
+    values into a single working copy of ``start_state`` and runs
+    **local** forward kinematics via
+    ``RobotCell.forward_kinematics_target_frame`` (target_mode=ROBOT)
+    — i.e. the URDF kinematic chain in process, with no backend round
+    trip. The frames are converted to Rhino planes; the polyline is
     built from their origins in order.
 
     Returns ``(planes, polyline)`` — ``planes`` is a list of
@@ -66,13 +44,46 @@ def trajectory_to_planes_and_polyline(planner, start_state, trajectory, group=No
     if not getattr(trajectory, "points", None):
         return ([], None)
 
-    trajectory_joint_names = getattr(trajectory, "joint_names", None)
+    robot_cell = getattr(getattr(planner, "client", None), "robot_cell", None)
+    if robot_cell is None:
+        return ([], None)
+
+    # ROS `trajectory_msgs/JointTrajectoryPoint` carries no joint_names —
+    # names live on the parent `JointTrajectory`. Fall back accordingly.
+    point_names = list(trajectory.points[0].joint_names) or list(getattr(trajectory, "joint_names", None) or [])
+
+    # One deepcopy outside the loop; per-point we only swap the configuration.
+    working_state = deepcopy(start_state)
+    base = working_state.robot_configuration
+
+    # Pre-compute merge data once. If we can't merge by name, fall back to
+    # using the point directly — works when the trajectory and cell share
+    # the same joint set.
+    merge_data = None
+    if base is not None and point_names:
+        base_names = list(base.joint_names)
+        merge_data = (
+            base_names,
+            list(base.joint_types),
+            list(base.joint_values),
+            {name: idx for idx, name in enumerate(base_names)},
+        )
+
     planes = []
     try:
         for point in trajectory.points:
-            state = _state_with_trajectory_point(start_state, point, trajectory_joint_names)
-            frame = planner.forward_kinematics(
-                robot_cell_state=state,
+            if merge_data is None:
+                working_state.robot_configuration = point
+            else:
+                base_names, base_types, base_values_template, name_to_pos = merge_data
+                values = list(base_values_template)
+                for name, value in zip(point_names, point.joint_values):
+                    idx = name_to_pos.get(name)
+                    if idx is not None:
+                        values[idx] = value
+                working_state.robot_configuration = Configuration(values, base_types, base_names)
+            frame = robot_cell.forward_kinematics_target_frame(
+                robot_cell_state=working_state,
                 target_mode=TargetMode.ROBOT,
                 group=group or None,
             )
