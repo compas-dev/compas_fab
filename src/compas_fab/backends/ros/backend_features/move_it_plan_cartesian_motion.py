@@ -117,7 +117,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
             if isinstance(waypoints, FrameWaypoints):
                 return await_callback(self.plan_cartesian_motion_with_frame_waypoints_async, **kwargs)
             elif isinstance(waypoints, PointAxisWaypoints):
-                return self.plan_cartesian_motion_with_point_axis_waypoints_async(**kwargs)
+                return await_callback(self.plan_cartesian_motion_with_point_axis_waypoints_async, **kwargs)
             else:
                 raise TypeError("Unsupported waypoints type {} for MoveIt planning backend.".format(type(waypoints)))
         except RosValidationError as e:
