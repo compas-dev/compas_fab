@@ -3,7 +3,7 @@
     "nickname": "Deconstruct Trajectory",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Expand a JointTrajectory into a list of Configurations and (optionally) a list of RobotCellStates ready to feed VisualizeRobotCell. Pair with a Stream Filter / Index slider to scrub through trajectory frames.",
+    "description": "Expand a JointTrajectory into per-point Configurations and (optionally) RobotCellStates ready to feed VisualizeRobotCell, plus DataTrees of velocities/accelerations/efforts for plotting the trajectory profile. Pair `cell_states` with a Stream Filter / Index slider to scrub through frames.",
     "exposure": 2,
     "ghpython": {
         "isAdvancedMode": true,
@@ -26,6 +26,18 @@
             {
                 "name": "cell_states",
                 "description": "One RobotCellState per trajectory point: a copy of `start_state` with `robot_configuration` set to the corresponding point. Empty when `start_state` is unwired."
+            },
+            {
+                "name": "velocities",
+                "description": "DataTree of joint velocities — one branch per trajectory point, each branch ordered to match the trajectory's `joint_names`. Zeros when the backend didn't populate this field."
+            },
+            {
+                "name": "accelerations",
+                "description": "DataTree of joint accelerations — one branch per trajectory point, ordered to match `joint_names`. Zeros when the backend didn't populate this field."
+            },
+            {
+                "name": "efforts",
+                "description": "DataTree of joint efforts — one branch per trajectory point, ordered to match `joint_names`. Zeros when the backend didn't populate this field."
             }
         ]
     }
