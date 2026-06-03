@@ -165,6 +165,38 @@ class MotionPlan(Data):
         """Snapshot of the realized path. Returns a fresh list; mutating it does not affect the plan."""
         return list(self._steps)
 
+    def iter_cell_states(self) -> Iterator["RobotCellState"]:
+        """Yield a `RobotCellState` snapshot for every trajectory point and every state-change in the realized path.
+
+        Useful for frame-by-frame playback: pair with an index slider and a
+        visualisation component to scrub through the entire plan (not just
+        one trajectory). Each yielded state is a fresh copy; mutating it does
+        not affect the plan.
+
+        Order: for a trajectory step, one snapshot per point in
+        `step.trajectory.points`, with the pre-step configuration merged with
+        the point's joint values (by name when joint_names are available,
+        otherwise the point is used directly). For a state-change step, one
+        snapshot — the explicit `post_state`.
+        """
+        running_state = self.start_state
+        for step in self._steps:
+            if step.is_trajectory:
+                pre_state = running_state
+                point_names = list(step.trajectory.points[0].joint_names) or list(getattr(step.trajectory, "joint_names", None) or [])
+                base = pre_state.robot_configuration
+                for point in step.trajectory.points:
+                    snapshot = pre_state.copy()
+                    if base is None or not point_names:
+                        snapshot.robot_configuration = point
+                    else:
+                        snapshot.robot_configuration = base.merged(point)
+                    yield snapshot
+                running_state = step.post_state
+            else:
+                running_state = step.post_state
+                yield running_state.copy()
+
     def step_by_name(self, name: str) -> PlanStep:
         """Return the step with the given name.
 

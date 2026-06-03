@@ -156,6 +156,39 @@ def test_append_step_state_change_without_post_state_raises(cell_and_state):
         plan.append_step(PlanStep(name="grasp"))
 
 
+def test_iter_cell_states_covers_every_point_and_state_change(cell_and_state, traj1, traj2):
+    cell, state = cell_and_state
+    grasped = state.copy()
+    plan = (
+        MotionPlan(name="iter", start_state=state)
+        .append_trajectory("descend", traj1)
+        .append_state_change("grasp", grasped)
+        .append_trajectory("retract", traj2)
+    )
+    states = list(plan.iter_cell_states())
+    # 2 (traj1) + 1 (state change) + 2 (traj2)
+    assert len(states) == 5
+    # First snapshot matches traj1.points[0] applied to start_state
+    assert states[0].robot_configuration.joint_values == [0.0] * 6
+    # Snapshot after the first trajectory matches traj1's last point
+    assert states[1].robot_configuration.joint_values == [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+    # State-change snapshot is a copy of `grasped`
+    assert states[2] is not grasped
+    assert states[2].robot_configuration.joint_values == grasped.robot_configuration.joint_values
+    # Final snapshot matches traj2's last point
+    assert states[-1].robot_configuration.joint_values == [1.0] * 6
+    # Snapshots are independent — mutating one does not affect the plan or others
+    states[0].robot_configuration.joint_values = [9.9] * 6
+    assert plan.start_state.robot_configuration.joint_values != [9.9] * 6
+    assert states[1].robot_configuration.joint_values != [9.9] * 6
+
+
+def test_iter_cell_states_empty_plan(cell_and_state):
+    cell, state = cell_and_state
+    plan = MotionPlan(name="empty", start_state=state)
+    assert list(plan.iter_cell_states()) == []
+
+
 def test_serialization_roundtrip(cell_and_state, traj1, traj2):
     cell, state = cell_and_state
     grasped_state = state.copy()

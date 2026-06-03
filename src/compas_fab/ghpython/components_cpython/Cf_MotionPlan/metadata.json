@@ -52,6 +52,10 @@
                 "description": "List of Rhino polylines — one per trajectory step, through the EE origins."
             },
             {
+                "name": "cell_states",
+                "description": "Flat list of RobotCellState snapshots covering the whole plan — one per trajectory point plus one per state-change step. Pair with an index slider + VisualizeRobotCell to scrub through the entire motion."
+            },
+            {
                 "name": "duration",
                 "description": "Sum of trajectory durations along the realized path, in seconds. Backends that do not time their trajectories report 0."
             },
