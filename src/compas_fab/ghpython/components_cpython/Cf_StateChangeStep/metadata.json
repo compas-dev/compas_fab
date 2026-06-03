@@ -1,0 +1,34 @@
+{
+    "name": "State Change Step",
+    "nickname": "State Change Step",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Wrap an explicit RobotCellState into a named state-change PlanStep. Drop between trajectory steps in a Cf_MotionPlan to record gripper toggles, tool attach/detach, rigid body grasp/release.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Unique name for this state change within the plan (e.g. 'grasp', 'release').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "post_state",
+                "description": "RobotCellState describing the cell AFTER the change (e.g. with a tool attached, or a rigid body grasped)."
+            },
+            {
+                "name": "description",
+                "description": "Optional free-form human description.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "step",
+                "description": "PlanStep — wire into Cf_MotionPlan's `steps` input."
+            }
+        ]
+    }
+}

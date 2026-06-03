@@ -1,0 +1,64 @@
+{
+    "name": "Motion Plan",
+    "nickname": "Motion Plan",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Assemble a MotionPlan from a list of PlanSteps (built upstream by Cf_TrajectoryStep / Cf_StateChangeStep). Threads the cell state through the chain, validates each step, and emits the assembled plan plus the composite EE planes/polyline for visualisation (one branch per trajectory step).",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Plan identifier.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "start_state",
+                "description": "RobotCellState the plan starts from."
+            },
+            {
+                "name": "steps",
+                "description": "Ordered list of PlanStep objects, typically from Cf_TrajectoryStep and Cf_StateChangeStep components.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "robot_cell",
+                "description": "Optional RobotCell. When provided, a structural signature is stored on the plan so a mismatched cell on load can be detected via verify_cell()."
+            },
+            {
+                "name": "group",
+                "description": "Planning group name used for the FK visualisation. Defaults to the cell's main group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "description",
+                "description": "Optional free-form description of the plan.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "plan",
+                "description": "The assembled MotionPlan. Serialisable via to_json / to_jsonstring."
+            },
+            {
+                "name": "planes",
+                "description": "DataTree of Rhino planes — one branch per trajectory step, one plane per trajectory point. Flatten for a single combined list."
+            },
+            {
+                "name": "polyline",
+                "description": "List of Rhino polylines — one per trajectory step, through the EE origins."
+            },
+            {
+                "name": "duration",
+                "description": "Sum of trajectory durations along the realized path, in seconds. Backends that do not time their trajectories report 0."
+            },
+            {
+                "name": "end_state",
+                "description": "RobotCellState at the end of the realized path."
+            }
+        ]
+    }
+}

@@ -1,5 +1,10 @@
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
+from typing import cast
+
+if TYPE_CHECKING:
+    from compas_fab.robots import RobotCellState
 
 from compas.data import Data
 from compas.tolerance import TOL
@@ -18,48 +23,35 @@ __all__ = [
 class JointTrajectoryPoint(Configuration):
     """Defines a point within a trajectory.
 
-    A trajectory point is a sub-class of [`Configuration`][compas_robots.Configuration] extended
-    with acceleration, effort and time from start information.
+    A trajectory point is a sub-class of [Configuration][compas_robots.Configuration]
+    extended with acceleration, effort and time-from-start information.
 
     Trajectory points are defined either as *joint_values + velocities and
     accelerations*, or as *joint_values + efforts*.
 
     Parameters
     ----------
-    joint_values : `list` of `float`, optional
-        Joint values expressed in radians or meters, depending on the respective
+    joint_values
+        Joint values expressed in radians or meters, depending on the joint
         type.
-    joint_types : `list` of `Joint.TYPE`, optional
-        Joint types, e.g. a `list` of
-        `Joint.REVOLUTE` for revolute joints.
-    velocities : `list` of `float`, optional
+    joint_types
+        Joint types, e.g. a list of `Joint.REVOLUTE` for revolute joints.
+    velocities
         Velocity of each joint.
-    accelerations : `list` of `float`, optional
+    accelerations
         Acceleration of each joint.
-    effort : `list` of `float`, optional
+    effort
         Effort of each joint.
-    time_from_start : `Duration`, optional
-        Duration of trajectory point counting from the start.
+    time_from_start
+        Duration of the trajectory point counted from the start.
+    joint_names
+        Names of the joints, in the same order as `joint_values`.
 
     Attributes
     ----------
-    joint_values : `list` of `float`
-        Joint values expressed in radians or meters, depending on the respective
-        type.
-    joint_types : `list` of `Joint.TYPE`
-        Joint types, e.g. a `list` of
-        `Joint.REVOLUTE` for revolute joints.
-    velocities : `list` of `float`
-        Velocity of each joint.
-    accelerations : `list` of `float`
-        Acceleration of each joint.
-    effort : `list` of `float`
-        Effort of each joint.
-    time_from_start : `Duration`
-        Duration of trajectory point counting from the start.
-    positions : `list` of `float`
+    positions
         Alias of `joint_values`.
-    data : obj:`dict`
+    data
         The data representing the trajectory point.
     """
 
@@ -133,11 +125,10 @@ class JointTrajectoryPoint(Configuration):
 
     @property
     def __data__(self):
-        """`dict` : The data representing the trajectory point.
+        """The serialised trajectory point.
 
-        By assigning a data dictionary to this property, the current data of the
-        configuration will be replaced by the data in the `dict`. The data getter
-        and setter should always be used in combination with each other.
+        Assigning a dict to this property replaces the current data; the
+        getter and setter must always be used together.
         """
         data_obj = super(JointTrajectoryPoint, self).__data__
         data_obj["velocities"] = self.velocities
@@ -187,29 +178,20 @@ class JointTrajectoryPoint(Configuration):
         return dict(zip(self.joint_names, self.effort))
 
     def merged(self, other) -> "JointTrajectoryPoint":
-        """Get a new ``JointTrajectoryPoint`` with this ``JointTrajectoryPoint`` merged
-        with another ``JointTrajectoryPoint``.  The other ``JointTrajectoryPoint``
-        takes precedence over this ``JointTrajectoryPoint`` in case a joint value is present in both.
+        """Return a new point with `self` merged with `other`.
 
-        Notes
-        -----
-            Caution: ``joint_names`` may be rearranged.
+        `other` takes precedence over `self` for any joint present in both.
+        Joint names in the returned point may be reordered.
 
         Parameters
         ----------
-        other : `JointTrajectoryPoint`
-            The ``JointTrajectoryPoint`` to be merged.
-
-        Returns
-        -------
-        `JointTrajectoryPoint`
-            A ``JointTrajectoryPoint`` with values for all included joints.
+        other
+            The point to be merged.
 
         Raises
         ------
-        `ValueError`
-            If the ``JointTrajectoryPoint`` or the other ``JointTrajectoryPoint`` does not specify
-            joint names for all joint values.
+        ValueError
+            If either point does not specify joint names for all joint values.
         """
         _joint_dict = self.joint_dict
         _joint_dict.update(other.joint_dict)
@@ -241,9 +223,10 @@ class Trajectory(Data):
 
     Attributes
     ----------
-    planning_time : `float`
-        Amount of time it took to complete the motion plan.
-    attributes : `dict`
+    planning_time
+        Amount of time it took to complete the motion plan, in seconds.
+        Defaults to `-1` when the backend did not report it.
+    attributes
         Custom attributes of the trajectory.
     """
 
@@ -271,55 +254,69 @@ class JointTrajectory(Trajectory):
 
     Parameters
     ----------
-    trajectory_points : `list` of `JointTrajectoryPoint`, optional
+    trajectory_points
         List of points composing the trajectory.
-    joint_names : `list` of `str`, optional
+    joint_names
         List of joint names of the trajectory.
-    start_configuration : [`Configuration`][compas_robots.Configuration], optional
-        Start configuration for the trajectory.
-    fraction : `float`, optional
-        Indicates the percentage of requested trajectory that was calculated,
-        e.g. ``1`` means the full trajectory was found.
-    attributes : `dict`
+    start_state
+        The full robot cell state the planner was given (tools, rigid bodies,
+        attached collision objects, robot configuration). When present,
+        callers no longer have to thread the cell state separately through
+        visualisation / replay code.
+    fraction
+        Percentage of the requested trajectory that was calculated, e.g. `1`
+        means the full trajectory was found.
+    attributes
         Custom attributes of the trajectory.
 
     Attributes
     ----------
-    points : `list` of `JointTrajectoryPoint`
+    points
         List of points composing the trajectory.
-    joint_names : `list` of `str`
-        List of joint names of the trajectory.
-    start_configuration : [`Configuration`][compas_robots.Configuration]
-        Start configuration for the trajectory.
-    fraction : `float`
-        Indicates the percentage of requested trajectory that was calculated,
-        e.g. ``1`` means the full trajectory was found.
-    attributes : `dict`
-    data : `dict`
-        The data representing the trajectory.
+    start_configuration
+        Start configuration for the trajectory. Not a constructor parameter:
+        assign via the property after construction to override. The getter
+        returns the explicit override when set, otherwise
+        `start_state.robot_configuration`, otherwise `None`.
+    data
+        The serialised trajectory.
     """
 
     def __init__(
         self,
         trajectory_points: Optional[list[JointTrajectoryPoint]] = None,
         joint_names: Optional[list[str]] = None,
-        start_configuration: Optional[Configuration] = None,
+        start_state: Optional["RobotCellState"] = None,
         fraction: Optional[float] = None,
         attributes: Optional[dict[str, Any]] = None,
     ):
         super(JointTrajectory, self).__init__(attributes=attributes)
         self.points = trajectory_points or []
         self.joint_names = joint_names or []
-        self.start_configuration = start_configuration
+        self._start_configuration: Optional[Configuration] = None
+        self.start_state = start_state
         self.fraction = fraction
 
     @property
+    def start_configuration(self) -> Optional[Configuration]:
+        if self._start_configuration is not None:
+            return self._start_configuration
+        if self.start_state is not None:
+            return self.start_state.robot_configuration
+        return None
+
+    @start_configuration.setter
+    def start_configuration(self, value: Optional[Configuration]) -> None:
+        self._start_configuration = value
+
+    @property
     def __data__(self):
-        """`dict` : The data representing the trajectory."""
+        """The serialised trajectory."""
         data_obj = {}
         data_obj["points"] = [p.__data__ for p in self.points]
         data_obj["joint_names"] = self.joint_names or []
-        data_obj["start_configuration"] = self.start_configuration.__data__ if self.start_configuration else None
+        data_obj["start_configuration"] = self._start_configuration.__data__ if self._start_configuration else None
+        data_obj["start_state"] = self.start_state.__data__ if self.start_state else None
         data_obj["fraction"] = self.fraction
         data_obj["planning_time"] = self.planning_time
         data_obj["attributes"] = self.attributes
@@ -328,26 +325,35 @@ class JointTrajectory(Trajectory):
 
     @classmethod
     def __from_data__(cls, data: dict[str, Any]) -> "JointTrajectory":
+        from compas_fab.robots import RobotCellState
+
         points = list(map(JointTrajectoryPoint.__from_data__, data.get("points") or []))
         joint_names = data.get("joint_names", [])
-        start_configuration = data.get("start_configuration", None)
-        start_configuration = Configuration.__from_data__(start_configuration) if start_configuration else None
+        start_configuration_data = data.get("start_configuration", None)
+        start_configuration = cast(
+            "Optional[Configuration]",
+            Configuration.__from_data__(start_configuration_data) if start_configuration_data else None,
+        )
+        start_state_data = data.get("start_state", None)
+        start_state = cast("Optional[RobotCellState]", RobotCellState.__from_data__(start_state_data) if start_state_data else None)
         fraction = data.get("fraction")
 
         trajectory = cls(
             trajectory_points=points,
             joint_names=joint_names,
-            start_configuration=start_configuration,
+            start_state=start_state,
             fraction=fraction,
             attributes=data["attributes"],
         )
+        if start_configuration is not None:
+            trajectory.start_configuration = start_configuration
         trajectory.planning_time = data["planning_time"]
 
         return trajectory
 
     @property
     def time_from_start(self) -> float:
-        """Effectively, time from start for the last point in the trajectory."""
+        """Time from start of the last point — effectively the trajectory's total duration in seconds. Zero when empty."""
         if not self.points:
             return 0.0
 

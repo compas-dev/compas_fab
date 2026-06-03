@@ -390,7 +390,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         def _build_return_trajectory(configurations):
             # Create the trajectory
-            trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
+            trajectory = JointTrajectory(joint_names=joint_names, start_state=start_state)
             for planned_configuration in configurations:
                 joint_values = [planned_configuration[joint_name] for joint_name in joint_names]
                 trajectory.points.append(JointTrajectoryPoint(joint_values=joint_values, joint_types=joint_types, joint_names=joint_names))
@@ -717,7 +717,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         intermediate_state: RobotCellState = deepcopy(start_state)
         start_configuration = start_state.robot_configuration
         # TODO: We currently trust that the input configuration has a correct joint order, this should be checked
-        trajectory = JointTrajectory(joint_names=joint_names, start_configuration=start_configuration)
+        trajectory = JointTrajectory(joint_names=joint_names, start_state=start_state)
 
         # Add the start configuration as the first point
         joint_values = [start_configuration[joint_name] for joint_name in joint_names]

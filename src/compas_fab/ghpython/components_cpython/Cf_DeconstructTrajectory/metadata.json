@@ -3,7 +3,7 @@
     "nickname": "Deconstruct Trajectory",
     "category": "COMPAS FAB",
     "subcategory": "Planning",
-    "description": "Expand a JointTrajectory into per-point Configurations and (optionally) RobotCellStates ready to feed VisualizeRobotCell, plus DataTrees of velocities/accelerations/efforts for plotting the trajectory profile. Pair `cell_states` with a Stream Filter / Index slider to scrub through frames.",
+    "description": "Expand a JointTrajectory into per-point Configurations and RobotCellStates ready to feed VisualizeRobotCell, plus DataTrees of velocities/accelerations/efforts for plotting the trajectory profile. Pair `cell_states` with a Stream Filter / Index slider to scrub through frames.",
     "exposure": 2,
     "ghpython": {
         "isAdvancedMode": true,
@@ -11,11 +11,7 @@
         "inputParameters": [
             {
                 "name": "trajectory",
-                "description": "A JointTrajectory (typically the output of PlanMotion or PlanCartesianMotion)."
-            },
-            {
-                "name": "start_state",
-                "description": "Optional RobotCellState used as the template for each per-point state. If unwired, the `cell_states` output is empty (only `configurations` is populated)."
+                "description": "A JointTrajectory (typically the output of PlanMotion or PlanCartesianMotion). The per-point `cell_states` are derived from `trajectory.start_state`, which the planner sets automatically."
             }
         ],
         "outputParameters": [
@@ -25,7 +21,7 @@
             },
             {
                 "name": "cell_states",
-                "description": "One RobotCellState per trajectory point: a copy of `start_state` with `robot_configuration` set to the corresponding point. Empty when `start_state` is unwired."
+                "description": "One RobotCellState per trajectory point: a copy of `trajectory.start_state` with `robot_configuration` set to the corresponding point. Empty when the trajectory has no `start_state`."
             },
             {
                 "name": "velocities",

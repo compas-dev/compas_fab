@@ -63,6 +63,10 @@ from .trajectory import (
     JointTrajectoryPoint,
     Trajectory,
 )
+from .motion_plan import (
+    MotionPlan,
+    PlanStep,
+)
 from .wrench import (
     Wrench,
 )
@@ -114,6 +118,9 @@ __all__ = [
     "JointTrajectory",
     "JointTrajectoryPoint",
     "Trajectory",
+    # Motion Plan
+    "MotionPlan",
+    "PlanStep",
     # Wrench
     "Wrench",
     # Inertia

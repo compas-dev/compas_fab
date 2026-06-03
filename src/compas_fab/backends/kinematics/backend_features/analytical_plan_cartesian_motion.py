@@ -127,6 +127,7 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         trajectory.points = [JointTrajectoryPoint(config.joint_values, config.joint_types, joint_names=config.joint_names) for config in path]
         first_configuration = robot_cell.fill_configuration_with_joint_names(path[0])
         trajectory.start_configuration = robot_cell.zero_full_configuration().merged(first_configuration)
+        trajectory.start_state = start_state
         return trajectory
 
     def _plan_cartesian_motion_with_point_axis_waypoints(

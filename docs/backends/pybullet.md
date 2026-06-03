@@ -76,6 +76,7 @@ Motion planning:
 
 - [`06_cartesian_motion_frame_waypoints.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/06_cartesian_motion_frame_waypoints.py) — Cartesian path with `FrameWaypoints`
 - [`06_cartesian_motion_point_axis_waypoints.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/06_cartesian_motion_point_axis_waypoints.py) — Cartesian path with `PointAxisWaypoints`
+- [`08_motion_plan_pick_and_place.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/08_motion_plan_pick_and_place.py) — assembling several trajectories + state changes into a serializable `MotionPlan` (see [Concepts](../concepts.md#assembling-multi-stage-motions))
 
 ## API reference
 

@@ -176,6 +176,7 @@ nav:
       - developer/index.md
       - Backend architecture: developer/architecture.md
       - Grasshopper components: developer/grasshopper.md
+      - MotionPlan design notes: developer/motion_plan.md
       - Icon system: developer/icons/index.md
   - Changelog: changelog.md
   - Citing: citing.md

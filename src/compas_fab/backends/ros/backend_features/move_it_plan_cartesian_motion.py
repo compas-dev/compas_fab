@@ -154,24 +154,24 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         # We are calling the synchronous function here for simplicity.
         planner.set_robot_cell_state(start_state)
         planning_scene: PlanningScene = planner.get_planning_scene()
-        start_state = planning_scene.robot_state
+        ros_start_state = planning_scene.robot_state
 
         # start_configuration = start_state.robot_configuration
         # joint_state = JointState(
         #     header=header, name=start_configuration.joint_names, position=start_configuration.joint_values
         # )
-        # start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
+        # ros_start_state = RobotState(joint_state, MultiDOFJointState(header=header), is_diff=True)
 
         # if options.get("attached_collision_meshes"):
         #     for acm in options["attached_collision_meshes"]:
         #         aco = AttachedCollisionObject.from_attached_collision_mesh(acm)
-        #         start_state.attached_collision_objects.append(aco)
+        #         ros_start_state.attached_collision_objects.append(aco)
 
         path_constraints = convert_constraints_to_rosmsg(options.get("path_constraints"), header)
 
         request = dict(
             header=header,
-            start_state=start_state,
+            start_state=ros_start_state,
             group_name=group,
             link_name=options["link"],
             waypoints=list_of_pose,
@@ -184,6 +184,7 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
         def response_handler(response):
             try:
                 trajectory = convert_trajectory(joints, response.solution, response.start_state, response.fraction, None, response)
+                trajectory.start_state = start_state
                 if response.fraction < 1:
                     errback(MotionPlanningError("Motion planning failed", trajectory))
                 callback(trajectory)

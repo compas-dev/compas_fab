@@ -12,40 +12,39 @@ the FK walk.
 
 from copy import deepcopy
 
-import compas
-
-if compas.RHINO:
-    from Rhino.Geometry import Polyline
-
+from compas.geometry import Polyline
 from compas_rhino.conversions import frame_to_rhino_plane
+from compas_rhino.conversions import polyline_to_rhino
 from compas_robots import Configuration
 
 from compas_fab.robots import TargetMode
 
 
-def trajectory_to_planes_and_polyline(planner, start_state, trajectory, group=None):
+def trajectory_to_planes_and_polyline(robot_cell, start_state, trajectory, group=None):
     """Compute Rhino planes and a connecting polyline from a trajectory.
 
     For each trajectory point, the helper substitutes the point's joint
-    values into a single working copy of ``start_state`` and runs
-    **local** forward kinematics via
-    ``RobotCell.forward_kinematics_target_frame`` (target_mode=ROBOT)
-    — i.e. the URDF kinematic chain in process, with no backend round
-    trip. The frames are converted to Rhino planes; the polyline is
-    built from their origins in order.
+    values into a single working copy of `start_state` and runs **local**
+    forward kinematics via `RobotCell.forward_kinematics_target_frame`
+    (`target_mode=ROBOT`) — i.e. the URDF kinematic chain in process, with
+    no backend round trip. The frames are converted to Rhino planes; a
+    polyline through their origins is computed in `compas` and converted
+    to Rhino.
 
-    Returns ``(planes, polyline)`` — ``planes`` is a list of
-    ``Rhino.Geometry.Plane``, ``polyline`` is a ``Rhino.Geometry.Polyline``
-    (or ``None`` when there are fewer than two points). Any failure
-    along the way returns ``([], None)`` rather than raising.
+    `start_state` may be `None`; in that case the trajectory's own
+    `start_state` (populated by the planner that produced it) is used.
+
+    Returns `(planes, polyline)`. `polyline` is `None` when there are
+    fewer than two points. Any failure along the way returns `([], None)`
+    rather than raising.
     """
-    if planner is None or start_state is None or trajectory is None:
+    if robot_cell is None or trajectory is None:
         return ([], None)
     if not getattr(trajectory, "points", None):
         return ([], None)
-
-    robot_cell = getattr(getattr(planner, "client", None), "robot_cell", None)
-    if robot_cell is None:
+    if start_state is None:
+        start_state = getattr(trajectory, "start_state", None)
+    if start_state is None:
         return ([], None)
 
     # ROS `trajectory_msgs/JointTrajectoryPoint` carries no joint_names —
@@ -69,7 +68,7 @@ def trajectory_to_planes_and_polyline(planner, start_state, trajectory, group=No
             {name: idx for idx, name in enumerate(base_names)},
         )
 
-    planes = []
+    frames = []
     try:
         for point in trajectory.points:
             if merge_data is None:
@@ -82,14 +81,16 @@ def trajectory_to_planes_and_polyline(planner, start_state, trajectory, group=No
                     if idx is not None:
                         values[idx] = value
                 working_state.robot_configuration = Configuration(values, base_types, base_names)
-            frame = robot_cell.forward_kinematics_target_frame(
-                robot_cell_state=working_state,
-                target_mode=TargetMode.ROBOT,
-                group=group or None,
+            frames.append(
+                robot_cell.forward_kinematics_target_frame(
+                    robot_cell_state=working_state,
+                    target_mode=TargetMode.ROBOT,
+                    group=group or None,
+                )
             )
-            planes.append(frame_to_rhino_plane(frame))
     except Exception:
         return ([], None)
 
-    polyline = Polyline([plane.Origin for plane in planes]) if len(planes) >= 2 else None
+    planes = [frame_to_rhino_plane(f) for f in frames]
+    polyline = polyline_to_rhino(Polyline([f.point for f in frames])) if len(frames) >= 2 else None
     return (planes, polyline)

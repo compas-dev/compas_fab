@@ -40,7 +40,8 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
         key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
         def _viz(trajectory):
-            return trajectory_to_planes_and_polyline(planner, start_state, trajectory, group or None)
+            robot_cell = getattr(getattr(planner, "client", None), "robot_cell", None)
+            return trajectory_to_planes_and_polyline(robot_cell, start_state, trajectory, group or None)
 
         def _replay_marker(error_msg, has_trajectory):
             if not error_msg:

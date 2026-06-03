@@ -5,6 +5,7 @@ from compas_robots.model import Joint
 from compas_fab.robots import Duration
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
+from compas_fab.robots import RobotCellLibrary
 
 
 @pytest.fixture
@@ -27,8 +28,8 @@ def trj():
     trajectory = JointTrajectory(
         trajectory_points=[p1, p2],
         joint_names=["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"],
-        start_configuration=config,
     )
+    trajectory.start_configuration = config
     trajectory.planning_time = 0.5
     return trajectory
 
@@ -51,6 +52,34 @@ def test_serialization(trj):
     assert new_trj.__data__ == data
     assert new_trj.planning_time == 0.5
     assert new_trj.time_from_start == Duration(6, 0).seconds
+
+
+def test_start_configuration_derived_from_start_state():
+    cell, state = RobotCellLibrary.ur5(load_geometry=False)
+    state.robot_configuration.joint_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+    trajectory = JointTrajectory(start_state=state)
+    # No explicit start_configuration → falls back to start_state.robot_configuration
+    assert trajectory.start_configuration is state.robot_configuration
+
+    # Explicit start_configuration takes precedence
+    explicit = Configuration.from_revolute_values([0.0] * 6)
+    trajectory.start_configuration = explicit
+    assert trajectory.start_configuration is explicit
+
+    # Clearing the explicit value reveals the start_state fallback again
+    trajectory.start_configuration = None
+    assert trajectory.start_configuration is state.robot_configuration
+
+
+def test_start_state_roundtrips_through_serialization():
+    cell, state = RobotCellLibrary.ur5(load_geometry=False)
+    state.robot_configuration.joint_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+    trajectory = JointTrajectory(start_state=state)
+    data = trajectory.__data__
+    assert data["start_state"] is not None
+    new_trj = JointTrajectory.__from_data__(data)
+    assert new_trj.start_state is not None
+    assert new_trj.start_configuration.joint_values == state.robot_configuration.joint_values
 
 
 def test_joint_trajectory_point_merged():
