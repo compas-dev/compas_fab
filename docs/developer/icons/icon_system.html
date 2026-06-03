@@ -196,7 +196,7 @@
       <p>A unified 24&times;24 icon set for the COMPAS&nbsp;FAB component toolbar — built from one geometric kit so the whole library reads as a family.</p>
     </div>
     <div class="stamp">
-      <div><b>32</b> components</div>
+      <div><b>36</b> components</div>
       <div><b>24&times;24</b> px · PNG/SVG</div>
       <div><b>7</b> subcategories</div>
       <div>rev <b>A</b> · 2026-06</div>
@@ -326,6 +326,10 @@
       ['ik','Inverse Kinematics','IK','Target → configuration for a cell state.'],
       ['planMotion','Plan Motion','Plan Motion','Free-space, joint-interpolated motion to a target.'],
       ['planCartesian','Plan Cartesian Motion','Cartesian Motion','Linear-in-tool-space motion through waypoints.'],
+      ['trajectoryStep','Trajectory Step','Trajectory Step','Wrap a JointTrajectory into a named PlanStep.'],
+      ['stateChangeStep','State Change Step','State Change Step','Wrap a state change (grasp, release, tool swap) into a PlanStep.'],
+      ['motionPlan','Motion Plan','Motion Plan','Assemble ordered PlanSteps into one MotionPlan.'],
+      ['deconstructTrajectory','Deconstruct Trajectory','Deconstruct Trajectory','Explode a trajectory into per-point states + velocity/accel data.'],
     ]],
     ['05','Backends','choose an engine',[
       ['analyticalPlanner','Analytical Kinematics Planner','Analytical Planner','Closed-form FK/IK in-process. No ROS or PyBullet.'],
