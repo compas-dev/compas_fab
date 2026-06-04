@@ -57,17 +57,6 @@ class AnalyticalKinematicsPlanner(
         # Initialize the dummy client
         self._client = AnalyticalKinematicsClient(verbose=verbose)
 
-    # The AnalyticalKinematicsPlanner does not require the user to know about the underlying client
-    # therefore the following properties are provided to access the client's properties
-
-    @property
-    def robot_cell(self):
-        return self._client.robot_cell
-
-    @property
-    def robot_cell_state(self):
-        return self._client.robot_cell_state
-
 
 class AnalyticalPyBulletPlanner(
     AnalyticalPlanCartesianMotion,

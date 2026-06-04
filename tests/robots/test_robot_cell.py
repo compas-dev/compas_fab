@@ -180,6 +180,29 @@ def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_g
     _test(*abb_irb4600_40_255_gripper_one_beam)
 
 
+def test_default_touch_links_returns_first_geometry_bearing_link():
+    """`default_touch_links` skips geometry-less mounting links and returns
+    just the first solid ancestor along the EE chain — listing frame-only
+    links as touch links is meaningless because MoveIt has no collision
+    geometry for them.
+    """
+    # UR exposes a `tool0` → `flange` → `wrist_3_link` chain where the first
+    # two are frame-only; only `wrist_3_link` carries geometry.
+    ur5_cell, _ = RobotCellLibrary.ur5(load_geometry=False)
+    assert ur5_cell.default_touch_links() == ["wrist_3_link"]
+
+    ur10e_cell, _ = RobotCellLibrary.ur10e(load_geometry=False)
+    assert ur10e_cell.default_touch_links() == ["wrist_3_link"]
+
+    # ABB exposes a single frame link (`tool0`) above `link_6`.
+    abb_cell, _ = RobotCellLibrary.abb_irb4600_40_255(load_geometry=False)
+    assert abb_cell.default_touch_links() == ["link_6"]
+
+    # Panda exposes a `panda_hand_tcp` frame above `panda_hand`.
+    panda_cell, _ = RobotCellLibrary.panda(load_geometry=False)
+    assert panda_cell.default_touch_links() == ["panda_hand"]
+
+
 def test_group_states(rfl: tuple[RobotCell, RobotCellState]):
     rc, rcs = rfl
     group_states = rc.group_states

@@ -25,6 +25,11 @@
                 "name": "group",
                 "description": "Optional planning group name. Defaults to the cell's main planning group.",
                 "typeHintID": "str"
+            },
+            {
+                "name": "check_collision",
+                "description": "When True, only collision-free IK solutions are returned; when False, in-collision solutions are accepted. Unwired keeps the backend default (True — collision-free).",
+                "typeHintID": "bool"
             }
         ],
         "outputParameters": [
