@@ -175,7 +175,7 @@ def test_04_inverse_kinematics_unreachable_example(ur5_robot_cell, planner):
         planner.inverse_kinematics(target, start_state, options={"max_results": 1, "timeout": 1})
 
 
-def test_04_inverse_kinematics_allow_collision_example(ur5_robot_cell, planner):
+def test_04_inverse_kinematics_check_collision_example(ur5_robot_cell, planner):
     box_mesh = Box(0.1, 0.1, 0.6).to_mesh(triangulated=True)
     ur5_robot_cell.rigid_body_models["box"] = RigidBody.from_mesh(box_mesh)
 
@@ -188,7 +188,7 @@ def test_04_inverse_kinematics_allow_collision_example(ur5_robot_cell, planner):
     with pytest.raises(InverseKinematicsError):
         planner.inverse_kinematics(target, start_state, options={"max_results": 1})
 
-    configuration = planner.inverse_kinematics(target, start_state, options={"max_results": 1, "allow_collision": True})
+    configuration = planner.inverse_kinematics(target, start_state, options={"max_results": 1, "check_collision": False})
     assert len(configuration.joint_values) == 6
 
 

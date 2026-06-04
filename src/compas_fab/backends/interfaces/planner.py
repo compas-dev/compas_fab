@@ -34,6 +34,20 @@ class PlannerInterface:
     def client(self) -> ClientInterface:
         return self._client
 
+    @property
+    def robot_cell(self):
+        """The robot cell currently loaded into the client. `None` if no cell has been loaded yet.
+
+        Delegates to `self.client.robot_cell` so every backend planner exposes
+        the same accessor without each one having to re-implement it.
+        """
+        return self._client.robot_cell if self._client is not None else None
+
+    @property
+    def robot_cell_state(self):
+        """The current robot cell state held by the client. `None` if no state has been set yet."""
+        return self._client.robot_cell_state if self._client is not None else None
+
     # ===========================================================================
     # Below is a list of methods offered by the mixin classes of PlannerInterface
     # The actual implementation of these methods can be found in the backend
