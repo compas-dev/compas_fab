@@ -45,7 +45,7 @@ from compas_fab.robots import TargetMode
 
 
 class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, planner, target, start_state, group: str):
+    def RunScript(self, planner, target, start_state, group: str, check_collision: bool):
         if planner is None or target is None:
             # Warn only when the input *is* wired but the upstream returned
             # None (i.e. upstream silently failed). If nothing is wired, the
@@ -85,11 +85,16 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                 "Wire a state explicitly to seed from a different configuration or to keep tool/workpiece attachments.",
             )
 
+        options = None
+        if check_collision is not None:
+            options = {"check_collision": bool(check_collision)}
+
         try:
             configuration = planner.inverse_kinematics(
                 target=target,
                 robot_cell_state=start_state,
                 group=group or None,
+                options=options,
             )
         except BackendTargetNotSupportedError:
             # The exception is raised with no payload — surface something

@@ -39,7 +39,7 @@ with RosClient() as client:
     calculate({})
 
     print("Inverse kinematics with collision check disabled:")
-    options = {"allow_collision": True}
+    options = {"check_collision": False}
     calculate(options)
 
 """

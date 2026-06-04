@@ -158,8 +158,10 @@ class MoveItInverseKinematics(InverseKinematics):
                 Whether or not to return the full configuration. Defaults to ``False``.
             - ``"verbose"``: (:obj:`bool`, optional)
                 Whether or not to print verbose output. Defaults to ``False``.
-            - ``"allow_collision"``: (:obj:`bool`, optional) When True, collision checking is disabled.
-              Defaults to ``False``.
+            - ``"check_collision"``: (:obj:`bool`, optional) When True (default), MoveIt is asked to
+              return only collision-free solutions; when False, in-collision solutions are accepted.
+              Defaults to ``True``. The legacy key ``"allow_collision"`` (inverted meaning) is also
+              accepted for backward compatibility.
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               An extra set of MoveIt constraints where the final link of the planning group must satisfy.
               Defaults to ``None``.
@@ -319,6 +321,7 @@ class MoveItInverseKinematics(InverseKinematics):
         options: Optional[dict] = None,
     ):
         """Asynchronous handler of MoveIt IK service."""
+        options = options or {}
         base_link = options["base_link"]
         header = Header(frame_id=base_link)
         # The pose_stamped does not accept tolerance values
@@ -339,12 +342,17 @@ class MoveItInverseKinematics(InverseKinematics):
         timeout_in_secs = options.get("timeout", 2)
         timeout_duration = {"secs": timeout_in_secs, "nsecs": 0}
 
+        # Accept the legacy `allow_collision` key (inverted meaning) so old callers keep working.
+        check_collision = options.get("check_collision")
+        if check_collision is None:
+            check_collision = not options.get("allow_collision", False)
+
         ik_request = PositionIKRequest(
             group_name=group,
             robot_state=robot_state,
             constraints=constraints,
             pose_stamped=pose_stamped,
-            avoid_collisions=not options.get("allow_collision", False),
+            avoid_collisions=bool(check_collision),
             attempts=options.get("attempts", 8),
             timeout=timeout_duration,
         )

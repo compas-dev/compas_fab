@@ -2,7 +2,7 @@
     "name": "ROS Client",
     "nickname": "ROS Client",
     "category": "COMPAS FAB",
-    "subcategory": "Backends",
+    "subcategory": "ROS",
     "description": "Connect to a ROS bridge (ROS 1 or ROS 2). The distro is auto-detected.",
     "exposure": 2,
     "ghpython": {
