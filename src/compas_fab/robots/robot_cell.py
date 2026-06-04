@@ -323,6 +323,55 @@ class RobotCell(Data):
         name = self.get_end_effector_link_name(group or self.main_group_name)
         return self.robot_model.get_link_by_name(name)
 
+    def default_touch_links(self, group: Optional[str] = None) -> list[str]:
+        """Return the link a tool attached at the group's end-effector will sit flush against.
+
+        Walks up the kinematic chain from the end-effector link, skipping
+        every geometry-less mounting link, and returns the first link with
+        visual or collision geometry — the one a tool attached at the EE
+        inevitably overlaps. Geometry-less frame links are *not* included
+        (MoveIt has no geometry to collide with for them, so listing them
+        as touch links is meaningless).
+
+        This is a sensible default for the `touch_links` argument of
+        `RobotCellState.set_tool_attached_to_group`.
+
+        For robots where the end-effector link itself carries geometry
+        (e.g. Panda's `panda_link8`), the EE link is returned. For robots
+        that expose a chain of frame-only mounting links (e.g. UR5:
+        `tool0` → `flange` → `wrist_3_link`), the walk steps past those
+        and returns just the first solid ancestor (`wrist_3_link`).
+
+        Parameters
+        ----------
+        group
+            Defaults to the cell's main planning group.
+
+        Returns
+        -------
+        list of str
+            A single-element list with the first link bearing geometry along
+            the EE chain; or an empty list if no such link exists (degenerate).
+
+        Examples
+        --------
+        >>> cell, _ = RobotCellLibrary.ur5(load_geometry=False)
+        >>> cell.default_touch_links()
+        ['wrist_3_link']
+        """
+        model = self.robot_model
+        assert model is not None, "robot_model is required to resolve touch links"
+        ee_name = self.get_end_effector_link_name(group or self.main_group_name)
+        current = model.get_link_by_name(ee_name)
+        while current is not None:
+            if current.visual or current.collision:
+                return [current.name]
+            parent_joint = model.find_parent_joint(current)
+            if parent_joint is None:
+                break
+            current = model.get_link_by_name(parent_joint.parent.link)
+        return []
+
     def get_base_link_name(self, group: Optional[str] = None) -> str:
         """Get the name of the robot's base link.
 
