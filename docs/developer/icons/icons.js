@@ -6,11 +6,13 @@
 
 const ICONS = {
   /* ---------------- ROBOT CELL ---------------- */
-  // iso-cube (the cell volume) drawn from library brackets
+  // iso-cube (the cell) sitting on a stack of books (the library)
   cellLibrary:
-    '<path d="M12 6 L16 8.5 L12 11 L8 8.5 Z"/>' +
-    '<path d="M8 8.5 V13.5 L12 16 L16 13.5 V8.5 M12 11 V16"/>' +
-    '<path class="ac" d="M6 5 H4 V19 H6 M18 5 H20 V19 H18"/>',
+    '<path d="M11 3.5 L15 6 L11 8.5 L7 6 Z"/>' +
+    '<path d="M7 6 V10.5 L11 13 L15 10.5 V6 M11 8.5 V13"/>' +
+    '<path class="ac" d="M4 20 H16 V17.6 H4 Z"/>' +
+    '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
+    '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
 
   // cell loaded from a URDF/SRDF document
   cellUrdf:
@@ -43,16 +45,26 @@ const ICONS = {
     '<path d="M6 7 L13 12 L18 7 M13 12 L6 19 M13 12 L18 19"/>' +
     '<circle class="adot" cx="13" cy="12" r="1.3"/>',
 
-  // tool pulled from the tool library
-  toolFromLibrary:
-    '<path d="M8 7 H14 L11 14 Z"/>' +
-    '<circle class="dot" cx="11" cy="14" r="1.1"/>' +
-    '<path class="ac" d="M6 6 H4 V18 H6 M18 6 H20 V18 H16"/>',
+  // tool (cone) built from a Rhino mesh + TCP
+  toolFromMesh:
+    '<path d="M5.5 7 H16.5 L11 17.5 Z"/>' +
+    '<path d="M5.5 7 L11 11 L16.5 7 M11 11 L8.2 7 M11 11 L13.8 7 M11 11 V17.5"/>' +
+    '<circle class="adot" cx="11" cy="17.5" r="1.3"/>',
 
-  // rigid body pulled from the body library
+  // tool (cone) pulled from a stack of books (the library)
+  toolFromLibrary:
+    '<path d="M6.5 4 H15.5 L11 12 Z"/>' +
+    '<circle class="dot" cx="11" cy="12" r="1.1"/>' +
+    '<path class="ac" d="M4 20 H16 V17.6 H4 Z"/>' +
+    '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
+    '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
+
+  // rigid body (box) pulled from a stack of books (the library)
   bodyFromLibrary:
-    '<rect x="8" y="8" width="8" height="8" rx="1"/>' +
-    '<path class="ac" d="M6 6 H4 V18 H6 M18 6 H20 V18 H16"/>',
+    '<rect x="7" y="3.5" width="8" height="8" rx="1"/>' +
+    '<path class="ac" d="M4 20 H16 V17.6 H4 Z"/>' +
+    '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
+    '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
 
   /* ---------------- CELL STATE ---------------- */
   // default state: robot at home (articulated arm at rest)
@@ -193,7 +205,7 @@ const ICONS = {
     '<path class="ac" d="M15.4 5.2 L19.2 6.2 L18.2 10"/>',
 
   // wrap a trajectory into a named Action (card holds a path)
-  trajectoryStep:
+  trajectoryAction:
     '<rect x="3.5" y="6.5" width="17" height="11" rx="2.2"/>' +
     '<path d="M6.5 14 L9.5 11 L13 12.5 L16 9.5"/>' +
     '<circle class="dot" cx="6.5" cy="14" r="1"/>' +
@@ -201,14 +213,14 @@ const ICONS = {
     '<circle class="adot" cx="16" cy="9.5" r="1.2"/>',
 
   // wrap a state change into a named Action (card holds a state-swap)
-  stateChangeStep:
+  stateChangeAction:
     '<rect x="3.5" y="6.5" width="17" height="11" rx="2.2"/>' +
     '<rect x="6" y="9.6" width="4" height="4.8" rx="0.7"/>' +
     '<path class="ac" d="M11 12 H14 M12.7 10.5 L14.3 12 L12.7 13.5"/>' +
     '<rect class="adot" x="15" y="9.6" width="4" height="4.8" rx="0.7"/>',
 
   // assemble ordered Actions into one ActionChain (threaded sequence)
-  motionPlan:
+  actionChain:
     '<rect x="8.5" y="5" width="11.5" height="3.5" rx="1.5"/>' +
     '<rect x="8.5" y="10.25" width="11.5" height="3.5" rx="1.5"/>' +
     '<rect x="8.5" y="15.5" width="11.5" height="3.5" rx="1.5"/>' +
@@ -224,19 +236,18 @@ const ICONS = {
     '<path class="ac" d="M6 19 V15.5 M10 19 V13 M14 19 V14.5 M18 19 V12"/>',
 
   /* ---------------- BACKENDS ---------------- */
-  // analytical (closed-form) solver chip
+  // analytical (closed-form) solver chip — labelled "A"
   analyticalPlanner:
     '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
     '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
-    '<path class="ac" d="M7.5 14 C 9 9.5, 11 9.5, 12 12 S 14.5 15.5, 16.5 11"/>',
+    '<path class="ac" d="M9.4 15.4 L12 8.6 L14.6 15.4"/>' +
+    '<path class="ac" d="M10.45 12.9 H13.55"/>',
 
-  // MoveIt / ROS-backed planner chip
+  // MoveIt / ROS-backed planner chip — labelled "M"
   moveitPlanner:
     '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
     '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
-    '<path class="ac" d="M7 15 L10 10 L13 13.5 L17 8.5"/>' +
-    '<circle class="adot" cx="7" cy="15" r="1"/>' +
-    '<circle class="adot" cx="17" cy="8.5" r="1"/>',
+    '<path class="ac" d="M8.8 15.4 V8.6 L12 12.6 L15.2 8.6 V15.4"/>',
 
   // ROS bridge client (connection)
   rosClient:
