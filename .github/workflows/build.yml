@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - prep-release
   pull_request:
     branches:
       - main
+      - prep-release
 
 jobs:
   build:
