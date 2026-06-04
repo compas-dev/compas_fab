@@ -192,7 +192,7 @@ const ICONS = {
     '<circle class="dot" cx="14" cy="10" r="1.3"/>' +
     '<path class="ac" d="M15.4 5.2 L19.2 6.2 L18.2 10"/>',
 
-  // wrap a trajectory into a named PlanStep (card holds a path)
+  // wrap a trajectory into a named Action (card holds a path)
   trajectoryStep:
     '<rect x="3.5" y="6.5" width="17" height="11" rx="2.2"/>' +
     '<path d="M6.5 14 L9.5 11 L13 12.5 L16 9.5"/>' +
@@ -200,14 +200,14 @@ const ICONS = {
     '<circle class="dot" cx="13" cy="12.5" r="1"/>' +
     '<circle class="adot" cx="16" cy="9.5" r="1.2"/>',
 
-  // wrap a state change into a named PlanStep (card holds a state-swap)
+  // wrap a state change into a named Action (card holds a state-swap)
   stateChangeStep:
     '<rect x="3.5" y="6.5" width="17" height="11" rx="2.2"/>' +
     '<rect x="6" y="9.6" width="4" height="4.8" rx="0.7"/>' +
     '<path class="ac" d="M11 12 H14 M12.7 10.5 L14.3 12 L12.7 13.5"/>' +
     '<rect class="adot" x="15" y="9.6" width="4" height="4.8" rx="0.7"/>',
 
-  // assemble ordered PlanSteps into one MotionPlan (threaded sequence)
+  // assemble ordered Actions into one ActionChain (threaded sequence)
   motionPlan:
     '<rect x="8.5" y="5" width="11.5" height="3.5" rx="1.5"/>' +
     '<rect x="8.5" y="10.25" width="11.5" height="3.5" rx="1.5"/>' +
