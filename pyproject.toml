@@ -124,7 +124,7 @@ serialize = [
 ]
 
 [tool.bumpversion.parts.pre_l]
-values = ["dev", "rc", "final"]
+values = ["rc", "final"]
 optional_value = "final"
 
 [[tool.bumpversion.files]]
