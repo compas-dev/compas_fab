@@ -7,7 +7,7 @@ fetches the mesh geometry. The result is cached in sticky so subsequent canvas
 runs do not re-fetch the (potentially large) mesh payload.
 
 Works against ROS 1 (rosbridge param server + fileserver) and ROS 2 (rosbridge
-topics + HTTP file server) — the RosClient auto-detects the distro and picks
+topics + HTTP file server): the RosClient auto-detects the distro and picks
 the matching loader.
 
 If you see HTTP 404 errors while loading geometry, your local ROS may be

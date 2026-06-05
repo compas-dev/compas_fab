@@ -10,7 +10,7 @@ of that state with `robot_configuration` set to the corresponding
 trajectory point, so it can be piped straight into `VisualizeRobotCell`
 (e.g. via an index slider to scrub through frames).
 
-`velocities`, `accelerations` and `efforts` are lists of lists — one
+`velocities`, `accelerations` and `efforts` are lists of lists: one
 inner list per trajectory point, each ordered to match the trajectory's
 `joint_names`. They land on the GH canvas as DataTrees (one branch per
 point), so a Quick Graph / chart node can plot the profile directly.

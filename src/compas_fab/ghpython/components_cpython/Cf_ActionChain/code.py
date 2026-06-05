@@ -10,8 +10,8 @@ the assembled chain plus composite outputs for visualisation.
 `planes` is a DataTree with one branch per trajectory action (per-action
 coloring / filtering work out of the box); `polyline` is a list of
 polylines parallel to those branches. `cell_states` is a flat list of
-RobotCellState snapshots — one per trajectory point plus one per state
-change — so a single index slider + VisualizeRobotCell can scrub through
+RobotCellState snapshots -one per trajectory point plus one per state
+change- so a single index slider + VisualizeRobotCell can scrub through
 the whole chain frame by frame.
 
 COMPAS FAB v1.1.0

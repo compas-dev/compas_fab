@@ -3,7 +3,7 @@
 Wrap a JointTrajectory into a named Action, ready for Cf_ActionChain.
 
 Use this between a planner output (Plan Motion / Plan Cartesian Motion)
-and the Cf_ActionChain assembler — drop one per trajectory in the chain,
+and the Cf_ActionChain assembler: drop one per trajectory in the chain,
 type the name next to the trajectory it labels. Optional `tags` (CSV)
 drive differentiated downstream execution (e.g. approach, linear).
 
