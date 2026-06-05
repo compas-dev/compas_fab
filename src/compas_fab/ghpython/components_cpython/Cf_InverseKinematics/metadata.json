@@ -28,7 +28,7 @@
             },
             {
                 "name": "check_collision",
-                "description": "When True, only collision-free IK solutions are returned; when False, in-collision solutions are accepted. Unwired keeps the backend default (True — collision-free).",
+                "description": "When True, only collision-free IK solutions are returned; when False, in-collision solutions are accepted. Unwired keeps the backend default (True: collision-free).",
                 "typeHintID": "bool"
             }
         ],
@@ -39,7 +39,7 @@
             },
             {
                 "name": "cell_state",
-                "description": "A copy of the start_state with `robot_configuration` set to the IK result. Wire straight into VisualizeRobotCell / ForwardKinematics / next planner step — no SetRobotConfiguration needed."
+                "description": "A copy of the start_state with `robot_configuration` set to the IK result. Wire straight into VisualizeRobotCell / ForwardKinematics / next planner step- no SetRobotConfiguration needed."
             }
         ]
     }

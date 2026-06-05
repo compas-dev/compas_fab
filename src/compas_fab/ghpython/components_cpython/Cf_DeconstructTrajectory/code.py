@@ -4,12 +4,13 @@ Expand a JointTrajectory into per-point Configurations and RobotCellStates,
 plus the per-point velocity/acceleration/effort profiles.
 
 `configurations` is always populated (one Configuration per trajectory
-point). `cell_states` is populated only when `start_state` is wired —
-each entry is a copy of `start_state` with `robot_configuration` set to
-the corresponding trajectory point, so it can be piped straight into
-`VisualizeRobotCell` (e.g. via an index slider to scrub through frames).
+point). `cell_states` is populated when the trajectory carries a
+`start_state` (set by the planner that produced it). Each entry is a copy
+of that state with `robot_configuration` set to the corresponding
+trajectory point, so it can be piped straight into `VisualizeRobotCell`
+(e.g. via an index slider to scrub through frames).
 
-`velocities`, `accelerations` and `efforts` are lists of lists — one
+`velocities`, `accelerations` and `efforts` are lists of lists: one
 inner list per trajectory point, each ordered to match the trajectory's
 `joint_names`. They land on the GH canvas as DataTrees (one branch per
 point), so a Quick Graph / chart node can plot the profile directly.
@@ -43,7 +44,7 @@ def _state_with_point(start_state, point, trajectory_joint_names):
 
 
 class DeconstructTrajectory(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, trajectory, start_state):
+    def RunScript(self, trajectory):
         if trajectory is None or not getattr(trajectory, "points", None):
             return ([], [], [], [], [])
 
@@ -53,6 +54,7 @@ class DeconstructTrajectory(Grasshopper.Kernel.GH_ScriptInstance):
         accelerations = list_to_tree([p.accelerations for p in points])
         efforts = list_to_tree([p.effort for p in points])
 
+        start_state = getattr(trajectory, "start_state", None)
         if start_state is None:
             return (configurations, [], velocities, accelerations, efforts)
 

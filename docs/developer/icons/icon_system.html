@@ -196,7 +196,7 @@
       <p>A unified 24&times;24 icon set for the COMPAS&nbsp;FAB component toolbar — built from one geometric kit so the whole library reads as a family.</p>
     </div>
     <div class="stamp">
-      <div><b>32</b> components</div>
+      <div><b>37</b> components</div>
       <div><b>24&times;24</b> px · PNG/SVG</div>
       <div><b>7</b> subcategories</div>
       <div>rev <b>A</b> · 2026-06</div>
@@ -268,8 +268,8 @@
     ['robotConfig','Sliders','joint config'],
     ['planCartesian','Polyline','motion path'],
     ['configTarget','Ring','goal / target'],
-    ['toolFromLibrary','Brackets','library'],
-    ['analyticalPlanner','Chip','solver backend'],
+    ['toolFromLibrary','Books','library'],
+    ['analyticalPlanner','Labelled chip','solver backend'],
     ['rosClient','Nodes','connection'],
   ];
   document.getElementById('kit').innerHTML = KIT.map(([id,b,s])=>
@@ -300,6 +300,7 @@
       ['addTool','Add Tool To Cell','Add Tool','Add a ToolModel to a cell. Passthrough builder.'],
       ['addBody','Add Rigid Body To Cell','Add Body','Add a RigidBody to a cell under a given id.'],
       ['bodyFromMesh','Rigid Body From Mesh','Body From Mesh','Construct a RigidBody from a Rhino mesh.'],
+      ['toolFromMesh','Tool From Mesh','Tool From Mesh','Construct a ToolModel from a Rhino mesh + TCP plane.'],
       ['toolFromLibrary','Tool From Library','Tool From Library','Load a pre-defined ToolModel (cone, gripper…).'],
       ['bodyFromLibrary','Rigid Body From Library','Body From Library','Load a pre-defined RigidBody (target_marker…).'],
     ]],
@@ -326,6 +327,10 @@
       ['ik','Inverse Kinematics','IK','Target → configuration for a cell state.'],
       ['planMotion','Plan Motion','Plan Motion','Free-space, joint-interpolated motion to a target.'],
       ['planCartesian','Plan Cartesian Motion','Cartesian Motion','Linear-in-tool-space motion through waypoints.'],
+      ['trajectoryAction','Trajectory Action','Trajectory Action','Wrap a JointTrajectory into a named Action.'],
+      ['stateChangeAction','State Change Action','State Change Action','Wrap a state change (grasp, release, tool swap) into an Action.'],
+      ['actionChain','Action Chain','Action Chain','Assemble ordered Actions into one ActionChain.'],
+      ['deconstructTrajectory','Deconstruct Trajectory','Deconstruct Trajectory','Explode a trajectory into per-point states + velocity/accel data.'],
     ]],
     ['05','Backends','choose an engine',[
       ['analyticalPlanner','Analytical Kinematics Planner','Analytical Planner','Closed-form FK/IK in-process. No ROS or PyBullet.'],

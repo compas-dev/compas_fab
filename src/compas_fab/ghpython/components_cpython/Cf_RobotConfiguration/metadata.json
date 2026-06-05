@@ -24,6 +24,10 @@
             {
                 "name": "configuration",
                 "description": "Configuration with joint_names and joint_types extracted from the cell."
+            },
+            {
+                "name": "cell_state",
+                "description": "A copy of the default cell state with `robot_configuration` set to the selected configuration."
             }
         ]
     }

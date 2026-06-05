@@ -206,6 +206,7 @@ class MoveItPlanMotion(PlanMotion):
         def response_handler(response):
             try:
                 trajectory = convert_trajectory(joints, response.trajectory, response.trajectory_start, 1.0, response.planning_time, response)
+                trajectory.start_state = start_state
                 callback(trajectory)
             except Exception as e:
                 errback(e)

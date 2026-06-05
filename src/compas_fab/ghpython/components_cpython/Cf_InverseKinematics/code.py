@@ -49,7 +49,7 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if planner is None or target is None:
             # Warn only when the input *is* wired but the upstream returned
             # None (i.e. upstream silently failed). If nothing is wired, the
-            # user is still building the canvas — staying quiet keeps it clean.
+            # user is still building the canvas: staying quiet keeps it clean.
             for name, value in (("planner", planner), ("target", target)):
                 if value is None:
                     param = next(p for p in ghenv.Component.Params.Input if p.Name == name)  # noqa: F821
@@ -63,7 +63,7 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                 target = FrameTarget(target_frame=target, target_mode=TargetMode.ROBOT)
                 warning(ghenv.Component, wrap_msg.format("bare COMPAS Frame"))  # noqa: F821
             else:
-                # Anything else (Rhino Plane, GH_Plane wrapper, ...) — try the
+                # Anything else (Rhino Plane, GH_Plane wrapper, ...): try the
                 # plane-to-frame conversion. If it isn't plane-shaped, surface
                 # a clean error.
                 try:
@@ -97,7 +97,7 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
                 options=options,
             )
         except BackendTargetNotSupportedError:
-            # The exception is raised with no payload — surface something
+            # The exception is raised with no payload: surface something
             # actionable: name the target type and the planner that rejected it.
             error(  # noqa: F821
                 ghenv.Component,  # noqa: F821

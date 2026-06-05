@@ -104,6 +104,76 @@ target, a planner.
 
 The next step is to [choose a backend](backends/index.md) and run the call.
 
+## Assembling multi-stage motions
+
+A single planning call returns one
+[`JointTrajectory`][compas_fab.robots.JointTrajectory]. Real workflows
+chain several together, eg. a pick-and-place cycle is six or eight
+trajectories interleaved with discrete state changes (gripper closes,
+tool attaches, rigid body grasped). An
+[`ActionChain`][compas_fab.robots.ActionChain] is the
+backend-agnostic data container that holds them together.
+
+A chain threads a single `RobotCellState` through an ordered list of
+[`Action`][compas_fab.robots.Action] objects. A single `Action` class
+covers both kinds — an action with a trajectory is *planned*, one
+without is *unplanned*:
+
+- A **planned (trajectory) action** carries a `JointTrajectory`. The
+  chain derives the post-state automatically (last point of the
+  trajectory applied to the pre-state).
+- A **state-change action** has no trajectory and an explicit
+  `post_state`. Use these for discrete transitions: gripper toggle,
+  tool attach/detach, rigid body grasped or released.
+
+Every action also carries `tags` (and a free-form `attributes` bag) to
+drive differentiated downstream execution — e.g. `approach`/`retract`,
+linear vs. free motion.
+
+```pycon
+>>> from compas_fab.robots import ActionChain
+>>> chain = ActionChain(name="pick_and_place", start_state=state, robot_cell=cell)
+>>> chain.append_trajectory("approach",  approach_trajectory, tags=["approach"])
+>>> chain.append_trajectory("descend",   descend_trajectory, tags=["linear"])
+>>> chain.append_state_change("grasp",   state_with_part_attached)
+>>> chain.append_trajectory("retract",   retract_trajectory, tags=["retract"])
+>>> chain.duration  # sum of trajectory durations
+2.37
+>>> chain.end_state  # post-state of the last action
+RobotCellState(...)
+```
+
+Each `append_*` returns the chain, so chaining works too:
+
+```pycon
+>>> chain = (ActionChain(name="pnp", start_state=state, robot_cell=cell)
+...        .append_trajectory("approach", t1)
+...        .append_state_change("grasp", grasped_state)
+...        .append_trajectory("retract", t2))
+```
+
+**Serialization.**
+
+Chains can be serialized to/from JSON using COMPAS data serialization mechanism:
+
+```pycon
+>>> chain.to_json("pick_and_place.json")
+>>> loaded = ActionChain.from_json("pick_and_place.json")
+>>> loaded.verify_cell(cell)  # raises if the cell has drifted
+```
+
+The chain owns the state sequence so each action's `start_state` (and
+its mirror on the contained trajectory) is stripped on serialize and
+re-threaded on load: only the chain's own `start_state` and the explicit
+state-change post-states are stored. Passing `robot_cell` at construction
+records a structural signature (robot name + tool/body ids, hashed with
+SHA-256) so a mismatched cell reports a clear error via `verify_cell()`.
+
+For a runnable end-to-end example, see
+[`08_motion_plan_pick_and_place.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/08_motion_plan_pick_and_place.py)
+(PyBullet) or [the ROS / MoveIt
+equivalent](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/08_motion_plan_pick_and_place.py).
+
 ## Where things live
 
 - [`compas_fab.robots`][compas_fab.robots]: every type on this page lives

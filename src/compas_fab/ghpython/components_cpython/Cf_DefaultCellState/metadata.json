@@ -16,7 +16,7 @@
         ],
         "outputParameters": [
             {
-                "name": "robot_cell_state",
+                "name": "default_cell_state",
                 "description": "Default RobotCellState matching the cell."
             }
         ]
