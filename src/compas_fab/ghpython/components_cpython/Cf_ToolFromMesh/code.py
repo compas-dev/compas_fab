@@ -16,6 +16,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 import Rhino
+import rhinoscriptsyntax as rs
 import System
 from compas.geometry import Frame
 from compas_rhino.conversions import mesh_to_compas
@@ -29,8 +30,8 @@ class ToolFromMesh(Grasshopper.Kernel.GH_ScriptInstance):
             return None
 
         frame = tcp_plane if isinstance(tcp_plane, Frame) else plane_to_compas_frame(tcp_plane)
-        c_visual = mesh_to_compas(visual_mesh)
-        c_collision = mesh_to_compas(collision_mesh) if collision_mesh else c_visual
+        c_visual = mesh_to_compas(rs.coercemesh(visual_mesh))
+        c_collision = mesh_to_compas(rs.coercemesh(collision_mesh)) if collision_mesh else c_visual
 
         return ToolModel(
             visual=c_visual,

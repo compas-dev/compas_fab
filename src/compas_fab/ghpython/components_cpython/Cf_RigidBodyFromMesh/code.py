@@ -10,6 +10,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 import Rhino
+import rhinoscriptsyntax as rs
 import System
 from compas_rhino.conversions import mesh_to_compas
 
@@ -22,8 +23,8 @@ class RigidBodyFromMesh(Grasshopper.Kernel.GH_ScriptInstance):
             return None
 
         native_scale = native_scale if native_scale else 1.0
-        c_visual = mesh_to_compas(visual_mesh)
-        c_collision = mesh_to_compas(collision_mesh) if collision_mesh else c_visual
+        c_visual = mesh_to_compas(rs.coercemesh(visual_mesh))
+        c_collision = mesh_to_compas(rs.coercemesh(collision_mesh)) if collision_mesh else c_visual
 
         return RigidBody(
             visual_meshes=[c_visual],
