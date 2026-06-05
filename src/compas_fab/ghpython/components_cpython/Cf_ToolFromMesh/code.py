@@ -19,6 +19,7 @@ import Rhino
 import rhinoscriptsyntax as rs
 import System
 from compas.geometry import Frame
+from compas_ghpython import warning as gh_warning
 from compas_rhino.conversions import mesh_to_compas
 from compas_rhino.conversions import plane_to_compas_frame
 from compas_robots import ToolModel
@@ -30,8 +31,11 @@ class ToolFromMesh(Grasshopper.Kernel.GH_ScriptInstance):
             return None
 
         frame = tcp_plane if isinstance(tcp_plane, Frame) else plane_to_compas_frame(tcp_plane)
-        c_visual = mesh_to_compas(rs.coercemesh(visual_mesh))
-        c_collision = mesh_to_compas(rs.coercemesh(collision_mesh)) if collision_mesh else c_visual
+        c_visual = mesh_to_compas(rs.coercemesh(visual_mesh)) if visual_mesh else None
+        c_collision = mesh_to_compas(rs.coercemesh(collision_mesh)) if collision_mesh else None
+
+        if collision_mesh is None:
+            gh_warning(ghenv.Component, "No collision mesh provided: the tool will be visualized but ignored for collision checking.")  # noqa: F821
 
         return ToolModel(
             visual=c_visual,
