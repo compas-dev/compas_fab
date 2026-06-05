@@ -1,4 +1,4 @@
-# r: compas_fab>=1.0.2
+# r: compas_fab>=1.1.0
 """
 Publishes messages to a ROS topic
 
