@@ -31,6 +31,8 @@ COMPAS FAB v1.1.0
 from copy import deepcopy
 
 import Grasshopper
+import Rhino
+import System
 from compas.geometry import Frame
 from compas_ghpython import error
 from compas_ghpython import warning

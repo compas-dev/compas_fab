@@ -9,6 +9,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas_rhino.conversions import mesh_to_compas
 
 from compas_fab.robots import RigidBody

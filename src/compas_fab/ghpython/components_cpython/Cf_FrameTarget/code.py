@@ -9,6 +9,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas.geometry import Frame
 from compas_rhino.conversions import plane_to_compas_frame
 

@@ -11,7 +11,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 import Rhino
-import System  # noqa: F401
+import System
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas_ghpython import error

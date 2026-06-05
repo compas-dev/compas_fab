@@ -8,6 +8,8 @@ COMPAS FAB v1.1.0
 import time
 
 import Grasshopper
+import Rhino
+import System
 from compas_ghpython import create_id
 from roslibpy import Topic
 from scriptcontext import sticky as st

@@ -12,6 +12,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas.scene import SceneObject
 from compas_ghpython import error
 

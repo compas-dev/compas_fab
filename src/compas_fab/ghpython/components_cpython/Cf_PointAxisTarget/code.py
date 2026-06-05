@@ -9,6 +9,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas_rhino.conversions import point_to_compas

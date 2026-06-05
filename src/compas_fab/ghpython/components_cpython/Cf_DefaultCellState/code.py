@@ -10,6 +10,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 
 
 class DefaultCellState(Grasshopper.Kernel.GH_ScriptInstance):

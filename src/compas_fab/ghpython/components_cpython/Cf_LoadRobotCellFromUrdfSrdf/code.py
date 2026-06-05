@@ -10,6 +10,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas_ghpython import create_id
 from scriptcontext import sticky as st
 

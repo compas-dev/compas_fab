@@ -14,6 +14,8 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas_rhino.conversions import frame_to_rhino_plane
 
 from compas_fab.robots import TargetMode
