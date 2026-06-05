@@ -142,6 +142,7 @@ plugins:
               modules: false
             type_parameter_headings: true
             unwrap_annotated: true
+  - print-site
 
 nav:
   - Home: index.md
