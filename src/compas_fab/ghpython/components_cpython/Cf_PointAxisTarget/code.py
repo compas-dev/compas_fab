@@ -35,7 +35,7 @@ class PointAxisTargetComponent(Grasshopper.Kernel.GH_ScriptInstance):
             return None
 
         cpoint = point if isinstance(point, Point) else point_to_compas(rs.coerce3dpoint(point))
-        caxis = target_z_axis if isinstance(target_z_axis, Vector) else vector_to_compas(target_z_axis)
+        caxis = target_z_axis if isinstance(target_z_axis, Vector) else vector_to_compas(rs.coerce3dvector(target_z_axis))
 
         mode = target_mode or "ROBOT"
         if isinstance(mode, str):

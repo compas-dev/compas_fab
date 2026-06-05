@@ -44,7 +44,7 @@ class PointAxisWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
             if p is None or a is None:
                 continue
             cp = p if isinstance(p, Point) else point_to_compas(rs.coerce3dpoint(p))
-            ca = a if isinstance(a, Vector) else vector_to_compas(a)
+            ca = a if isinstance(a, Vector) else vector_to_compas(rs.coerce3dvector(a))
             pairs.append((cp, ca.unitized()))
 
         if not pairs:
