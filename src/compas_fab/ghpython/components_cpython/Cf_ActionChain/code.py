@@ -18,10 +18,13 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas_ghpython import error as gh_error
+from compas_rhino.conversions import frame_to_rhino_plane
+from compas_rhino.conversions import polyline_to_rhino
 from ghpythonlib.treehelpers import list_to_tree
 
-from compas_fab.ghpython import trajectory_to_planes_and_polyline
 from compas_fab.robots import ActionChain
 
 
@@ -59,9 +62,11 @@ class ActionChainComponent(Grasshopper.Kernel.GH_ScriptInstance):
             if not action.is_trajectory:
                 running_state = action.post_state
                 continue
-            planes, polyline = trajectory_to_planes_and_polyline(
-                robot_cell, running_state, action.trajectory, group or None
-            )
+
+            frames, polyline = action.trajectory.to_frames_and_polyline(robot_cell, running_state, group or None)
+            planes = [frame_to_rhino_plane(f) for f in frames]
+            polyline = polyline_to_rhino(polyline) if polyline else None
+
             planes_per_action.append(planes)
             polylines_per_action.append(polyline)
             running_state = action.post_state

@@ -3,10 +3,14 @@ from typing import Any
 from typing import Optional
 from typing import cast
 
+from compas_fab.robots import TargetMode
+
 if TYPE_CHECKING:
+    from compas_fab.robots import RobotCell
     from compas_fab.robots import RobotCellState
 
 from compas.data import Data
+from compas.geometry import Polyline
 from compas.tolerance import TOL
 from compas_robots import Configuration
 from compas_robots.configuration import FixedLengthList
@@ -358,3 +362,76 @@ class JointTrajectory(Trajectory):
             return 0.0
 
         return self.points[-1].time_from_start.seconds
+
+    def to_frames_and_polyline(self, robot_cell: "RobotCell", start_state: Optional["RobotCellState"], group=None):
+        """Compute frames and a connecting polyline from a trajectory.
+
+        For each trajectory point, the helper substitutes the point's joint
+        values into a single working copy of `start_state` and runs **local**
+        forward kinematics via `RobotCell.forward_kinematics_target_frame`
+        (`target_mode=ROBOT`), i.e. the URDF kinematic chain in-process, with
+        no backend round trip. A polyline through their origins is computed
+        as well.
+
+        `start_state` may be `None`; in that case the trajectory's own
+        `start_state` (populated by the planner that produced it) is used.
+
+        Returns `(frames, polyline)`. `polyline` is `None` when there are
+        fewer than two points. Any failure along the way returns `([], None)`
+        rather than raising.
+        """
+        start_state = start_state or self.start_state
+
+        if robot_cell is None:
+            return ([], None)
+        if self.points is None:
+            return ([], None)
+        if start_state is None:
+            return ([], None)
+
+        # ROS `trajectory_msgs/JointTrajectoryPoint` carries no joint_names,
+        # names live on the parent `JointTrajectory`. Fall back accordingly.
+        point_names = self.points[0].joint_names or self.joint_names or []
+
+        # One copy outside the loop; per-point we only swap the configuration.
+        working_state = start_state.copy()
+        base = working_state.robot_configuration
+
+        # Pre-compute merge data once. If we can't merge by name, fall back to
+        # using the point directly — works when the trajectory and cell share
+        # the same joint set.
+        merge_data = None
+        if base is not None and point_names:
+            base_names = list(base.joint_names)
+            merge_data = (
+                base_names,
+                list(base.joint_types),
+                list(base.joint_values),
+                {name: idx for idx, name in enumerate(base_names)},
+            )
+
+        frames = []
+        try:
+            for point in self.points:
+                if merge_data is None:
+                    working_state.robot_configuration = point
+                else:
+                    base_names, base_types, base_values_template, name_to_pos = merge_data
+                    values = list(base_values_template)
+                    for name, value in zip(point_names, point.joint_values):
+                        idx = name_to_pos.get(name)
+                        if idx is not None:
+                            values[idx] = value
+                    working_state.robot_configuration = Configuration(values, base_types, base_names)
+                frames.append(
+                    robot_cell.forward_kinematics_target_frame(
+                        robot_cell_state=working_state,
+                        target_mode=TargetMode.ROBOT,
+                        group=group or None,
+                    )
+                )
+        except Exception:
+            return ([], None)
+
+        polyline = Polyline([f.point for f in frames]) if len(frames) >= 2 else None
+        return (frames, polyline)

@@ -15,14 +15,17 @@ COMPAS FAB v1.1.0
 """
 
 import Grasshopper
+import Rhino
+import System
 from compas_ghpython import create_id
 from compas_ghpython import error as gh_error
 from compas_ghpython import warning as gh_warning
+from compas_rhino.conversions import frame_to_rhino_plane
+from compas_rhino.conversions import polyline_to_rhino
 from scriptcontext import sticky as st
 
 from compas_fab.backends import BackendError
 from compas_fab.backends import MotionPlanningError
-from compas_fab.ghpython import trajectory_to_planes_and_polyline
 
 
 class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
@@ -40,8 +43,10 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
         key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
         def _viz(trajectory):
-            robot_cell = getattr(getattr(planner, "client", None), "robot_cell", None)
-            return trajectory_to_planes_and_polyline(robot_cell, start_state, trajectory, group or None)
+            frames, polyline = trajectory.to_frames_and_polyline(planner.robot_cell, start_state, group or None)
+            planes = [frame_to_rhino_plane(f) for f in frames]
+            polyline = polyline_to_rhino(polyline) if polyline else None
+            return planes, polyline
 
         def _replay_marker(error_msg, has_trajectory):
             if not error_msg:
