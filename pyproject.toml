@@ -115,6 +115,16 @@ search = "{current_version}"
 replace = "{new_version}"
 
 [[tool.bumpversion.files]]
+filename = "CITATION.cff"
+search = version: "{current_version}"
+replace = version: "{new_version}"
+
+[[tool.bumpversion.files]]
 filename = "CHANGELOG.md"
 search = "Unreleased"
 replace = "[{new_version}] {now:%Y-%m-%d}"
+
+[[tool.bumpversion.files]]
+glob = "src/compas_fab/ghpython/components_cpython/**/code.py"
+search = "# r: compas_fab>={current_version}"
+replace = "# r: compas_fab>={new_version}"
