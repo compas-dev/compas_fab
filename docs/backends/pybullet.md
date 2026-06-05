@@ -60,23 +60,23 @@ Inverse + forward kinematics on a UR5 with a GUI:
 
 Setup:
 
-- [`01_set_robot_cell.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/01_set_robot_cell.py) — building a cell with floor + obstacles
-- [`01_set_robot_cell_state.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/01_set_robot_cell_state.py) — populating cell state
-- [`02_check_collision.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/02_check_collision.py) — collision checking against rigid bodies
+- [`01_set_robot_cell.py`](pybullet/files/01_set_robot_cell.py){: download="01_set_robot_cell.py" } — building a cell with floor + obstacles
+- [`01_set_robot_cell_state.py`](pybullet/files/01_set_robot_cell_state.py){: download="01_set_robot_cell_state.py" } — populating cell state
+- [`02_check_collision.py`](pybullet/files/02_check_collision.py){: download="02_check_collision.py" } — collision checking against rigid bodies
 
 Kinematics:
 
-- [`03_fk.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/03_fk.py), [`03_fk_target_mode.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/03_fk_target_mode.py), [`03_fk_to_link.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/03_fk_to_link.py) — forward kinematics variants
-- [`03_iter_ik.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/03_iter_ik.py) — iterating over IK solutions
-- [`04_ik_point_axis_target.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/04_ik_point_axis_target.py) — IK with a free rotation axis (drilling, milling)
-- [`04_ik_semi_constrained.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/04_ik_semi_constrained.py), [`04_ik_tool_target_mode.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/04_ik_tool_target_mode.py) — constrained / tool-frame variants
-- [`04_ik_errors.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/04_ik_errors.py), [`04_ik_multiple_solutions.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/04_ik_multiple_solutions.py) — error handling and multi-solution patterns
+- [`03_fk.py`](pybullet/files/03_fk.py){: download="03_fk.py" }, [`03_fk_target_mode.py`](pybullet/files/03_fk_target_mode.py){: download="03_fk_target_mode.py" }, [`03_fk_to_link.py`](pybullet/files/03_fk_to_link.py){: download="03_fk_to_link.py" } — forward kinematics variants
+- [`03_iter_ik.py`](pybullet/files/03_iter_ik.py){: download="03_iter_ik.py" } — iterating over IK solutions
+- [`04_ik_point_axis_target.py`](pybullet/files/04_ik_point_axis_target.py){: download="04_ik_point_axis_target.py" } — IK with a free rotation axis (drilling, milling)
+- [`04_ik_semi_constrained.py`](pybullet/files/04_ik_semi_constrained.py){: download="04_ik_semi_constrained.py" }, [`04_ik_tool_target_mode.py`](pybullet/files/04_ik_tool_target_mode.py){: download="04_ik_tool_target_mode.py" } — constrained / tool-frame variants
+- [`04_ik_errors.py`](pybullet/files/04_ik_errors.py){: download="04_ik_errors.py" }, [`04_ik_multiple_solutions.py`](pybullet/files/04_ik_multiple_solutions.py){: download="04_ik_multiple_solutions.py" } — error handling and multi-solution patterns
 
 Motion planning:
 
-- [`06_cartesian_motion_frame_waypoints.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/06_cartesian_motion_frame_waypoints.py) — Cartesian path with `FrameWaypoints`
-- [`06_cartesian_motion_point_axis_waypoints.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/06_cartesian_motion_point_axis_waypoints.py) — Cartesian path with `PointAxisWaypoints`
-- [`08_motion_plan_pick_and_place.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/08_motion_plan_pick_and_place.py) — assembling several trajectories + state changes into a serializable `ActionChain` (see [Concepts](../concepts.md#assembling-multi-stage-motions))
+- [`06_cartesian_motion_frame_waypoints.py`](pybullet/files/06_cartesian_motion_frame_waypoints.py){: download="06_cartesian_motion_frame_waypoints.py" } — Cartesian path with `FrameWaypoints`
+- [`06_cartesian_motion_point_axis_waypoints.py`](pybullet/files/06_cartesian_motion_point_axis_waypoints.py){: download="06_cartesian_motion_point_axis_waypoints.py" } — Cartesian path with `PointAxisWaypoints`
+- [`08_motion_plan_pick_and_place.py`](pybullet/files/08_motion_plan_pick_and_place.py){: download="08_motion_plan_pick_and_place.py" } — assembling several trajectories + state changes into a serializable `ActionChain` (see [Concepts](../concepts.md#assembling-multi-stage-motions))
 
 ## API reference
 

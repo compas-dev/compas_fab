@@ -49,8 +49,8 @@ calls — useful when feeding adjacent IK calls into a Cartesian path solver.
 
 ## More examples
 
-- [`03_analytical_pybullet_planner.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py) — full cell with tool attached, workpiece grasp, GUI visualisation
-- [`04_cartesian_path_analytic_pybullet.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py) — Cartesian path planning with collision-aware analytical IK
+- [`03_analytical_pybullet_planner.py`](analytical_kinematics/files/03_analytical_pybullet_planner.py){: download="03_analytical_pybullet_planner.py" } — full cell with tool attached, workpiece grasp, GUI visualisation
+- [`04_cartesian_path_analytic_pybullet.py`](analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py){: download="04_cartesian_path_analytic_pybullet.py" } — Cartesian path planning with collision-aware analytical IK
 
 ## API reference
 

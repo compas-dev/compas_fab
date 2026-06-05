@@ -170,9 +170,9 @@ records a structural signature (robot name + tool/body ids, hashed with
 SHA-256) so a mismatched cell reports a clear error via `verify_cell()`.
 
 For a runnable end-to-end example, see
-[`08_motion_plan_pick_and_place.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/pybullet/files/08_motion_plan_pick_and_place.py)
+[`08_motion_plan_pick_and_place.py`](backends/pybullet/files/08_motion_plan_pick_and_place.py){: download="08_motion_plan_pick_and_place.py" }
 (PyBullet) or [the ROS / MoveIt
-equivalent](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/ros/files/08_motion_plan_pick_and_place.py).
+equivalent](backends/ros/files/08_motion_plan_pick_and_place.py){: download="08_motion_plan_pick_and_place.py" }.
 
 ## Where things live
 

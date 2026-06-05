@@ -43,8 +43,8 @@ Forward kinematics on a UR5:
 
 ## More examples
 
-- [`02_inverse_kinematics.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/analytical_kinematics/files/02_inverse_kinematics.py) — IK returning 8 solutions for a UR5
-- [`02_inverse_kinematics with_tools.py`](https://github.com/compas-dev/compas_fab/blob/main/docs/backends/analytical_kinematics/files/02_inverse_kinematics%20with_tools.py) — IK with a tool attached to the flange
+- [`02_inverse_kinematics.py`](analytical_kinematics/files/02_inverse_kinematics.py){: download="02_inverse_kinematics.py" } — IK returning 8 solutions for a UR5
+- [`02_inverse_kinematics with_tools.py`](analytical_kinematics/files/02_inverse_kinematics%20with_tools.py){: download="02_inverse_kinematics with_tools.py" } — IK with a tool attached to the flange
 
 For collision-aware IK and Cartesian planning, see
 [Analytical IK + PyBullet](analytical_pybullet.md).

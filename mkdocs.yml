@@ -10,7 +10,8 @@ exclude_docs: |
   installation/docker_files/
   installation/ros_setup_ur.txt
   conftest.py
-  **/files/
+  **/__pycache__/
+  **/*.pyc
   **/images/
   analysis/
   concepts/
