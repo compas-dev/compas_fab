@@ -10,6 +10,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 import Rhino
+import rhinoscriptsyntax as rs
 import System
 from compas.geometry import Point
 from compas.geometry import Vector
@@ -33,7 +34,7 @@ class PointAxisTargetComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if point is None or target_z_axis is None:
             return None
 
-        cpoint = point if isinstance(point, Point) else point_to_compas(point)
+        cpoint = point if isinstance(point, Point) else point_to_compas(rs.coerce3dpoint(point))
         caxis = target_z_axis if isinstance(target_z_axis, Vector) else vector_to_compas(target_z_axis)
 
         mode = target_mode or "ROBOT"
