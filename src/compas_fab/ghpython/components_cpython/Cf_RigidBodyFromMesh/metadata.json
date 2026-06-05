@@ -4,7 +4,7 @@
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
     "description": "Construct a RigidBody from a Rhino mesh. The same mesh is used for collision checking unless a separate `collision_mesh` is provided.",
-    "exposure": 2,
+    "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,

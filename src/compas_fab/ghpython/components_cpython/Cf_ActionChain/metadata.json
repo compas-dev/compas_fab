@@ -4,7 +4,7 @@
     "category": "COMPAS FAB",
     "subcategory": "Planning",
     "description": "Assemble an ActionChain from a list of Actions (built upstream by Cf_TrajectoryAction / Cf_StateChangeAction). Threads the cell state through the chain, validates each action, and emits the assembled chain plus the composite EE planes/polyline for visualisation (one branch per trajectory action).",
-    "exposure": 2,
+    "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,

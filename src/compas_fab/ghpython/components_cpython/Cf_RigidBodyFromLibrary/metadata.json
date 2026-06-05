@@ -4,7 +4,7 @@
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
     "description": "Load a pre-defined RigidBody from RigidBodyLibrary (e.g. 'target_marker').",
-    "exposure": 2,
+    "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,

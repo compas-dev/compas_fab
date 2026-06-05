@@ -4,7 +4,7 @@
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
     "description": "Add a ToolModel to a RobotCell. Passthrough builder: returns a new cell, leaves the input untouched.",
-    "exposure": 2,
+    "exposure": 8,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
