@@ -54,6 +54,8 @@ from .ros import (
 # Kinematics imports
 from .kinematics import (
     # Kinematics - Analytic IK
+    AnalyticalKinematics,
+    AnalyticalKinematicsClient,
     AnalyticalInverseKinematics,
     AnalyticalPlanCartesianMotion,
     AnalyticalPyBulletPlanner,
@@ -109,6 +111,8 @@ __all__ = [
     "HttpFileServerLoader",
     "MoveItPlanner",
     # Kinematics
+    "AnalyticalKinematics",
+    "AnalyticalKinematicsClient",
     "AnalyticalInverseKinematics",
     "AnalyticalPlanCartesianMotion",
     "AnalyticalPyBulletPlanner",

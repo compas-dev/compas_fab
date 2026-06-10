@@ -21,6 +21,7 @@ from .solvers import (
     Staubli_TX260LKinematics,
     ABB_IRB4600_40_255Kinematics,
 )
+from .solvers.analytical_kinematics import AnalyticalKinematics
 
 __all__ = [
     # exceptions
@@ -32,6 +33,7 @@ __all__ = [
     "AnalyticalPyBulletPlanner",
     "AnalyticalKinematicsPlanner",
     # solvers
+    "AnalyticalKinematics",
     "OffsetWristKinematics",
     "SphericalWristKinematics",
     "UR3Kinematics",

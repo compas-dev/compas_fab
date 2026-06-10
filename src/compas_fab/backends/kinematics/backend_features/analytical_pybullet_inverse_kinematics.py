@@ -23,13 +23,6 @@ class AnalyticalPybulletInverseKinematics(AnalyticalInverseKinematics):
 
     Includes the ability to use PyBullet for collision checking.
 
-    Parameters
-    ----------
-    client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
-        The backend client to use for communication.
-    solver : :obj:`str`, optional
-        The solver to use to calculate IK.
-
     Notes
     -----
     This works only for industrial robot arms with six revolute joints.

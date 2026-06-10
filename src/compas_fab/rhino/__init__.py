@@ -10,8 +10,14 @@ import compas
 if compas.RHINO:
     from .scene import (
         ReachabilityMapObject,
+        RigidBodyObject,
+        RobotCellObject,
+        RobotModelObject,
     )
 
     __all__ = [
         "ReachabilityMapObject",
+        "RigidBodyObject",
+        "RobotCellObject",
+        "RobotModelObject",
     ]

@@ -7,6 +7,7 @@ from compas_fab.backends.ros.backend_features.move_it_forward_kinematics import 
 from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import MoveItInverseKinematics
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
 from compas_fab.backends.ros.backend_features.move_it_plan_motion import MoveItPlanMotion
+from compas_fab.backends.ros.backend_features.move_it_reset_planning_scene import MoveItResetPlanningScene
 
 __all__ = [
     "MoveItSetRobotCell",
@@ -16,4 +17,5 @@ __all__ = [
     "MoveItPlanCartesianMotion",
     "MoveItPlanMotion",
     "MoveItPlanningScene",
+    "MoveItResetPlanningScene",
 ]
