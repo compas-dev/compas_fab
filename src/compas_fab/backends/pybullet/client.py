@@ -213,7 +213,8 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         self.tools_puids: dict[str, int] = {}
 
         self.disabled_collisions = set()
-        self._cache_dir = None
+        # Backing handle for the lazily-created `_cache_dir` property.
+        self._cache_dir_handle = None
 
     # NOTE: This function is overloaded from the ClientInterface to provide Pybullet specific docstring
     @property
@@ -242,13 +243,27 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         return self._robot_cell_state
 
+    @property
+    def _cache_dir(self):
+        """Temporary directory for the meshes and URDFs streamed to PyBullet.
+
+        Created lazily on first access so the client works whether or not it is
+        used as a context manager (e.g. when ``connect()`` is called directly).
+        It is cleaned up on ``__exit__``; otherwise the underlying
+        ``TemporaryDirectory`` removes itself when it is garbage collected.
+        """
+        if self._cache_dir_handle is None:
+            self._cache_dir_handle = tempfile.TemporaryDirectory(prefix="compas_fab")
+        return self._cache_dir_handle
+
     def __enter__(self):
-        self._cache_dir = tempfile.TemporaryDirectory(prefix="compas_fab")
         self.connect(verbose=self.verbose, enable_debug_gui=self.enable_debug_gui)
         return self
 
     def __exit__(self, *args):
-        self._cache_dir.cleanup()
+        if self._cache_dir_handle is not None:
+            self._cache_dir_handle.cleanup()
+            self._cache_dir_handle = None
         self.disconnect(verbose=self.verbose)
 
     @property

@@ -39,6 +39,15 @@ def redirect_stdout(to=os.devnull, enabled=True):
 
     enabled = False if called_from_test or called_from_ipykernel else enabled
 
+    # Embedded interpreters (e.g. Rhino's CPython) replace ``sys.stdout`` with a
+    # stream that has no OS-level file descriptor, so ``fileno()`` raises and
+    # fd-level redirection is impossible. Fall back to running without it.
+    if enabled:
+        try:
+            sys.stdout.fileno()
+        except (AttributeError, OSError, ValueError):
+            enabled = False
+
     if not enabled:
         yield
     else:
