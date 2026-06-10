@@ -7,6 +7,21 @@ from roslibpy.ros2 import Header as RoslibpyRos2Header
 _TYPE_MAP = {}
 
 
+def _to_plain(value):
+    """Recursively convert ``Mapping`` values (e.g. roslibpy's ``UserDict``-based
+    ``Header``/``Time``) into plain ``dict``/``list`` so the result is JSON serializable.
+
+    roslibpy 2.0 wraps a header's ``stamp`` in a ``roslibpy.core.Time``, which is a
+    ``UserDict`` and *not* a real ``dict`` — ``json.dumps`` rejects it. Flattening here
+    keeps the per-distro field shaping roslibpy provides while emitting only plain types.
+    """
+    if isinstance(value, Mapping):
+        return {k: _to_plain(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_to_plain(v) for v in value]
+    return value
+
+
 def format_header_for_distro(header, ros_distro):
     if hasattr(header, "filter_fields_for_distro"):
         header.filter_fields_for_distro(ros_distro)
@@ -16,10 +31,10 @@ def format_header_for_distro(header, ros_distro):
     frame_id = header.get("frame_id") if header else None
 
     if ros_distro.is_ros2:
-        return dict(RoslibpyRos2Header(stamp=stamp, frame_id=frame_id))
+        return _to_plain(RoslibpyRos2Header(stamp=stamp, frame_id=frame_id))
 
     seq = header.get("seq") if header else None
-    return dict(RoslibpyRos1Header(seq=seq, stamp=stamp, frame_id=frame_id))
+    return _to_plain(RoslibpyRos1Header(seq=seq, stamp=stamp, frame_id=frame_id))
 
 
 def _format_stamp_for_roslibpy(stamp):
@@ -153,8 +168,8 @@ class Header(ROSmsg):
     def msg(self):
         stamp = _format_stamp_for_roslibpy(self.stamp)
         if self._roslibpy_header_cls is RoslibpyRos2Header:
-            return dict(RoslibpyRos2Header(stamp=stamp, frame_id=self.frame_id))
-        return dict(RoslibpyRos1Header(seq=self.seq, stamp=stamp, frame_id=self.frame_id))
+            return _to_plain(RoslibpyRos2Header(stamp=stamp, frame_id=self.frame_id))
+        return _to_plain(RoslibpyRos1Header(seq=self.seq, stamp=stamp, frame_id=self.frame_id))
 
     def filter_fields_for_distro(self, ros_distro):
         self._roslibpy_header_cls = RoslibpyRos2Header if ros_distro.is_ros2 else RoslibpyRos1Header

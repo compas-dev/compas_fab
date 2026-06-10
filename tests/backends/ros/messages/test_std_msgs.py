@@ -44,6 +44,20 @@ def test_ros2_header_filter_accepts_ros2_time_keys():
     assert h.msg == {"stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
 
 
+def test_header_msg_is_json_serializable():
+    # Regression: roslibpy 2.0 wraps a header's stamp in a UserDict-based
+    # roslibpy.core.Time, which json.dumps rejects. Header.msg must emit plain dicts.
+    import json
+
+    h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
+    assert type(h.msg["stamp"]) is dict
+    json.dumps(h.msg)  # must not raise
+
+    h.filter_fields_for_distro(RosDistro.JAZZY)
+    assert type(h.msg["stamp"]) is dict
+    json.dumps(h.msg)  # must not raise
+
+
 def test_time_accepts_ros2_time_keys():
     t = Time.from_msg({"sec": 80, "nanosec": 20})
     assert t.secs == 80
