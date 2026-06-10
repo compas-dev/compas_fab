@@ -4,7 +4,7 @@
 data container for assembling multi-stage motions out of
 [`Action`][compas_fab.robots.Action] objects. The current API supports linear processes, such as pick-and-place, and 3D printing: a chain of trajectory actions interspersed with discrete state-change actions, threaded through a single cell state.
 
-A single `Action` class is used for both kinds — an action with a
+A single `Action` class is used for both kinds: an action with a
 trajectory is *planned*, one without is *unplanned* (a discrete state
 change). Using one class rather than a planned/unplanned split means
 backtracking/undo just clears the trajectory instead of swapping class

@@ -23,7 +23,7 @@ cells for prototyping:
 Robot name=ur10e, Links=11, Joints=10 (6 configurable)
 ```
 
-Each library entry returns the cell **and** a default state — the second
+Each library entry returns the cell **and** a default state: the second
 core type.
 
 ## Robot cell state
@@ -116,7 +116,7 @@ backend-agnostic data container that holds them together.
 
 A chain threads a single `RobotCellState` through an ordered list of
 [`Action`][compas_fab.robots.Action] objects. A single `Action` class
-covers both kinds — an action with a trajectory is *planned*, one
+covers both kinds: an action with a trajectory is *planned*, one
 without is *unplanned*:
 
 - A **planned (trajectory) action** carries a `JointTrajectory`. The
@@ -127,7 +127,7 @@ without is *unplanned*:
   tool attach/detach, rigid body grasped or released.
 
 Every action also carries `tags` (and a free-form `attributes` bag) to
-drive differentiated downstream execution — e.g. `approach`/`retract`,
+drive differentiated downstream execution, e.g. `approach`/`retract`,
 linear vs. free motion.
 
 ```pycon

@@ -3,7 +3,7 @@
 The ROS-backed integration tests in
 [`tests/backends/ros/test_doc_examples_integration.py`](../backends/ros/test_doc_examples_integration.py)
 talk to a real rosbridge over WebSocket. Both ROS 1 (Noetic + MoveIt 1)
-and ROS 2 (Jazzy + MoveIt 2) are supported — the test fixture auto-detects
+and ROS 2 (Jazzy + MoveIt 2) are supported, the test fixture auto-detects
 the distro from `client.ros_distro` and adapts.
 
 ## Stacks
@@ -13,7 +13,7 @@ the distro from `client.ros_distro` and adapts.
 | **ROS 1** (Noetic + MoveIt 1, UR5) | [`docker-compose.yml`](docker-compose.yml) | **9090** | `11311` (rosmaster) |
 | **ROS 2** (Jazzy + MoveIt 2, UR5) | [`docker-compose-ros2.yml`](docker-compose-ros2.yml) | **9091** | `9190` (HTTP assets) |
 
-Both stacks are deliberately minimal — just enough MoveIt to answer the
+Both stacks are deliberately minimal, just enough MoveIt to answer the
 service calls the test suite makes. Default ports don't collide, so both
 can run simultaneously.
 
@@ -51,7 +51,7 @@ assert ROS-2-specific URDF / SRDF shapes (`world` root link,
 # Start the ROS 2 test stack
 docker compose -f tests/integration_setup/docker-compose-ros2.yml up -d
 
-# Run the tests against it (default port 9091 — no env var needed)
+# Run the tests against it (default port 9091, no env var needed)
 COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS=1 \
   uv run pytest tests/backends/ros/test_doc_examples_integration.py
 ```

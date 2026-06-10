@@ -137,10 +137,10 @@ class BaseRobotModelObject(SceneObject):
 
         Parameters
         ----------
-        robot_configuration : :class:`~compas_robots.Configuration`, optional
+        robot_configuration
             The robot configuration to update the robot model.
             This is only optional for robot models that do not have any configurable joints.
-        base_frame : :class:`~compas.geometry.Frame`, optional
+        base_frame
             The frame of the RobotCoordinateFrame relative to the WorldCoordinateFrame.
             Default is World XY frame at origin.
 
@@ -150,7 +150,7 @@ class BaseRobotModelObject(SceneObject):
 
         Notes
         -----
-        It is possible to call this method before the `draw()` method.
+        It is possible to call this method before the [`draw`][] method.
         """
 
         # Create the native geometry when the `draw()` or `update()` method is called for the first time

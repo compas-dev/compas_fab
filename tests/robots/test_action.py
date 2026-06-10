@@ -213,7 +213,7 @@ def test_iter_cell_states_covers_every_point_and_state_change(cell_and_state, tr
     assert states[2].robot_configuration.joint_values == grasped.robot_configuration.joint_values
     # Final snapshot matches traj2's last point
     assert states[-1].robot_configuration.joint_values == [1.0] * 6
-    # Snapshots are independent — mutating one does not affect the chain or others
+    # Snapshots are independent, mutating one does not affect the chain or others
     states[0].robot_configuration.joint_values = [9.9] * 6
     assert chain.start_state.robot_configuration.joint_values != [9.9] * 6
     assert states[1].robot_configuration.joint_values != [9.9] * 6

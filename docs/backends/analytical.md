@@ -1,7 +1,7 @@
 # Analytical IK
 
 Closed-form inverse kinematics for known industrial robots. Runs entirely
-in-process — no Docker, no PyBullet, no ROS — and is the fastest IK option
+in-process -no Docker, no PyBullet, no ROS- and is the fastest IK option
 in `compas_fab`.
 
 ## When to use
@@ -18,7 +18,7 @@ in `compas_fab`.
 |---|---|
 | Closed-form IK in microseconds | Only the supported analytical robot families |
 | Zero setup beyond `pip install compas_fab` | No collision checking |
-| Works from any Python host (CAD, headless, CI) | No motion planning — IK / FK only |
+| Works from any Python host (CAD, headless, CI) | No motion planning, IK / FK only |
 
 ## Setup
 
@@ -43,8 +43,8 @@ Forward kinematics on a UR5:
 
 ## More examples
 
-- [`02_inverse_kinematics.py`](analytical_kinematics/files/02_inverse_kinematics.py){: download="02_inverse_kinematics.py" } — IK returning 8 solutions for a UR5
-- [`02_inverse_kinematics with_tools.py`](analytical_kinematics/files/02_inverse_kinematics%20with_tools.py){: download="02_inverse_kinematics with_tools.py" } — IK with a tool attached to the flange
+- [`02_inverse_kinematics.py`](analytical_kinematics/files/02_inverse_kinematics.py){: download="02_inverse_kinematics.py" }: IK returning 8 solutions for a UR5
+- [`02_inverse_kinematics with_tools.py`](analytical_kinematics/files/02_inverse_kinematics%20with_tools.py){: download="02_inverse_kinematics with_tools.py" }: IK with a tool attached to the flange
 
 For collision-aware IK and Cartesian planning, see
 [Analytical IK + PyBullet](analytical_pybullet.md).
@@ -52,4 +52,4 @@ For collision-aware IK and Cartesian planning, see
 ## API reference
 
 - [compas_fab.backends.AnalyticalKinematicsPlanner][]
-- [compas_fab.backends][] — all available solvers
+- [compas_fab.backends][]: all available solvers

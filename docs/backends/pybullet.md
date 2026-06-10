@@ -1,7 +1,7 @@
 # PyBullet
 
 [PyBullet](https://pybullet.org/) wraps the Bullet physics engine. It runs
-in-process — no Docker, no server — and gives you forward kinematics,
+in-process -no Docker, no server- and gives you forward kinematics,
 inverse kinematics (numerical), collision checking, and **Cartesian** motion
 planning.
 

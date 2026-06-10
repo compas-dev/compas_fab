@@ -182,7 +182,7 @@ def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_g
 
 def test_default_touch_links_returns_first_geometry_bearing_link():
     """`default_touch_links` skips geometry-less mounting links and returns
-    just the first solid ancestor along the EE chain — listing frame-only
+    just the first solid ancestor along the EE chain, listing frame-only
     links as touch links is meaningless because MoveIt has no collision
     geometry for them.
     """
