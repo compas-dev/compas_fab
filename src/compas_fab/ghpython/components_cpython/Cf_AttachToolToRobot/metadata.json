@@ -10,17 +10,17 @@
         "iconDisplay": 2,
         "inputParameters": [
             {
+                "name": "robot_cell",
+                "description": "Optional RobotCell — validates `tool_id`, derives the default `cell_state` when unwired, and resolves the main planning group when `group` is empty."
+            },
+            {
                 "name": "cell_state",
-                "description": "The RobotCellState to modify."
+                "description": "The RobotCellState to modify. If left unwired, the default state is derived from `robot_cell`."
             },
             {
                 "name": "tool_id",
                 "description": "Id of the tool inside the RobotCell.",
                 "typeHintID": "str"
-            },
-            {
-                "name": "robot_cell",
-                "description": "Optional RobotCell — used to resolve the main planning group when `group` is left empty."
             },
             {
                 "name": "group",
