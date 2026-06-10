@@ -3,28 +3,28 @@
     "nickname": "Tool From Mesh",
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
-    "description": "Construct a ToolModel from a Rhino mesh and a TCP plane. The TCP is expressed in the robot's `tool0` link frame. The same mesh is used for collision checking unless a separate `collision_mesh` is provided. Output feeds directly into AddToolToCell or AddAndAttachTool.",
+    "description": "Construct a ToolModel from a Rhino mesh and a TCP plane. The TCP is expressed in the robot's `tool0` link frame. The same mesh is used for collision checking unless a separate `collision_mesh` is provided. Output feeds directly into a Load Robot Cell component's `tools` input.",
     "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
         "inputParameters": [
             {
-                "name": "visual_mesh",
-                "description": "Rhino mesh for visualization (and collision checking if no separate collision mesh is provided)."
+                "name": "name",
+                "description": "Tool identifier (used as the tool id when added to a cell). Defaults to `attached_tool`.",
+                "typeHintID": "str"
             },
             {
-                "name": "tcp_plane",
-                "description": "Tool Coordinate Frame in the robot's `tool0` link frame, as a Rhino Plane or COMPAS Frame."
+                "name": "visual_mesh",
+                "description": "Rhino mesh for visualization (and collision checking if no separate collision mesh is provided)."
             },
             {
                 "name": "collision_mesh",
                 "description": "Optional Rhino mesh used only for collision checking. Defaults to `visual_mesh`."
             },
             {
-                "name": "name",
-                "description": "Tool identifier (used as the tool id when added to a cell). Defaults to `attached_tool`.",
-                "typeHintID": "str"
+                "name": "tcp_plane",
+                "description": "Tool Coordinate Frame in the robot's `tool0` link frame, as a Rhino Plane or COMPAS Frame."
             }
         ],
         "outputParameters": [

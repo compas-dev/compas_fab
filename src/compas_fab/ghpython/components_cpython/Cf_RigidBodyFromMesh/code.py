@@ -5,6 +5,9 @@ Construct a RigidBody from a Rhino mesh (and optional separate collision mesh).
 If only `visual_mesh` is wired, the same mesh is used for collision checking.
 Use `native_scale` to declare a non-meter document scale (e.g. 0.001 for mm).
 
+Set `name` to the id under which the body is registered when wired into a
+`Load Robot Cell` component's `rigid_bodies` input.
+
 COMPAS FAB v1.1.0
 """
 
@@ -18,7 +21,7 @@ from compas_fab.robots import RigidBody
 
 
 class RigidBodyFromMesh(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, visual_mesh, collision_mesh, native_scale: float):
+    def RunScript(self, name: str, visual_mesh, collision_mesh, native_scale: float):
         if visual_mesh is None:
             return None
 
@@ -32,4 +35,5 @@ class RigidBodyFromMesh(Grasshopper.Kernel.GH_ScriptInstance):
             visual_meshes=[c_visual] if c_visual else [],
             collision_meshes=[c_collision] if c_collision else [],
             native_scale=native_scale,
+            name=name.strip() if name else None,
         )

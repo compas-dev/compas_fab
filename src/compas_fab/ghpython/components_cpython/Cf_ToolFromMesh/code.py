@@ -7,9 +7,9 @@ Coordinate Frame expressed in the robot's `tool0` link frame. If
 `collision_mesh` is unwired, `visual_mesh` is reused for collision
 checks.
 
-The result is a static (no joints) `ToolModel` ready to feed into
-`AddToolToCell` or `AddAndAttachTool`. Kinematic tools (with their own
-joints) should be loaded from URDF instead.
+The result is a static (no joints) `ToolModel` ready to feed into a
+`Load Robot Cell` component's `tools` input. Kinematic tools (with their
+own joints) should be loaded from URDF instead.
 
 COMPAS FAB v1.1.0
 """
@@ -26,7 +26,7 @@ from compas_robots import ToolModel
 
 
 class ToolFromMesh(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, visual_mesh, tcp_plane, collision_mesh, name: str):
+    def RunScript(self, name: str, visual_mesh, collision_mesh, tcp_plane):
         if visual_mesh is None or tcp_plane is None:
             return None
 

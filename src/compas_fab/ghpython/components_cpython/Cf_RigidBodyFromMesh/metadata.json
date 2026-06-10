@@ -10,6 +10,11 @@
         "iconDisplay": 2,
         "inputParameters": [
             {
+                "name": "name",
+                "description": "Identifier for the body. Used as its key when wired into a Load Robot Cell component's `rigid_bodies` input. Required for that use.",
+                "typeHintID": "str"
+            },
+            {
                 "name": "visual_mesh",
                 "description": "Rhino mesh for visualization (and collision checking if no separate collision mesh is provided)."
             },
