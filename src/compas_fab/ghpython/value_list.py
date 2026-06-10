@@ -1,27 +1,40 @@
 """Helpers for auto-creating Grasshopper Value Lists on component inputs.
 
-Two flavours:
-
-* :func:`ensure_value_list` — fire-and-forget, used for static option sets
-  (e.g. the fixed list of robots in `RobotCellLibrary`). Creates the VL on
-  first solve when nothing is wired, then never touches it again.
-
-* :func:`ensure_dynamic_value_list` — for options that depend on upstream
-  data (e.g. the keys of `cell.tool_models`). Tracks the VL we created
-  via `scriptcontext.sticky` and refreshes its items when the option set
-  changes. Defers the canvas mutation to a `ScheduleSolution(delay,
-  callback)` callback so the rebuild happens between solves rather than
-  expiring downstream consumers mid-solve.
+Two flavours, `ensure_value_list` (static option sets) and
+`ensure_dynamic_value_list` (options that track upstream data) — see the
+`compas_fab.ghpython` package overview for how they differ and when to use each.
 """
 
-import compas
+import Grasshopper
+import System
+from compas_ghpython import create_id
+from scriptcontext import sticky as st
 
-if compas.RHINO:
-    import Grasshopper
-    import System
+
+def _place_left_of_input(obj, param, gap=30.0, y_offset=0.0):
+    """Position a floating object just left of a component input.
+
+    Places ``obj`` so its right edge sits ``gap`` pixels to the left of the
+    input's pivot and its vertical centre lines up with the input, regardless of
+    the object's width or how its pivot relates to its bounds.
+
+    Must be called once ``obj`` is in the document AND between solves (e.g. from a
+    ``ScheduleSolution`` callback): ``PerformLayout`` only yields the real rendered
+    size there. The shift is computed from the measured ``Bounds`` rather than from
+    the pivot directly, because a value list's pivot is *not* the top-left of its
+    bounds (the NickName label offsets it).
+    """
+    obj.Attributes.PerformLayout()
+    bounds = obj.Attributes.Bounds
+    pivot = obj.Attributes.Pivot
+    target = param.Attributes.Pivot
+    dx = (target.X - gap) - (bounds.X + bounds.Width)
+    dy = (target.Y + y_offset) - (bounds.Y + bounds.Height / 2.0)
+    obj.Attributes.Pivot = System.Drawing.PointF(pivot.X + dx, pivot.Y + dy)
+    obj.Attributes.ExpireLayout()
 
 
-def ensure_value_list(component, input_name, options, default=None, x_offset=240, y_offset=0):
+def ensure_value_list(component, input_name, options, default=None, x_offset=30, y_offset=0):
     """Create and wire a Value List to a component input if nothing is connected.
 
     No-op if the input already has a source connected. Safe to call on every
@@ -39,8 +52,9 @@ def ensure_value_list(component, input_name, options, default=None, x_offset=240
     default : str, optional
         If provided and present in `options`, that item is pre-selected.
     x_offset, y_offset : float, optional
-        Pixel offset of the value list from the input pivot. Default places
-        the value list to the left of the input.
+        `x_offset` is the gap (px) between the value list's right edge and the
+        input; `y_offset` nudges it vertically. The value list is placed just to
+        the left of the input, vertically centred on it.
     """
     param = None
     for p in component.Params.Input:
@@ -66,23 +80,26 @@ def ensure_value_list(component, input_name, options, default=None, x_offset=240
                 break
 
     value_list.CreateAttributes()
-    pivot = param.Attributes.Pivot
-    value_list.Attributes.Pivot = System.Drawing.PointF(pivot.X - x_offset, pivot.Y + y_offset)
-    value_list.Attributes.ExpireLayout()
-
+    # Rough placement so it lands somewhere sane until the precise reposition.
+    value_list.Attributes.Pivot = param.Attributes.Pivot
     doc.AddObject(value_list, False)
     param.AddSource(value_list)
 
-    # The source was wired during this solve, so the new value won't reach the
-    # input until the next one. Schedule a fresh solve so the user doesn't have
-    # to manually re-trigger the component.
-    doc.ScheduleSolution(5)
+    # The value list's real width isn't available during this solve
+    # (`PerformLayout` only reports the rendered size between solves), so position
+    # it precisely in a scheduled callback. That callback doubles as the follow-up
+    # solve which lets the selected value reach the input, so the user doesn't have
+    # to re-trigger the component.
+    def _finish(_doc):
+        _place_left_of_input(value_list, param, gap=x_offset, y_offset=y_offset)
+
+    doc.ScheduleSolution(5, _finish)
 
 
-def ensure_dynamic_value_list(component, input_name, options, signature_key=None, x_offset=240, y_offset=0):
+def ensure_dynamic_value_list(component, input_name, options, signature_key=None, x_offset=30, y_offset=0):
     """Maintain a Value List on `input_name` whose items reflect `options`.
 
-    Unlike :func:`ensure_value_list`, this variant tracks the VL it created
+    Unlike [`ensure_value_list`][], this variant tracks the VL it created
     (sticky-cached by the component's `InstanceGuid` and `signature_key`) and
     re-populates its items whenever the `options` set changes between solves.
     Use this when the available choices come from upstream data — e.g. the
@@ -114,11 +131,9 @@ def ensure_dynamic_value_list(component, input_name, options, signature_key=None
         Suffix used to identify the tracked VL in sticky. Override only when
         a single component manages more than one dynamic VL.
     x_offset, y_offset : float, optional
-        Pixel offset of the value list from the input pivot.
+        `x_offset` is the gap (px) between the value list's right edge and the
+        input; `y_offset` nudges it vertically. Placed just left of the input.
     """
-    from compas_ghpython import create_id
-    from scriptcontext import sticky as st
-
     doc = component.OnPingDocument()
     if doc is None:
         return
@@ -182,10 +197,9 @@ def ensure_dynamic_value_list(component, input_name, options, signature_key=None
                 vl.ListItems.Add(Grasshopper.Kernel.Special.GH_ValueListItem(opt, '"{}"'.format(opt)))
             vl.SelectItem(0)
             vl.CreateAttributes()
-            pivot = target_param.Attributes.Pivot
-            vl.Attributes.Pivot = System.Drawing.PointF(pivot.X - x_offset, pivot.Y + y_offset)
-            vl.Attributes.ExpireLayout()
+            vl.Attributes.Pivot = target_param.Attributes.Pivot
             doc.AddObject(vl, False)
+            _place_left_of_input(vl, target_param, gap=x_offset, y_offset=y_offset)
             target_param.AddSource(vl)
             st[sticky_key] = str(vl.InstanceGuid)
         component.ExpireSolution(False)

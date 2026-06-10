@@ -10,12 +10,10 @@ the script receives `joints` as a plain Python list of floats — no
 
 import math
 
-import compas
-
-if compas.RHINO:
-    import Grasshopper
-    import System
-
+import Grasshopper
+import System
+from compas_ghpython import create_id
+from scriptcontext import sticky as st
 
 _DEFAULT_CONTINUOUS_RANGE = 2 * math.pi
 _DEFAULT_PRISMATIC_RANGE = 1.0
@@ -125,9 +123,6 @@ def ensure_joint_sliders(component, robot_model, input_name="joints", signature_
     `joint_types`, and as a fallback when the `joints` list isn't yet
     populated (e.g. the very first solve before the scheduled follow-up).
     """
-    from compas_ghpython import create_id
-    from scriptcontext import sticky as st
-
     doc = component.OnPingDocument()
     if doc is None:
         return []
