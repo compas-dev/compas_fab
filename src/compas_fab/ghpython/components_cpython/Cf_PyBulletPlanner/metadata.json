@@ -1,0 +1,29 @@
+{
+    "name": "PyBullet Planner",
+    "nickname": "PyBullet Planner",
+    "category": "COMPAS FAB",
+    "subcategory": "Backends",
+    "description": "Create a PyBulletPlanner that manages its own in-process PyBullet physics server (no ROS). Pass a RobotCell and it connects, builds the planner, and applies set_robot_cell. Supports collision checking, FK/IK and Cartesian motion; free-space plan_motion is not yet implemented for this backend.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "RobotCell to plan against. Applied to the planner via set_robot_cell on every run."
+            },
+            {
+                "name": "connection_type",
+                "description": "'direct' (headless, recommended on the canvas) or 'gui' (opens a separate PyBullet window for visualization, where a display is available). A dropdown is auto-created. Defaults to 'direct'.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "planner",
+                "description": "PyBulletPlanner with its robot cell loaded, ready for FK/IK/Cartesian motion."
+            }
+        ]
+    }
+}
