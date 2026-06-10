@@ -2,7 +2,11 @@
 
 This document details the architecture used to implement backend clients and
 backend features. It is aimed at contributors extending `compas_fab` with a
-new backend.
+new backend — it is not needed for everyday planning. End users interact with
+the planner and client classes in
+[compas_fab.backends][compas_fab.backends]; each planner already exposes every
+backend-feature method directly, composing the features below through multiple
+inheritance.
 
 ## Clients vs. planners
 
@@ -74,3 +78,5 @@ The following backend feature modules are provided:
   ROS / MoveIt implementations.
 - [compas_fab.backends.pybullet.backend_features][compas_fab.backends.pybullet.backend_features] —
   PyBullet implementations.
+- [compas_fab.backends.kinematics.backend_features][compas_fab.backends.kinematics.backend_features] —
+  analytical-kinematics implementations.

@@ -1,12 +1,3 @@
-"""Tools to plan and execute robotic fabrication processes using the
-COMPAS Framework, with a focus on enabling use from within CAD environments.
-
-Core features live in [`compas_fab.robots`][]; backend implementations for
-motion planning live in [`compas_fab.backends`][]. CAD integrations are
-provided by [`compas_fab.blender`][], [`compas_fab.ghpython`][] and
-[`compas_fab.rhino`][].
-"""
-
 import os
 
 import compas

@@ -112,7 +112,7 @@ plugins:
             group_by_category: true
             heading_level: 2
             inheritance_diagram_direction: TD
-            inherited_members: false
+            inherited_members: true
             line_length: 88
             merge_init_into_class: true
             modernize_annotations: true
@@ -160,26 +160,25 @@ nav:
       - api/index.md
       - Core:
           - api/core/index.md
-          - compas_fab: api/compas_fab.md
           - compas_fab.robots: api/compas_fab.robots.md
           - compas_fab.backends: api/compas_fab.backends.md
-          - compas_fab.backends.interfaces: api/compas_fab.backends.interfaces.md
-          - compas_fab.backends.ros: api/compas_fab.backends.ros.md
-          - compas_fab.backends.ros.backend_features: api/compas_fab.backends.ros.backend_features.md
-          - compas_fab.backends.pybullet: api/compas_fab.backends.pybullet.md
-          - compas_fab.backends.pybullet.backend_features: api/compas_fab.backends.pybullet.backend_features.md
           - compas_fab.utilities: api/compas_fab.utilities.md
+          - compas_fab.scene: api/compas_fab.scene.md
       - Integrations:
           - api/integrations/index.md
           - compas_fab.blender: api/compas_fab.blender.md
           - compas_fab.ghpython: api/compas_fab.ghpython.md
           - compas_fab.rhino: api/compas_fab.rhino.md
-  - Developer guide:
-      - developer/index.md
-      - Backend architecture: developer/architecture.md
-      - Grasshopper components: developer/grasshopper.md
-      - ActionChain design notes: developer/action.md
-      - Icon system: developer/icons/index.md
+      - Extending compas_fab:
+          - developer/index.md
+          - Backend architecture: developer/architecture.md
+          - compas_fab.backends.interfaces: api/compas_fab.backends.interfaces.md
+          - compas_fab.backends.ros.backend_features: api/compas_fab.backends.ros.backend_features.md
+          - compas_fab.backends.pybullet.backend_features: api/compas_fab.backends.pybullet.backend_features.md
+          - compas_fab.backends.kinematics.backend_features: api/compas_fab.backends.kinematics.backend_features.md
+          - ActionChain design notes: developer/action.md
+          - Grasshopper components: developer/grasshopper.md
+          - Icon system: developer/icons/index.md
   - Changelog: changelog.md
   - Citing: citing.md
   - License: license.md
