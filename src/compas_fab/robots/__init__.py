@@ -73,6 +73,10 @@ from .wrench import (
 from .inertia import (
     Inertia,
 )
+from .interpolators import (
+    FrameInterpolator,
+    PointAxisInterpolator,
+)
 
 __all__ = [
     # Constraints
@@ -118,6 +122,9 @@ __all__ = [
     "JointTrajectory",
     "JointTrajectoryPoint",
     "Trajectory",
+    # Interpolators
+    "FrameInterpolator",
+    "PointAxisInterpolator",
     # Action Chain
     "Action",
     "ActionChain",
