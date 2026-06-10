@@ -1,3 +1,4 @@
+import json
 from compas_fab.backends.ros.messages import Float32MultiArray
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import Int8MultiArray
@@ -47,8 +48,6 @@ def test_ros2_header_filter_accepts_ros2_time_keys():
 def test_header_msg_is_json_serializable():
     # Regression: roslibpy 2.0 wraps a header's stamp in a UserDict-based
     # roslibpy.core.Time, which json.dumps rejects. Header.msg must emit plain dicts.
-    import json
-
     h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
     assert type(h.msg["stamp"]) is dict
     json.dumps(h.msg)  # must not raise
