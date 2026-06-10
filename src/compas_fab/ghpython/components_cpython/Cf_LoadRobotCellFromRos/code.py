@@ -27,6 +27,8 @@ from compas_ghpython import create_id
 from compas_ghpython import error
 from scriptcontext import sticky as st
 
+from compas_fab.ghpython import register_models_into_cell
+
 
 class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(
@@ -37,6 +39,8 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
         srdf_param_name: str,
         http_file_server_base_url: str,
         load: bool,
+        tools,
+        rigid_bodies,
     ):
         if ros_client is None or not ros_client.is_connected:
             return (None, None, None)
@@ -48,6 +52,8 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
         except Exception:
             detected_distro = None
 
+        # Cache only the base cell; tools/rigid bodies are merged fresh on every run so
+        # editing them does not require re-fetching the (potentially large) mesh payload.
         key = create_id(  # noqa: F821
             ghenv.Component,  # noqa: F821
             "ros_robot_cell_{}_{}_{}".format(load_geometry, urdf_param_name or "default", srdf_param_name or "default"),
@@ -63,9 +69,7 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                 kwargs["http_file_server_base_url"] = http_file_server_base_url
 
             try:
-                robot_cell = ros_client.load_robot_cell(**kwargs)
-                robot_cell_state = robot_cell.default_cell_state()
-                st[key] = (robot_cell, robot_cell_state)
+                st[key] = ros_client.load_robot_cell(**kwargs)
             except Exception as e:
                 msg = str(e)
                 if "404" in msg or "Not Found" in msg:
@@ -77,9 +81,10 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                     error(ghenv.Component, "ROS load failed: {}".format(e))  # noqa: F821
                 return (None, None, detected_distro)
 
-        cached = st.get(key)
-        if cached is None:
+        base_cell = st.get(key)
+        if base_cell is None:
             return (None, None, detected_distro)
 
-        robot_cell, robot_cell_state = cached
+        robot_cell = register_models_into_cell(ghenv.Component, base_cell, tools, rigid_bodies)  # noqa: F821
+        robot_cell_state = robot_cell.default_cell_state()
         return (robot_cell, robot_cell_state, detected_distro)

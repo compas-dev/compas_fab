@@ -1,3 +1,4 @@
+from typing import Optional
 from typing import Union
 
 from compas.data import Data
@@ -16,6 +17,7 @@ class RigidBody(Data):
         visual_meshes: Union[list[Mesh], Mesh],
         collision_meshes: Union[list[Mesh], Mesh],
         native_scale: float = 1.0,
+        name: Optional[str] = None,
     ):
         """Represents a rigid body for use in a RobotCell.
 
@@ -47,6 +49,12 @@ class RigidBody(Data):
             In another words, `mesh.scale(native_scale)` will convert the input mesh to meters.
             For example, if the modeling environment is in millimeters, `native_scale` should be set to ``'0.001'``.
             Default is ``'1.0'``.
+        name : str, optional
+            A human-readable identifier for the rigid body, stored via the base
+            [`Data`][compas.data.Data] class.
+            When the body is added to a [`RobotCell`][compas_fab.robots.RobotCell], this name is used as the
+            key under which it is registered in ``cell.rigid_body_models``.
+            Default is ``None`` (the inherited ``name`` then falls back to the class name).
 
         Attributes
         ----------
@@ -60,7 +68,7 @@ class RigidBody(Data):
         compas_fab do not support weight and inertia properties for rigid bodies.
 
         """
-        super(RigidBody, self).__init__()
+        super(RigidBody, self).__init__(name=name)
 
         # If None is provided, we change that to an empty list
         if not visual_meshes:
@@ -106,7 +114,7 @@ class RigidBody(Data):
         return [mesh.scaled(self.native_scale) for mesh in self.collision_meshes]
 
     @classmethod
-    def from_mesh(cls, mesh: Mesh, native_scale: float = 1.0) -> "RigidBody":
+    def from_mesh(cls, mesh: Mesh, native_scale: float = 1.0, name: Optional[str] = None) -> "RigidBody":
         """Creates a RigidBody from a single mesh.
 
         This function is a convenience function for creating a RigidBody from a single mesh.
@@ -118,6 +126,8 @@ class RigidBody(Data):
             The mesh of the rigid body.
         native_scale : float, optional
             The native scale of the rigid body. Default is 1.0.
+        name : str, optional
+            A human-readable identifier for the rigid body. Default is ``None``.
 
         Returns
         -------
@@ -130,10 +140,10 @@ class RigidBody(Data):
         consider using the constructor directly: `RigidBody(visual_meshes, collision_meshes)`.
 
         """
-        return cls([mesh], [mesh], native_scale=native_scale)
+        return cls([mesh], [mesh], native_scale=native_scale, name=name)
 
     @classmethod
-    def from_meshes(cls, meshes: list[Mesh], native_scale: float = 1.0) -> "RigidBody":
+    def from_meshes(cls, meshes: list[Mesh], native_scale: float = 1.0, name: Optional[str] = None) -> "RigidBody":
         """Creates a RigidBody from a list of meshes.
 
         This function is a convenience function for creating a RigidBody from a list of meshes.
@@ -146,6 +156,8 @@ class RigidBody(Data):
             The meshes of the rigid body.
         native_scale : float, optional
             The native scale of the rigid body. Default is 1.0.
+        name : str, optional
+            A human-readable identifier for the rigid body. Default is ``None``.
 
         Returns
         -------
@@ -158,4 +170,4 @@ class RigidBody(Data):
         consider using the constructor directly: `RigidBody(visual_meshes, collision_meshes)`.
 
         """
-        return cls(meshes, meshes, native_scale=native_scale)
+        return cls(meshes, meshes, native_scale=native_scale, name=name)

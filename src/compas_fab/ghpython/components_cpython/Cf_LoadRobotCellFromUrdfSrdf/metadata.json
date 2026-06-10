@@ -3,7 +3,7 @@
     "nickname": "Cell from URDF",
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
-    "description": "Load a RobotCell from URDF + SRDF files on disk. Optionally points at a local mesh package folder for geometry. No ROS required.",
+    "description": "Load a RobotCell from URDF + SRDF files on disk. Optionally points at a local mesh package folder for geometry. No ROS required. Tools and rigid bodies wired into `tools`/`rigid_bodies` are registered into the cell in one go, so no separate Add* + set_robot_cell() step is needed.",
     "exposure": 2,
     "ghpython": {
         "isAdvancedMode": true,
@@ -28,6 +28,16 @@
                 "name": "reload",
                 "description": "Force a reload (bypass cache). Defaults to False.",
                 "typeHintID": "bool"
+            },
+            {
+                "name": "tools",
+                "description": "Optional list of ToolModels to register into the cell. Each is keyed by its `.name`.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "rigid_bodies",
+                "description": "Optional list of RigidBodies to register into the cell. Each is keyed by its `.name` (set it on the Rigid Body From… component).",
+                "scriptParamAccess": 1
             }
         ],
         "outputParameters": [

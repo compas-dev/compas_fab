@@ -3,7 +3,7 @@
     "nickname": "Cell from ROS",
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
-    "description": "Load a RobotCell (URDF + SRDF, optionally with meshes) from a connected ROS bridge. Auto-detects ROS 1 vs ROS 2 transport.",
+    "description": "Load a RobotCell (URDF + SRDF, optionally with meshes) from a connected ROS bridge. Auto-detects ROS 1 vs ROS 2 transport. Tools and rigid bodies wired into `tools`/`rigid_bodies` are registered into the cell in one go, so no separate Add* + set_robot_cell() step is needed.",
     "exposure": 2,
     "ghpython": {
         "isAdvancedMode": true,
@@ -36,6 +36,16 @@
                 "name": "load",
                 "description": "Trigger the (re)load. Defaults to False so the canvas does not refetch on every refresh.",
                 "typeHintID": "bool"
+            },
+            {
+                "name": "tools",
+                "description": "Optional list of ToolModels to register into the cell. Each is keyed by its `.name`. Re-applied on every refresh without refetching, so editing this does not need a reload.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "rigid_bodies",
+                "description": "Optional list of RigidBodies to register into the cell. Each is keyed by its `.name` (set it on the Rigid Body From… component).",
+                "scriptParamAccess": 1
             }
         ],
         "outputParameters": [
