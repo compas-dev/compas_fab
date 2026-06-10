@@ -14,8 +14,11 @@ import System
 from compas.geometry import Frame
 from compas_rhino.conversions import plane_to_compas_frame
 
+from compas_fab.ghpython import ensure_value_list
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import TargetMode
+
+_TARGET_MODES = [mode.value for mode in TargetMode]
 
 
 class FrameWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
@@ -27,6 +30,8 @@ class FrameWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
         tolerance_orientation: float,
         native_scale: float,
     ):
+        ensure_value_list(ghenv.Component, "target_mode", _TARGET_MODES, default="ROBOT")  # noqa: F821
+
         if not planes:
             return None
 

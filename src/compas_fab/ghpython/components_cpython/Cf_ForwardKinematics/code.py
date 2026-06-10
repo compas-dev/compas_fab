@@ -18,11 +18,16 @@ import Rhino
 import System
 from compas_rhino.conversions import frame_to_rhino_plane
 
+from compas_fab.ghpython import ensure_value_list
 from compas_fab.robots import TargetMode
+
+_TARGET_MODES = [mode.value for mode in TargetMode]
 
 
 class ForwardKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, planner, cell_state, target_mode: str, group: str):
+        ensure_value_list(ghenv.Component, "target_mode", _TARGET_MODES, default="ROBOT")  # noqa: F821
+
         if not (planner and cell_state):
             return (None, None)
 

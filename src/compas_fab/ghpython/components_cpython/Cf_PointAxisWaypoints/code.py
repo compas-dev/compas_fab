@@ -19,8 +19,11 @@ from compas_ghpython import error
 from compas_rhino.conversions import point_to_compas
 from compas_rhino.conversions import vector_to_compas
 
+from compas_fab.ghpython import ensure_value_list
 from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import TargetMode
+
+_TARGET_MODES = [mode.value for mode in TargetMode]
 
 
 class PointAxisWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
@@ -33,6 +36,8 @@ class PointAxisWaypointsComponent(Grasshopper.Kernel.GH_ScriptInstance):
         tolerance_orientation: float,
         native_scale: float,
     ):
+        ensure_value_list(ghenv.Component, "target_mode", _TARGET_MODES, default="ROBOT")  # noqa: F821
+
         if not points or not axes:
             return None
         if len(points) != len(axes):
