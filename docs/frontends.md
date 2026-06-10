@@ -54,7 +54,7 @@ host, which is useful for headless planning, batch jobs, CI, and more.
 
 ## Which front-end works with which backend?
 
-| Front-end | Analytical | Analytical + PyBullet | PyBullet | ROS / ROS 2 |
+| Front-end | Analytical | Analytical + PyBullet | PyBullet | ROS |
 |---|:-:|:-:|:-:|:-:|
 | Rhino 8 | ✓ | — | — | ✓ (over WebSocket) |
 | Grasshopper | ✓ | — | — | ✓ (over WebSocket) |

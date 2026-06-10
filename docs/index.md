@@ -1,7 +1,7 @@
 # COMPAS FAB
 
 **Robotic fabrication for the COMPAS Framework.** One library that drives
-five planning backends, from microsecond closed-form IK to full ROS 2 /
+five planning backends, from microsecond closed-form IK to full ROS 2 +
 MoveIt 2 motion planning, and works from any CAD environment or a plain
 Python script.
 
@@ -19,8 +19,8 @@ Robot name=ur10e, Links=11, Joints=10 (6 configurable)
 | [Analytical IK](backends/analytical.md) | Closed-form IK in pure Python for UR, Stäubli, ABB, etc | None |
 | [Analytical IK + PyBullet](backends/analytical_pybullet.md) | Analytical IK with PyBullet collision checking | `pip install pybullet` |
 | [PyBullet](backends/pybullet.md) | Numerical IK, collision checking, motion planning, in-process | `pip install pybullet` |
-| [ROS 1 / MoveIt 1](backends/ros.md) | Full motion planning over rosbridge (legacy) | Docker or local ROS setup |
-| [ROS 2 / MoveIt 2](backends/ros2.md) | Full motion planning over rosbridge (current) | Docker or local ROS setup |
+| [ROS 1 + MoveIt 1](backends/ros.md) | Full motion planning over rosbridge (legacy) | Docker or local ROS setup |
+| [ROS 2 + MoveIt 2](backends/ros2.md) | Full motion planning over rosbridge (current) | Docker or local ROS setup |
 
 Not sure which fits? See **[Choosing a backend](backends/index.md)**.
 
@@ -28,8 +28,8 @@ Not sure which fits? See **[Choosing a backend](backends/index.md)**.
 
 - **…just compute IK for a robot** → [Analytical IK](backends/analytical.md)
 - **…compute IK and check collisions, no Docker** → [Analytical IK + PyBullet](backends/analytical_pybullet.md) or [PyBullet](backends/pybullet.md)
-- **…plan full motion against a robot over ROS 1** → [ROS 1 / MoveIt 1](backends/ros.md)
-- **…plan full motion against a robot over ROS 2** → [ROS 2 / MoveIt 2](backends/ros2.md)
+- **…plan full motion against a robot over ROS 1** → [ROS 1 + MoveIt 1](backends/ros.md)
+- **…plan full motion against a robot over ROS 2** → [ROS 2 + MoveIt 2](backends/ros2.md)
 - **…drive a robot from Rhino or Grasshopper** → [CAD front-ends](frontends.md)
 - **…just understand the data model** → [Concepts](concepts.md)
 

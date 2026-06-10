@@ -1,14 +1,14 @@
-# ROS 1 / MoveIt 1
+# ROS 1 + MoveIt 1
 
-The ROS 1 / MoveIt 1 back-end is the legacy planning stack for `compas_fab`.
-For new projects we recommend the [ROS 2 / MoveIt 2](ros2.md) back-end —
+The ROS 1 + MoveIt 1 back-end is the legacy planning stack for `compas_fab`.
+For new projects we recommend the [ROS 2 + MoveIt 2](ros2.md) back-end —
 ROS 1 reached end of life on Noetic and receives no further upstream updates.
 
 ## When to use
 
 - You already have a ROS 1 workspace or a robot that only ships ROS 1 drivers.
 - You are reproducing a legacy `compas_fab` example or paper.
-- For anything new, prefer [ROS 2 / MoveIt 2](ros2.md).
+- For anything new, prefer [ROS 2 + MoveIt 2](ros2.md).
 
 ## Trade-offs
 

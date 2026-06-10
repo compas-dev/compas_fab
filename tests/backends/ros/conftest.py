@@ -89,7 +89,7 @@ def _make_ros_client(distro_label, port_env, default_port, legacy_port_env=None)
 
 @pytest.fixture(scope="module")
 def ros1_client():
-    """Live RosClient connected to the ROS 1 / MoveIt 1 stack.
+    """Live RosClient connected to the ROS 1 + MoveIt 1 stack.
 
     Default host port is ``COMPAS_FAB_ROS1_PORT`` (9090). Skipped if
     ``COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS != "1"`` or if rosbridge isn't
@@ -107,7 +107,7 @@ def ros1_client():
 
 @pytest.fixture(scope="module")
 def ros2_client():
-    """Live RosClient connected to the ROS 2 / MoveIt 2 stack.
+    """Live RosClient connected to the ROS 2 + MoveIt 2 stack.
 
     Default host port is ``COMPAS_FAB_ROS2_PORT`` (9091). Skipped if
     ``COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS != "1"`` or if rosbridge isn't

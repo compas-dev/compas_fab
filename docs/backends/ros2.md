@@ -1,4 +1,4 @@
-# ROS 2 / MoveIt 2
+# ROS 2 + MoveIt 2
 
 The current ROS-based planning back-end for `compas_fab`. Uses ROS 2 Jazzy
 (LTS, 2024–2029), MoveIt 2, and `rmw_zenoh_cpp` for transport (replacing
@@ -119,7 +119,7 @@ urdf = loader.load_urdf("/robot_description", "std_msgs/String")
 
 The example scripts in `docs/backends/ros/files/` target both ROS 1 and ROS 2
 back-ends because the `RosClient` API is unchanged — see the
-[ROS / MoveIt 1 examples](ros.md#more-examples) for the full list (kinematics,
+[ROS + MoveIt 1 examples](ros.md#more-examples) for the full list (kinematics,
 motion planning, Cartesian motion, pub/sub).
 
 ## Notes on Zenoh

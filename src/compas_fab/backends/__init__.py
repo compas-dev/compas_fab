@@ -2,7 +2,7 @@
 
 Submodules group classes by backend family:
 
-- ROS / MoveIt: [`RosClient`][compas_fab.backends.RosClient],
+- ROS + MoveIt: [`RosClient`][compas_fab.backends.RosClient],
   [`MoveItPlanner`][compas_fab.backends.MoveItPlanner],
   [`RosFileServerLoader`][compas_fab.backends.RosFileServerLoader],
   [`HttpFileServerLoader`][compas_fab.backends.HttpFileServerLoader].

@@ -75,7 +75,7 @@ The following backend feature modules are provided:
 - [compas_fab.backends.interfaces][compas_fab.backends.interfaces] —
   the abstract base classes.
 - [compas_fab.backends.ros.backend_features][compas_fab.backends.ros.backend_features] —
-  ROS / MoveIt implementations.
+  ROS + MoveIt implementations.
 - [compas_fab.backends.pybullet.backend_features][compas_fab.backends.pybullet.backend_features] —
   PyBullet implementations.
 - [compas_fab.backends.kinematics.backend_features][compas_fab.backends.kinematics.backend_features] —
