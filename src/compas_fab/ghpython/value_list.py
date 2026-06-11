@@ -42,6 +42,56 @@ def _place_left_of_input(
     obj.Attributes.ExpireLayout()
 
 
+def _ensure_floating_source(component, input_name, build, x_offset, y_offset):
+    """Create ``build()`` and wire it to ``input_name`` once, if nothing is connected.
+
+    The object is created, added and wired inside a ``ScheduleSolution`` callback
+    rather than directly in ``RunScript``. This matters for correctness, not just
+    placement: ``AddObject`` / ``AddSource`` issued from *inside* a running solution
+    do not commit until that solution finishes, so a follow-up solve still reads
+    ``SourceCount == 0`` and we would keep adding **duplicate** widgets on every
+    recompute. Deferring the mutation to between solves lets the wire commit, and a
+    sticky "pending" flag keyed on this component+input ensures we only ever
+    schedule one creation while that first one is in flight.
+
+    ``build`` is a zero-argument callable returning a fully-configured (but not yet
+    laid out) ``IGH_DocumentObject`` (e.g. a populated value list or a toggle).
+    """
+    param = next((p for p in component.Params.Input if p.Name == input_name), None)
+    if param is None or param.SourceCount > 0:
+        return
+
+    doc = component.OnPingDocument()
+    if doc is None:
+        return
+
+    pending_key = create_id(component, "autosource_pending_" + input_name)
+    if st.get(pending_key):
+        return
+    st[pending_key] = True
+
+    def _create(_doc):
+        try:
+            # Re-check between solves: a source may have committed (or been wired by
+            # the user) since we scheduled this.
+            if param.SourceCount == 0:
+                obj = build()
+                obj.CreateAttributes()
+                # Rough placement so it lands somewhere sane until the precise reposition.
+                obj.Attributes.Pivot = param.Attributes.Pivot
+                doc.AddObject(obj, False)
+                param.AddSource(obj)
+                # Real rendered size is only available here (between solves), so the
+                # precise reposition happens now. This callback doubles as the
+                # follow-up solve that lets the value reach the input.
+                _place_left_of_input(obj, param, gap=x_offset, y_offset=y_offset)
+                component.ExpireSolution(False)
+        finally:
+            st[pending_key] = False
+
+    doc.ScheduleSolution(5, _create)
+
+
 def ensure_boolean_toggle(
     component: Grasshopper.Kernel.IGH_Component,
     input_name: str,
@@ -52,8 +102,9 @@ def ensure_boolean_toggle(
     """Create and wire a Boolean Toggle to a component input if nothing is connected.
 
     No-op if the input already has a source connected. Safe to call on every
-    `RunScript` invocation. Gives a boolean input a one-click on/off widget on the
-    canvas instead of forcing the user to find and wire a separate toggle.
+    `RunScript` invocation (creation is deferred and de-duplicated, so repeated
+    recomputes do not stack up toggles). Gives a boolean input a one-click on/off
+    widget on the canvas instead of forcing the user to wire a separate toggle.
 
     Parameters
     ----------
@@ -68,36 +119,14 @@ def ensure_boolean_toggle(
         `y_offset` nudges it vertically. Placed just to the left of the input,
         vertically centred on it.
     """
-    param = None
-    for p in component.Params.Input:
-        if p.Name == input_name:
-            param = p
-            break
-    if param is None or param.SourceCount > 0:
-        return
 
-    doc = component.OnPingDocument()
-    if doc is None:
-        return
+    def build():
+        toggle = Grasshopper.Kernel.Special.GH_BooleanToggle()
+        toggle.NickName = input_name
+        toggle.Value = bool(default)
+        return toggle
 
-    toggle = Grasshopper.Kernel.Special.GH_BooleanToggle()
-    toggle.NickName = input_name
-    toggle.Value = bool(default)
-
-    toggle.CreateAttributes()
-    # Rough placement so it lands somewhere sane until the precise reposition.
-    toggle.Attributes.Pivot = param.Attributes.Pivot
-    doc.AddObject(toggle, False)
-    param.AddSource(toggle)
-
-    # As with the value list, the real rendered size is only available between
-    # solves, so position it precisely in a scheduled callback. That callback
-    # also serves as the follow-up solve that lets the toggle's value reach the
-    # input, so the user doesn't have to re-trigger the component.
-    def _finish(_doc):
-        _place_left_of_input(toggle, param, gap=x_offset, y_offset=y_offset)
-
-    doc.ScheduleSolution(5, _finish)
+    _ensure_floating_source(component, input_name, build, x_offset, y_offset)
 
 
 def ensure_value_list(
@@ -111,8 +140,8 @@ def ensure_value_list(
     """Create and wire a Value List to a component input if nothing is connected.
 
     No-op if the input already has a source connected. Safe to call on every
-    `RunScript` invocation: Grasshopper drops the duplicate-add silently and the
-    `SourceCount > 0` check handles subsequent solves.
+    `RunScript` invocation (creation is deferred and de-duplicated, so repeated
+    recomputes do not stack up value lists).
 
     Parameters
     ----------
@@ -129,44 +158,22 @@ def ensure_value_list(
         input; `y_offset` nudges it vertically. The value list is placed just to
         the left of the input, vertically centred on it.
     """
-    param = None
-    for p in component.Params.Input:
-        if p.Name == input_name:
-            param = p
-            break
-    if param is None or param.SourceCount > 0:
-        return
+    options = list(options)
 
-    doc = component.OnPingDocument()
-    if doc is None:
-        return
+    def build():
+        value_list = Grasshopper.Kernel.Special.GH_ValueList()
+        value_list.NickName = input_name
+        value_list.ListItems.Clear()
+        for opt in options:
+            value_list.ListItems.Add(Grasshopper.Kernel.Special.GH_ValueListItem(opt, '"{}"'.format(opt)))
+        if default is not None:
+            for i, opt in enumerate(options):
+                if opt == default:
+                    value_list.SelectItem(i)
+                    break
+        return value_list
 
-    value_list = Grasshopper.Kernel.Special.GH_ValueList()
-    value_list.NickName = input_name
-    value_list.ListItems.Clear()
-    for opt in options:
-        value_list.ListItems.Add(Grasshopper.Kernel.Special.GH_ValueListItem(opt, '"{}"'.format(opt)))
-    if default is not None:
-        for i, opt in enumerate(options):
-            if opt == default:
-                value_list.SelectItem(i)
-                break
-
-    value_list.CreateAttributes()
-    # Rough placement so it lands somewhere sane until the precise reposition.
-    value_list.Attributes.Pivot = param.Attributes.Pivot
-    doc.AddObject(value_list, False)
-    param.AddSource(value_list)
-
-    # The value list's real width isn't available during this solve
-    # (`PerformLayout` only reports the rendered size between solves), so position
-    # it precisely in a scheduled callback. That callback doubles as the follow-up
-    # solve which lets the selected value reach the input, so the user doesn't have
-    # to re-trigger the component.
-    def _finish(_doc):
-        _place_left_of_input(value_list, param, gap=x_offset, y_offset=y_offset)
-
-    doc.ScheduleSolution(5, _finish)
+    _ensure_floating_source(component, input_name, build, x_offset, y_offset)
 
 
 def ensure_dynamic_value_list(
