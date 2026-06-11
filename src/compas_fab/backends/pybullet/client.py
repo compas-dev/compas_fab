@@ -47,7 +47,13 @@ if TYPE_CHECKING:
 # in this process. Either way, code inside this file can refer to
 # `pybullet` as if it were a normal module — the proxy forwards attribute
 # access to the real module on first touch.
-if "pybullet" not in sys.modules:
+if "pybullet" in sys.modules:
+    # Already imported elsewhere in this process (e.g. the user imported it in
+    # their Grasshopper script). Bind the real module into this namespace; the
+    # import is cached so this is cheap. Without this, being in `sys.modules`
+    # alone never binds the `pybullet` name here -> NameError on first use.
+    import pybullet  # noqa: F401, F811
+else:
     pybullet = LazyLoader("pybullet", globals(), "pybullet")  # noqa: F811
 
 __all__ = [
