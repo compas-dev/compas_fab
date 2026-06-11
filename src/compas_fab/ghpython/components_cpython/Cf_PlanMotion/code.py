@@ -9,7 +9,10 @@ True to (re)plan.
 Any planning failure (no plan found, start/goal in collision, timed out, …)
 flags the component red with the backend error message. When the backend
 returns a `partial_trajectory`, the component is flagged with a warning
-instead and the partial trajectory is surfaced.
+instead and the partial trajectory is surfaced. On a full failure the start
+state is collision-checked (when the planner supports it) and a concise hint
+appended. The message is also exposed on the `debug_info` output so it can be
+read in a wired panel.
 
 COMPAS FAB v1.1.0
 """
@@ -26,6 +29,7 @@ from scriptcontext import sticky as st
 
 from compas_fab.backends import BackendError
 from compas_fab.backends import MotionPlanningError
+from compas_fab.ghpython import collision_diagnostic
 
 
 class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
@@ -50,22 +54,26 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
             polyline = polyline_to_rhino(polyline) if polyline else None
             return planes, polyline
 
-        def _replay_marker(error_msg, has_trajectory):
+        def _diagnose(error_msg, has_trajectory):
+            """Flag the component for an error and return the message shown (for debug_info)."""
             if not error_msg:
-                return
+                return ""
             if has_trajectory:
-                gh_warning(ghenv.Component, "Motion planning failed but a partial trajectory was returned: {}".format(error_msg))  # noqa: F821
+                message = "Motion planning failed but a partial trajectory was returned: {}".format(error_msg)
+                gh_warning(ghenv.Component, message)  # noqa: F821
             else:
-                gh_error(ghenv.Component, "Motion planning failed: {}".format(error_msg))  # noqa: F821
+                message = "Motion planning failed: {}".format(error_msg)
+                gh_error(ghenv.Component, message)  # noqa: F821
+            return message
 
         if not (planner and target and start_state and compute):
             cached = st.get(key)
             if cached is None:
-                return (None, [], None)
+                return (None, [], None, "")
             trajectory, error_msg = cached
-            _replay_marker(error_msg, trajectory is not None)
+            debug_info = _diagnose(error_msg, trajectory is not None)
             planes, polyline = _viz(trajectory)
-            return (trajectory, planes, polyline)
+            return (trajectory, planes, polyline, debug_info)
 
         options = {}
         if planner_id:
@@ -89,8 +97,15 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
             error_msg = str(e)
         except BackendError as e:
             error_msg = str(e)
-        _replay_marker(error_msg, trajectory is not None)
 
+        # On a full failure, append a concise collision check on the start state
+        # (a common cause). Cached with the error so replays don't re-query the backend.
+        if error_msg and trajectory is None:
+            hint = collision_diagnostic(planner, start_state, group or None)
+            if hint:
+                error_msg += "\n" + hint
+
+        debug_info = _diagnose(error_msg, trajectory is not None)
         st[key] = (trajectory, error_msg)
         planes, polyline = _viz(trajectory)
-        return (trajectory, planes, polyline)
+        return (trajectory, planes, polyline, debug_info)

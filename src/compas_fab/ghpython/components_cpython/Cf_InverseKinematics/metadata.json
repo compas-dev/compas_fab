@@ -40,6 +40,10 @@
             {
                 "name": "cell_state",
                 "description": "A copy of the start_state with `robot_configuration` set to the IK result. Wire straight into VisualizeRobotCell / ForwardKinematics / next planner step- no SetRobotConfiguration needed."
+            },
+            {
+                "name": "debug_info",
+                "description": "The warnings / errors raised by this run (including a collision diagnostic on failure), as a single string. Wire a panel to read them; empty on a clean solve."
             }
         ]
     }

@@ -38,6 +38,7 @@ if compas.RHINO:
         RobotModelObject,
     )
     from .cell_builder import register_models_into_cell
+    from .diagnostics import collision_diagnostic
     from .joint_sliders import ensure_joint_sliders
     from .moveit_options import MoveItPlannerOptions
     from .sticky_cache import cache_scene_object
@@ -52,6 +53,7 @@ if compas.RHINO:
         "RobotCellObject",
         "RobotModelObject",
         "cache_scene_object",
+        "collision_diagnostic",
         "ensure_boolean_toggle",
         "ensure_dynamic_value_list",
         "ensure_joint_sliders",

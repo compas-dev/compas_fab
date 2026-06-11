@@ -58,6 +58,10 @@
             {
                 "name": "polyline",
                 "description": "Polyline connecting the plane origins in trajectory order. None when the trajectory has fewer than two points."
+            },
+            {
+                "name": "debug_info",
+                "description": "The failure message (including a collision diagnostic on a full failure), as a single string. Wire a panel to read it; empty on success."
             }
         ]
     }
