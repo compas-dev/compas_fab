@@ -15,7 +15,7 @@
             },
             {
                 "name": "cell_state",
-                "description": "RobotCellState describing the configuration to draw."
+                "description": "Optional RobotCellState describing the configuration to draw. If unwired, the cell's default state is used."
             },
             {
                 "name": "draw_visual",

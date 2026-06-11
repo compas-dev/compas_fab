@@ -2,6 +2,9 @@
 """
 Draw a RobotCell at the configuration described by a RobotCellState.
 
+If no `cell_state` is wired, the cell's default state is used, so the cell is
+still drawn (in its default configuration with nothing attached).
+
 This component reuses a cached `RobotCellObject` keyed on the input cell's
 identity, so meshes are only built once per canvas session and subsequent
 state changes only update transforms (fast).
@@ -35,6 +38,12 @@ class VisualizeRobotCell(Grasshopper.Kernel.GH_ScriptInstance):
         if robot_cell is None:
             return (None, None, None, None)
 
+        # Fall back to the cell's default state when none is wired. The child
+        # scene objects (robot model, tools, rigid bodies) are only built when a
+        # state is applied, so without this the draws below hit a None object.
+        if cell_state is None:
+            cell_state = robot_cell.default_cell_state()
+
         draw_visual = True if draw_visual is None else draw_visual
         draw_collision = False if draw_collision is None else draw_collision
         native_scale = native_scale if native_scale else 1.0
@@ -54,8 +63,7 @@ class VisualizeRobotCell(Grasshopper.Kernel.GH_ScriptInstance):
             )
             st[key] = scene_object
 
-        if cell_state is not None:
-            scene_object.update(cell_state)
+        scene_object.update(cell_state)
 
         # Collect outputs from the child scene objects directly so each output
         # can be wired separately without re-running draw().
@@ -70,7 +78,7 @@ class VisualizeRobotCell(Grasshopper.Kernel.GH_ScriptInstance):
             rigid_body_meshes.extend(rb_so.draw())
 
         base_plane = None
-        if cell_state is not None and cell_state.robot_base_frame is not None:
+        if cell_state.robot_base_frame is not None:
             base_plane = frame_to_rhino_plane(cell_state.robot_base_frame)
 
         return (robot_meshes, tool_meshes, rigid_body_meshes, base_plane)
