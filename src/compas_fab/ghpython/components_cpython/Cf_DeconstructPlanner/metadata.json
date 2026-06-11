@@ -3,7 +3,7 @@
     "nickname": "Deconstruct Planner",
     "category": "COMPAS FAB",
     "subcategory": "Backends",
-    "description": "Deconstruct a planner into the robot cell it currently holds: its robot_cell, robot_cell_state, and robot_model. Read from the planner's client; each output is None until a cell has been loaded.",
+    "description": "Deconstruct a planner into the robot cell it currently holds: its robot_cell and robot_model. Read from the planner's client; each output is None until a cell has been loaded. The cell state is not exposed (the client's state is rarely the one you want).",
     "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
@@ -18,10 +18,6 @@
             {
                 "name": "robot_cell",
                 "description": "The RobotCell currently held by the planner's client. None if no cell has been loaded yet."
-            },
-            {
-                "name": "robot_cell_state",
-                "description": "The RobotCellState currently held by the planner's client. None if no state has been set yet."
             },
             {
                 "name": "robot_model",
