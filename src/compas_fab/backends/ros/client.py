@@ -150,13 +150,13 @@ class RosClient(Ros, ClientInterface):
 
     Parameters
     ----------
-    host : :obj:`str`
+    host
         ROS bridge host. Defaults to ``localhost``.
-    port : :obj:`int`
+    port
         Port of the ROS Bridge. Defaults to ``9090``.
-    is_secure : :obj:`bool`
+    is_secure
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
-    transport : :obj:`str`, optional
+    transport
         Per-connection roslibpy transport backend: ``"twisted"`` (default
         on most platforms), ``"asyncio"`` (opt-in, requires
         ``pip install roslibpy[asyncio]``), or ``"cli"`` (auto-selected on
@@ -172,7 +172,7 @@ class RosClient(Ros, ClientInterface):
     Connected: True
     """
 
-    def __init__(self, host="localhost", port=9090, is_secure=False, transport=None):
+    def __init__(self, host: str = "localhost", port: int = 9090, is_secure: bool = False, transport: Optional[str] = None):
         # `Ros.__init__` is called via super, but `ClientInterface.__init__`
         # is bypassed because `Ros` is the first base in the MRO and does
         # not call `super().__init__()`. We initialise the ClientInterface

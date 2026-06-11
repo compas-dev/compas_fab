@@ -1,3 +1,5 @@
+from typing import Optional
+
 from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 from compas_fab.backends.interfaces import ClientInterface
 
@@ -11,7 +13,7 @@ class PlannerInterface:
 
     Parameters
     ----------
-    client : :class:`compas_fab.backends.interfaces.ClientInterface`, optional
+    client
         The client instance associated with the planner.
         Typically this is set by the backend client during initialization
         using `planner = PlannerInterface(client)`.
@@ -26,7 +28,7 @@ class PlannerInterface:
 
     """
 
-    def __init__(self, client=None):
+    def __init__(self, client: Optional[ClientInterface] = None):
         self._client = client
         super(PlannerInterface, self).__init__()
 

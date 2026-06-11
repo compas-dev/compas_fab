@@ -19,11 +19,11 @@ class AnalyticalKinematics:
 
     Attributes
     ----------
-    base_frame_offset : :class:`compas.geometry.Frame`, Optional
+    base_frame
         The base frame of the analytical robot relative to the world coordinate system.
         This should be the same as the base frame of the robot in the URDF model.
         Defaults to no offset.
-    flange_frame_offset : :class:`compas.geometry.Frame`, Optional
+    flange_frame
         The end-effector frame of the robot relative to the last joint of the analytical robot.
         This should match the end effector of the robot in the URDF model.
         Defaults to no offset.

@@ -88,7 +88,7 @@ def inverse_kinematics_spherical_wrist(target_frame: Frame, points: list[Point])
 
     Parameters
     ----------
-    frame : :class:`compas.geometry.Frame`
+    target_frame
         The frame we search the inverse kinematics for.
     points
         A list of 4 points specifying the robot's joint positions.

@@ -15,13 +15,13 @@ class AnalyticalSetRobotCell(SetRobotCell):
         Note that the Analytical Planner does not support collision checking. Therefore, the
         geometry of the robot, tools and rigid bodies in the robot cell are not checked.
 
-        Attributes
+        Parameters
         ----------
-        robot_cell : :class:`compas_fab.robots.RobotCell`
+        robot_cell
             The robot cell to set for the planner.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state
             The robot cell state to set for the planner.
-        options : dict, optional
+        options
             This input is not used by the AnalyticalClient.
 
         Notes

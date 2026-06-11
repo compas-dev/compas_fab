@@ -12,6 +12,12 @@ the `Attach*` components.
 """
 
 from copy import deepcopy
+from typing import Optional
+
+from compas_robots import ToolModel
+
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RobotCell
 
 
 def _explicit_name(item):
@@ -25,7 +31,12 @@ def _explicit_name(item):
     return (getattr(item, "_name", None) or "").strip()
 
 
-def register_models_into_cell(component, robot_cell, tools=None, rigid_bodies=None):
+def register_models_into_cell(
+    component,
+    robot_cell: RobotCell,
+    tools: Optional[list[ToolModel]] = None,
+    rigid_bodies: Optional[list[RigidBody]] = None,
+) -> Optional[RobotCell]:
     """Return a deepcopy of ``robot_cell`` with the given tools and rigid bodies registered.
 
     Tools are keyed by ``tool.name``; rigid bodies by ``body.name``. The input cell is
@@ -36,11 +47,11 @@ def register_models_into_cell(component, robot_cell, tools=None, rigid_bodies=No
     ----------
     component
         The Grasshopper component (``ghenv.Component``) used to surface errors.
-    robot_cell : :class:`compas_fab.robots.RobotCell`
+    robot_cell
         The base cell to copy and extend.
-    tools : list of :class:`compas_robots.ToolModel`, optional
+    tools
         Tools to register. Each must have a non-empty ``.name``.
-    rigid_bodies : list of :class:`compas_fab.robots.RigidBody`, optional
+    rigid_bodies
         Rigid bodies to register. Each must have a non-empty ``.name``.
 
     Returns
