@@ -50,6 +50,10 @@
         ],
         "outputParameters": [
             {
+                "name": "ros_client",
+                "description": "The same RosClient passed in, with the loaded cell recorded on it (`ros_client.robot_cell`). Pass-through so you can wire it straight into the MoveIt Planner, which reads the cell from the client — this also guarantees the cell is loaded before the planner runs."
+            },
+            {
                 "name": "robot_cell",
                 "description": "Loaded RobotCell."
             },

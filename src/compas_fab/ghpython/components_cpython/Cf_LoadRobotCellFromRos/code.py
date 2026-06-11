@@ -10,6 +10,11 @@ Works against ROS 1 (rosbridge param server + fileserver) and ROS 2 (rosbridge
 topics + HTTP file server): the RosClient auto-detects the distro and picks
 the matching loader.
 
+The fully-registered cell (including any tools / rigid bodies) is recorded on
+the client and the client is passed straight back out as `ros_client`, so wiring
+that output into the MoveIt Planner is enough - the planner reads the cell from
+`ros_client.robot_cell`.
+
 If you see HTTP 404 errors while loading geometry, your local ROS may be
 ROS 1 but missing the `/rosapi/get_ros_version` service AND the
 `/rosdistro` parameter, which causes the client to fall back to ROS 2
@@ -46,7 +51,7 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
         ensure_boolean_toggle(ghenv.Component, "load_geometry", default=True)  # noqa: F821
 
         if ros_client is None or not ros_client.is_connected:
-            return (None, None, None)
+            return (ros_client, None, None, None)
 
         load_geometry = True if load_geometry is None else load_geometry
 
@@ -87,12 +92,20 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                     )
                 else:
                     error(ghenv.Component, "ROS load failed: {}".format(e))  # noqa: F821
-                return (None, None, detected_distro)
+                return (ros_client, None, None, detected_distro)
             st[key] = base_cell
 
         if base_cell is None:
-            return (None, None, detected_distro)
+            return (ros_client, None, None, detected_distro)
 
         robot_cell = register_models_into_cell(ghenv.Component, base_cell, tools, rigid_bodies)  # noqa: F821
         robot_cell_state = robot_cell.default_cell_state()
-        return (robot_cell, robot_cell_state, detected_distro)
+
+        # Record the fully-registered cell on the client so downstream components
+        # (e.g. MoveIt Planner) can read it from `ros_client.robot_cell` without it
+        # being re-wired. `load_robot_cell` only stored the base cell, without the
+        # tools / rigid bodies registered here.
+        ros_client._robot_cell = robot_cell
+        ros_client._robot_cell_state = robot_cell_state
+
+        return (ros_client, robot_cell, robot_cell_state, detected_distro)

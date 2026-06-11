@@ -9,11 +9,11 @@ def list_files_in_directory(directory: str, fullpath: bool = False, extensions: 
 
     Parameters
     ----------
-    directory : :obj:`str`
+    directory
         The directory to search for files.
-    fullpath : :obj:`bool`, optional
+    fullpath
         Specifies if the returned list of strings is with the full path.
-    extensions : :obj:`list` of :obj:`str`, optional
+    extensions
         A list of allowed extensions, e.g. ["jpg", "png"] if you just want to list images.
 
     Returns

@@ -62,7 +62,7 @@ class BaseRigidBodyObject(SceneObject):
 
         Parameters
         ----------
-        rigid_body_state : :class:`~compas_fab.robots.RigidBodyState`, optional
+        rigid_body_state
             The rigid body state to draw.
 
         Returns
@@ -87,7 +87,7 @@ class BaseRigidBodyObject(SceneObject):
 
         Parameters
         ----------
-        rigid_body_state : :class:`~compas_fab.robots.RigidBodyState`
+        rigid_body_state
             The rigid body state to update the object.
 
         Notes

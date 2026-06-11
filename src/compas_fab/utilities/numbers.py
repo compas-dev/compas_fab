@@ -20,15 +20,15 @@ def map_range(value: float, from_min: float, from_max: float, to_min: float, to_
 
     Parameters
     ----------
-    value : :obj:`float`
+    value
         The value to map.
-    from_min : :obj:`float`
+    from_min
         The minimum value of the input range.
-    from_max : :obj:`float`
+    from_max
         The maximum value of the input range.
-    to_min : :obj:`float`
+    to_min
         The minimum value of the output range.
-    to_max : :obj:`float`
+    to_max
         The maximum value of the output range.
 
     Returns
@@ -51,12 +51,12 @@ def range_geometric_row(number: float, d: int, r: float = 1.1) -> list[float]:
 
     Parameters
     ----------
-    number : :obj:`float`
+    number
         The initial number to divide. This number is the first element
         in the returned list.
-    d : :obj:`int`
+    d
         The number of elements in the returned list.
-    r : :obj:`float`, optional
+    r
         The ratio between the numbers in the list. Default is 1.1.
 
     Returns
@@ -82,11 +82,11 @@ def arange(start: float, stop: float, step: float) -> list[float]:
 
     Parameters
     ----------
-    start : :obj:`float`
+    start
         The starting value of the sequence.
-    stop : :obj:`float`
+    stop
         The end value of the sequence.
-    step : :obj:`float`
+    step
         The spacing between the values.
 
     Returns
@@ -106,9 +106,9 @@ def diffs(l1: list[float], l2: list[float]) -> list[float]:
 
     Parameters
     ----------
-    l1 : :obj:`list` of :obj:`float`
+    l1
         The first list.
-    l2 : :obj:`list` of :obj:`float`
+    l2
         The second list.
 
     Returns
@@ -133,11 +133,11 @@ def allclose(l1: list[float], l2: list[float], tol: float = 1e-05) -> bool:
 
     Parameters
     ----------
-    l1 : :obj:`list` of :obj:`float`
+    l1
         The first list.
-    l2 : :obj:`list` of :obj:`float`
+    l2
         The second list.
-    tol : :obj:`float`, optional
+    tol
         The tolerance within which the lists are considered equal. Default is 1e-05.
 
     Returns
@@ -167,7 +167,7 @@ def argsort(numbers: list[float]) -> list[int]:
 
     Parameters
     ----------
-    numbers : :obj:`list` of :obj:`float`
+    numbers
         A list of numbers.
 
     Returns
@@ -191,7 +191,7 @@ def argmin(numbers: list[float]) -> int:
 
     Parameters
     ----------
-    numbers : :obj:`list` of :obj:`float`
+    numbers
         A list of numbers.
 
     Returns
@@ -214,7 +214,7 @@ def argmax(numbers: list[float]) -> int:
 
     Parameters
     ----------
-    numbers : :obj:`list` of :obj:`float`
+    numbers
         A list of numbers.
 
     Returns
@@ -235,7 +235,7 @@ def sign(number: float) -> int:
 
     Parameters
     ----------
-    number : float
+    number
         A number to check the sign of.
 
     Returns
@@ -253,11 +253,11 @@ def clamp(value: float, min_value: float, max_value: float) -> float:
 
     Parameters
     ----------
-    value : float
+    value
         The value to clamp.
-    min_value : float
+    min_value
         The minimum value.
-    max_value : float
+    max_value
         The maximum value.
 
     Returns

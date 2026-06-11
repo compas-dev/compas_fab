@@ -21,11 +21,11 @@ class GHSceneObject(compas_ghpython_GHSceneObject):
 
         Parameters
         ----------
-        geometry : :class:`~compas.datastructures.Mesh`
+        geometry
             Instance of a mesh data structure
-        name : str, optional
+        name
             The name of the mesh to draw.
-        color : :class:`~compas.colors.Color`
+        color
             The color of the object.`
 
         Returns

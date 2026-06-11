@@ -19,14 +19,14 @@ class BaseRobotModelObject(SceneObject):
 
     Parameters
     ----------
-    draw_visual : bool, optional
+    draw_visual
         Draw the visual meshes of the robot model. Default is `True`.
-    draw_collision : bool, optional
+    draw_collision
         Draw the collision meshes of the robot model. Default is `False`.
         It is possible to turn on both `draw_visual` and `draw_collision`, however both set of meshes
         will be returned as a combined list in the `draw()` method. Consider creating two separate
         RobotModelObjects if you want to draw the visual and collision meshes separately
-    native_scale : float, optional
+    native_scale
         The native scale factor to visualize the robot model, in case the native CAD environment
         uses a different unit system other than meters. The native scale value should be set such
         that a `meter_mesh.scale(1/native_scale)` will create the mesh in the native unit system.
@@ -214,9 +214,9 @@ class BaseRobotModelObject(SceneObject):
 
         Parameters
         ----------
-        geometry : object
+        geometry
             A CAD-specific (i.e. native) geometry object as returned by :meth:`_create_geometry`.
-        transformation : :class:`~compas.geometry.Transformation`
+        transformation
             Transformation to update the geometry object.
 
         Returns
@@ -232,11 +232,11 @@ class BaseRobotModelObject(SceneObject):
 
         Parameters
         ----------
-        geometry : :class:`~compas.datastructures.Mesh`
+        geometry
             Instance of a mesh data structure
-        name : str, optional
+        name
             The name of the mesh to draw.
-        color : :class:`~compas.colors.Color`
+        color
             The color of the object.`
 
         Returns

@@ -2,6 +2,10 @@
 """
 Create a MoveItPlanner backed by a connected RosClient.
 
+The robot cell is taken from `ros_client.robot_cell` (set by a Load Robot Cell
+From ROS component upstream), so wire that component's `ros_client` output into
+here - no separate robot_cell input is needed.
+
 The planner is cached in sticky and reused across canvas refreshes so the
 planning scene is not reset on every tick. If the client disconnects and
 reconnects, the cached planner is rebuilt.
@@ -19,7 +23,7 @@ from compas_fab.backends import MoveItPlanner
 
 
 class MoveItPlannerComponent(Grasshopper.Kernel.GH_ScriptInstance):
-    def RunScript(self, ros_client, robot_cell):
+    def RunScript(self, ros_client):
         if ros_client is None or not ros_client.is_connected:
             return None
 
@@ -34,6 +38,10 @@ class MoveItPlannerComponent(Grasshopper.Kernel.GH_ScriptInstance):
             cached = MoveItPlanner(ros_client)
             st[key] = cached
 
+        # The cell is read from the client (set by Load Robot Cell From ROS), not
+        # wired in directly. Uploading it to the planning scene here keeps planning
+        # calls from re-uploading geometry.
+        robot_cell = ros_client.robot_cell
         if robot_cell is not None:
             cached.set_robot_cell(robot_cell)
 

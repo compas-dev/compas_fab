@@ -74,7 +74,7 @@ class BaseRobotCellObject(SceneObject):
 
         Parameters
         ----------
-        robot_cell_state : RobotCellState, optional
+        robot_cell_state
             The state of the robot cell, containing the configuration of the robot and the state of the rigid bodies and tools.
 
         Returns
