@@ -41,7 +41,8 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         group
             The planning group used for calculation.
         options
-            Dictionary containing the key-value pairs that are passed to [`PlannerInterface.iter_inverse_kinematics`][compas_fab.backends.interfaces.PlannerInterface.iter_inverse_kinematics]
+            Dictionary containing the key-value pairs that are passed to
+            [`PlannerInterface.iter_inverse_kinematics`][compas_fab.backends.interfaces.PlannerInterface.iter_inverse_kinematics]
 
         Returns
         -------
