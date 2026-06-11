@@ -1,4 +1,4 @@
-# Full ROS 2 / MoveIt 2 demo stack — URSim, the UR ROS 2 driver, MoveIt 2,
+# Full ROS 2 + MoveIt 2 demo stack — URSim, the UR ROS 2 driver, MoveIt 2,
 # rosbridge, an HTTP file server, and a web-based RViz viewport via noVNC.
 # Use this when you want to actually drive a simulated robot end-to-end.
 #
