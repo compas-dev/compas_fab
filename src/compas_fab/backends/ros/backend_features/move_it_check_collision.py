@@ -14,9 +14,6 @@ from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
 
 if TYPE_CHECKING:
-    from compas_fab.backends import MoveItPlanner
-    from compas_fab.backends import RosClient
-    from compas_fab.robots import RobotCell
     from compas_fab.robots import RobotCellState
 
 __all__ = [

@@ -17,6 +17,7 @@ import rhinoscriptsyntax as rs
 import System
 from compas_ghpython import warning as gh_warning
 from compas_rhino.conversions import mesh_to_compas
+
 from compas_fab.robots import RigidBody
 
 
