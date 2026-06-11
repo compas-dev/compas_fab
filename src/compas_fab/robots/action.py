@@ -1,6 +1,5 @@
 """Higher-level container for assembling planned motions into a named, serializable workflow."""
 
-import hashlib
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Any
@@ -20,12 +19,6 @@ __all__ = [
     "Action",
     "ActionChain",
 ]
-
-
-def _cell_signature(cell: "RobotCell") -> str:
-    """Stable fingerprint of a cell's structural identity (robot name + tool/body ids)."""
-    parts = [cell.robot_model.name or "", *sorted(cell.tool_ids), *sorted(cell.rigid_body_ids)]
-    return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
 
 
 class Action:
@@ -205,7 +198,7 @@ class ActionChain(Data):
         self.name = name
         self.description = description
         self.start_state = start_state
-        self.cell_signature: Optional[str] = _cell_signature(robot_cell) if robot_cell is not None else None
+        self.cell_signature: Optional[str] = robot_cell.structural_signature() if robot_cell is not None else None
         self._actions: list[Action] = []
 
     def __iter__(self) -> Iterator[Action]:
@@ -396,7 +389,7 @@ class ActionChain(Data):
         """
         if self.cell_signature is None:
             return
-        actual = _cell_signature(robot_cell)
+        actual = robot_cell.structural_signature()
         if actual != self.cell_signature:
             raise ValueError(
                 "Chain {!r} was assembled against a different cell. "

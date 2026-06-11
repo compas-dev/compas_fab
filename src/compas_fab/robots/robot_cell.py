@@ -1,3 +1,4 @@
+import hashlib
 import os
 import random
 from typing import Optional
@@ -98,6 +99,19 @@ class RobotCell(Data):
     @property
     def rigid_body_ids(self) -> list[str]:
         return list(self.rigid_body_models.keys())
+
+    def structural_signature(self) -> str:
+        """A stable fingerprint of the cell's structural identity.
+
+        Combines the robot model name with the sorted tool and rigid-body ids and
+        hashes them. Two cells with the same robot and the same set of tool/body
+        ids (by name) share a signature, regardless of object identity. Useful for
+        cheaply detecting whether a cell's set of registered models has changed —
+        e.g. to match an [`Action`][compas_fab.robots.Action]'s start state to a
+        cell, or to decide whether a planning scene needs re-uploading.
+        """
+        parts = [self.robot_model.name or "", *sorted(self.tool_ids), *sorted(self.rigid_body_ids)]
+        return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
 
     @property
     def __data__(self):
