@@ -4,7 +4,7 @@
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
     "description": "Deconstruct a RobotCell into its robot model, registered rigid bodies and tools, and a matching default RobotCellState. The inverse of registering models via Load Robot Cell.",
-    "exposure": 4,
+    "exposure": 2,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
