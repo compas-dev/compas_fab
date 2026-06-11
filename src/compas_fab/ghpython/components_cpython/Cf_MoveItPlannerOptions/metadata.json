@@ -1,0 +1,35 @@
+{
+    "name": "MoveIt Planner Options",
+    "nickname": "MoveIt Planner Options",
+    "category": "COMPAS FAB",
+    "subcategory": "Backends",
+    "description": "Bundle advanced load options (URDF/SRDF parameter names, HTTP file server URL) into a single object for the MoveIt Planner's `options` input. Optional - only needed for non-standard ROS setups.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "urdf_param_name",
+                "description": "ROS parameter / topic name for the URDF. Defaults to '/robot_description'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "srdf_param_name",
+                "description": "ROS parameter / topic name for the SRDF. Defaults to '/robot_description_semantic'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "http_file_server_base_url",
+                "description": "ROS 2 only: base URL of the HTTP file server hosting package:// meshes. Defaults to http://<rosbridge-host>:9190.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "options",
+                "description": "A MoveItPlannerOptions object. Wire it into the MoveIt Planner's `options` input."
+            }
+        ]
+    }
+}

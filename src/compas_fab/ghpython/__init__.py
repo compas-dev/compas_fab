@@ -39,12 +39,14 @@ if compas.RHINO:
     )
     from .cell_builder import register_models_into_cell
     from .joint_sliders import ensure_joint_sliders
+    from .moveit_options import MoveItPlannerOptions
     from .sticky_cache import cache_scene_object
     from .value_list import ensure_boolean_toggle
     from .value_list import ensure_dynamic_value_list
     from .value_list import ensure_value_list
 
     __all__ = [
+        "MoveItPlannerOptions",
         "ReachabilityMapObject",
         "RigidBodyObject",
         "RobotCellObject",
