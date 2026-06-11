@@ -16,7 +16,7 @@
             },
             {
                 "name": "load_geometry",
-                "description": "Whether to load the robot's mesh geometry. Required for visualization. Defaults to True when unwired."
+                "description": "Whether to load the robot's mesh geometry. Required for visualization. Defaults to True when unwired. A Boolean Toggle is auto-created on this input when nothing is wired."
             },
             {
                 "name": "reload",

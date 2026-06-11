@@ -18,6 +18,7 @@ from compas_ghpython import create_id
 from compas_ghpython import error
 from scriptcontext import sticky as st
 
+from compas_fab.ghpython import ensure_boolean_toggle
 from compas_fab.ghpython import ensure_value_list
 from compas_fab.ghpython import register_models_into_cell
 from compas_fab.robots import RobotCellLibrary
@@ -32,6 +33,7 @@ _LIBRARY_NAMES = sorted(
 class LoadRobotCellFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, name: str, load_geometry: bool, reload: bool, tools, rigid_bodies):
         ensure_value_list(ghenv.Component, "name", _LIBRARY_NAMES, default="ur5")  # noqa: F821
+        ensure_boolean_toggle(ghenv.Component, "load_geometry", default=True)  # noqa: F821
 
         if not name:
             return (None, None)

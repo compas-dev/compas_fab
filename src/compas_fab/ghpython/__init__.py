@@ -10,7 +10,9 @@ Alongside them are the helpers the `Cf_*` components call to register models int
 a cell ([`register_models_into_cell`][compas_fab.ghpython.register_models_into_cell]),
 auto-build per-joint sliders ([`ensure_joint_sliders`][compas_fab.ghpython.ensure_joint_sliders]),
 cache scene objects across solves ([`cache_scene_object`][compas_fab.ghpython.cache_scene_object]),
-and auto-create dropdowns on component inputs.
+and auto-create dropdowns ([`ensure_value_list`][compas_fab.ghpython.ensure_value_list]) or
+boolean toggles ([`ensure_boolean_toggle`][compas_fab.ghpython.ensure_boolean_toggle]) on
+component inputs.
 
 Value-list dropdowns come in two flavours:
 
@@ -38,6 +40,7 @@ if compas.RHINO:
     from .cell_builder import register_models_into_cell
     from .joint_sliders import ensure_joint_sliders
     from .sticky_cache import cache_scene_object
+    from .value_list import ensure_boolean_toggle
     from .value_list import ensure_dynamic_value_list
     from .value_list import ensure_value_list
 
@@ -47,6 +50,7 @@ if compas.RHINO:
         "RobotCellObject",
         "RobotModelObject",
         "cache_scene_object",
+        "ensure_boolean_toggle",
         "ensure_dynamic_value_list",
         "ensure_joint_sliders",
         "ensure_value_list",

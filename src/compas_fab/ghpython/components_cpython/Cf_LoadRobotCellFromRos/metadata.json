@@ -15,7 +15,7 @@
             },
             {
                 "name": "load_geometry",
-                "description": "If True (default when unwired), fetch mesh geometry. Set to False for faster loads when only kinematics are needed."
+                "description": "If True (default when unwired), fetch mesh geometry. Set to False for faster loads when only kinematics are needed. A Boolean Toggle is auto-created on this input when nothing is wired."
             },
             {
                 "name": "urdf_param_name",
@@ -33,8 +33,8 @@
                 "typeHintID": "str"
             },
             {
-                "name": "load",
-                "description": "Trigger the (re)load. Defaults to False so the canvas does not refetch on every refresh.",
+                "name": "reload",
+                "description": "Force a refetch from ROS (bypass the sticky cache). The cell is loaded automatically on the first run; flip this to re-fetch after the robot description or geometry changes. Defaults to False so the canvas does not refetch the (potentially large) mesh payload on every refresh.",
                 "typeHintID": "bool"
             },
             {

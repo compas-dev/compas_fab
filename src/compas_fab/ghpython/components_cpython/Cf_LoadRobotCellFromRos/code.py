@@ -27,6 +27,7 @@ from compas_ghpython import create_id
 from compas_ghpython import error
 from scriptcontext import sticky as st
 
+from compas_fab.ghpython import ensure_boolean_toggle
 from compas_fab.ghpython import register_models_into_cell
 
 
@@ -38,10 +39,12 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
         urdf_param_name: str,
         srdf_param_name: str,
         http_file_server_base_url: str,
-        load: bool,
+        reload: bool,
         tools,
         rigid_bodies,
     ):
+        ensure_boolean_toggle(ghenv.Component, "load_geometry", default=True)  # noqa: F821
+
         if ros_client is None or not ros_client.is_connected:
             return (None, None, None)
 
@@ -58,8 +61,11 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
             ghenv.Component,  # noqa: F821
             "ros_robot_cell_{}_{}_{}".format(load_geometry, urdf_param_name or "default", srdf_param_name or "default"),
         )
+        base_cell = st.get(key)
 
-        if load:
+        # Fetch on the first run (nothing cached yet) or when the user forces a reload.
+        # The mesh payload can be large, so we don't re-fetch on every canvas refresh.
+        if reload or base_cell is None:
             kwargs = dict(load_geometry=load_geometry)
             if urdf_param_name:
                 kwargs["urdf_param_name"] = urdf_param_name
@@ -69,8 +75,10 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                 kwargs["http_file_server_base_url"] = http_file_server_base_url
 
             try:
-                st[key] = ros_client.load_robot_cell(**kwargs)
+                base_cell = ros_client.load_robot_cell(**kwargs)
             except Exception as e:
+                # Don't poison the cache; let the user retry by toggling reload or fixing inputs.
+                st.pop(key, None)
                 msg = str(e)
                 if "404" in msg or "Not Found" in msg:
                     error(  # noqa: F821
@@ -80,8 +88,8 @@ class LoadRobotCellFromRos(Grasshopper.Kernel.GH_ScriptInstance):
                 else:
                     error(ghenv.Component, "ROS load failed: {}".format(e))  # noqa: F821
                 return (None, None, detected_distro)
+            st[key] = base_cell
 
-        base_cell = st.get(key)
         if base_cell is None:
             return (None, None, detected_distro)
 

@@ -5,13 +5,21 @@ Two flavours, `ensure_value_list` (static option sets) and
 `compas_fab.ghpython` package overview for how they differ and when to use each.
 """
 
+from typing import Iterable
+from typing import Optional
+
 import Grasshopper
 import System
 from compas_ghpython import create_id
 from scriptcontext import sticky as st
 
 
-def _place_left_of_input(obj, param, gap=30.0, y_offset=0.0):
+def _place_left_of_input(
+    obj: Grasshopper.Kernel.IGH_DocumentObject,
+    param: Grasshopper.Kernel.IGH_Param,
+    gap: float = 30.0,
+    y_offset: float = 0.0,
+) -> None:
     """Position a floating object just left of a component input.
 
     Places ``obj`` so its right edge sits ``gap`` pixels to the left of the
@@ -34,7 +42,72 @@ def _place_left_of_input(obj, param, gap=30.0, y_offset=0.0):
     obj.Attributes.ExpireLayout()
 
 
-def ensure_value_list(component, input_name, options, default=None, x_offset=30, y_offset=0):
+def ensure_boolean_toggle(
+    component: Grasshopper.Kernel.IGH_Component,
+    input_name: str,
+    default: bool = True,
+    x_offset: float = 30,
+    y_offset: float = 0,
+) -> None:
+    """Create and wire a Boolean Toggle to a component input if nothing is connected.
+
+    No-op if the input already has a source connected. Safe to call on every
+    `RunScript` invocation. Gives a boolean input a one-click on/off widget on the
+    canvas instead of forcing the user to find and wire a separate toggle.
+
+    Parameters
+    ----------
+    component
+        The hosting component. Pass `ghenv.Component`.
+    input_name
+        The `Name` of the input parameter to attach to.
+    default
+        The toggle's initial value. Defaults to True.
+    x_offset, y_offset
+        `x_offset` is the gap (px) between the toggle's right edge and the input;
+        `y_offset` nudges it vertically. Placed just to the left of the input,
+        vertically centred on it.
+    """
+    param = None
+    for p in component.Params.Input:
+        if p.Name == input_name:
+            param = p
+            break
+    if param is None or param.SourceCount > 0:
+        return
+
+    doc = component.OnPingDocument()
+    if doc is None:
+        return
+
+    toggle = Grasshopper.Kernel.Special.GH_BooleanToggle()
+    toggle.NickName = input_name
+    toggle.Value = bool(default)
+
+    toggle.CreateAttributes()
+    # Rough placement so it lands somewhere sane until the precise reposition.
+    toggle.Attributes.Pivot = param.Attributes.Pivot
+    doc.AddObject(toggle, False)
+    param.AddSource(toggle)
+
+    # As with the value list, the real rendered size is only available between
+    # solves, so position it precisely in a scheduled callback. That callback
+    # also serves as the follow-up solve that lets the toggle's value reach the
+    # input, so the user doesn't have to re-trigger the component.
+    def _finish(_doc):
+        _place_left_of_input(toggle, param, gap=x_offset, y_offset=y_offset)
+
+    doc.ScheduleSolution(5, _finish)
+
+
+def ensure_value_list(
+    component: Grasshopper.Kernel.IGH_Component,
+    input_name: str,
+    options: Iterable[str],
+    default: Optional[str] = None,
+    x_offset: float = 30,
+    y_offset: float = 0,
+) -> None:
     """Create and wire a Value List to a component input if nothing is connected.
 
     No-op if the input already has a source connected. Safe to call on every
@@ -43,15 +116,15 @@ def ensure_value_list(component, input_name, options, default=None, x_offset=30,
 
     Parameters
     ----------
-    component : Grasshopper.Kernel.IGH_Component
+    component
         The hosting component. Pass `ghenv.Component`.
-    input_name : str
+    input_name
         The `Name` of the input parameter to attach to.
-    options : iterable of str
+    options
         The string options to populate the Value List with.
-    default : str, optional
+    default
         If provided and present in `options`, that item is pre-selected.
-    x_offset, y_offset : float, optional
+    x_offset, y_offset
         `x_offset` is the gap (px) between the value list's right edge and the
         input; `y_offset` nudges it vertically. The value list is placed just to
         the left of the input, vertically centred on it.
@@ -96,7 +169,14 @@ def ensure_value_list(component, input_name, options, default=None, x_offset=30,
     doc.ScheduleSolution(5, _finish)
 
 
-def ensure_dynamic_value_list(component, input_name, options, signature_key=None, x_offset=30, y_offset=0):
+def ensure_dynamic_value_list(
+    component: Grasshopper.Kernel.IGH_Component,
+    input_name: str,
+    options: Iterable[str],
+    signature_key: Optional[str] = None,
+    x_offset: float = 30,
+    y_offset: float = 0,
+) -> None:
     """Maintain a Value List on `input_name` whose items reflect `options`.
 
     Unlike [`ensure_value_list`][], this variant tracks the VL it created
@@ -121,16 +201,16 @@ def ensure_dynamic_value_list(component, input_name, options, signature_key=None
 
     Parameters
     ----------
-    component : Grasshopper.Kernel.IGH_Component
+    component
         Pass `ghenv.Component`.
-    input_name : str
+    input_name
         Name of the input parameter to attach a VL to.
-    options : iterable of str
+    options
         Current option set the VL should expose. Empty means "skip".
-    signature_key : str, optional
+    signature_key
         Suffix used to identify the tracked VL in sticky. Override only when
         a single component manages more than one dynamic VL.
-    x_offset, y_offset : float, optional
+    x_offset, y_offset
         `x_offset` is the gap (px) between the value list's right edge and the
         input; `y_offset` nudges it vertically. Placed just left of the input.
     """
