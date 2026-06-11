@@ -287,20 +287,35 @@ class RigidBodyLibrary:
         return RigidBody(mesh, None)
 
     @classmethod
-    def floor(cls, size: float = 1.0) -> RigidBody:
+    def floor(cls, size: float = 1.0, clearance: float = 1e-2) -> RigidBody:
         """Create and return a floor as RigidBody, useful for simulating a floor.
 
-        The floor is square with a default size of 1m x 1m.
-        The floor is centered around the object origin at Z=0.
+        The floor is square with a default size of 1m x 1m, centered around the
+        object origin and sitting ``clearance`` below Z=0 (default 1 cm).
+
+        The downward offset keeps the floor from registering a collision with the
+        robot's base link, which would otherwise make every configuration fail
+        collision checking. Note that a robot base's *collision* geometry often
+        dips a few millimetres below Z=0 (e.g. the UR5 ``base_link_inertia``
+        reaches about -7 mm), so the clearance must exceed that, not just a
+        floating-point epsilon — hence the 1 cm default. Deep-skirted bases may
+        need a larger value; pass ``clearance=0`` for a floor flush with Z=0.
+
+        The robot-agnostic alternative is to not offset at all and instead add the
+        base link to the floor's RigidBodyState ``touch_links`` (what the bundled
+        cells such as ``ur5_cone_tool`` do), which exempts the pair no matter how
+        far the base geometry extends.
+
         The floor has only one visual mesh, and one collision mesh.
         """
 
-        # Create a plane mesh
+        # Create a plane mesh, offset slightly below Z=0 (see docstring).
+        z = -clearance
         vertices = [
-            [-size / 2, -size / 2, 0],
-            [size / 2, -size / 2, 0],
-            [size / 2, size / 2, 0],
-            [-size / 2, size / 2, 0],
+            [-size / 2, -size / 2, z],
+            [size / 2, -size / 2, z],
+            [size / 2, size / 2, z],
+            [-size / 2, size / 2, z],
         ]
         faces = [[0, 1, 2], [0, 2, 3]]
         mesh = Mesh.from_vertices_and_faces(vertices, faces)
