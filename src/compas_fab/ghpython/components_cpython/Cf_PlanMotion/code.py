@@ -43,6 +43,8 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
         key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
         def _viz(trajectory):
+            if trajectory is None:
+                return [], None
             frames, polyline = trajectory.to_frames_and_polyline(planner.robot_cell, start_state, group or None)
             planes = [frame_to_rhino_plane(f) for f in frames]
             polyline = polyline_to_rhino(polyline) if polyline else None
