@@ -23,7 +23,10 @@ considered. Wire an explicit `start_state` to pose the robot mid-process
 or to use a state with attached tools / workpieces.
 
 If no IK solution is found, the component is flagged with an error message
-(visible in the component balloon) and returns (None, None).
+(visible in the component balloon) and returns (None, None). When the planner
+supports collision checking, the start state is additionally checked and, if it
+is in collision, the colliding pairs are appended to the message to explain why
+no collision-free solution exists.
 
 COMPAS FAB v1.1.0
 """
@@ -38,12 +41,35 @@ from compas_ghpython import error
 from compas_ghpython import warning
 from compas_rhino.conversions import plane_to_compas_frame
 
+from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
+from compas_fab.backends.exceptions import CollisionCheckError
 from compas_fab.backends.exceptions import InverseKinematicsError
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import Target
 from compas_fab.robots import TargetMode
+
+
+def _collision_diagnostic(planner, state):
+    """Explain an IK failure via a collision check on the start state, if available.
+
+    Returns a human-readable hint, or `None` when the planner cannot collision-check
+    (so the caller just reports the bare IK error). Never raises - a diagnostic must
+    not mask the real failure.
+    """
+    try:
+        planner.check_collision(state, options={"full_report": True})
+    except CollisionCheckError as cc:
+        return "The start state is in collision, which blocks every collision-free solution:\n{}".format(cc)
+    except (BackendFeatureNotSupportedError, AttributeError, NotImplementedError):
+        return None
+    except Exception:
+        return None
+    return (
+        "The start state itself is collision-free, so the failure is most likely reachability "
+        "(target out of range or orientation infeasible) or collisions at the target pose."
+    )
 
 
 class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
@@ -110,7 +136,11 @@ class InverseKinematicsComponent(Grasshopper.Kernel.GH_ScriptInstance):
             )
             return (None, None)
         except InverseKinematicsError as e:
-            error(ghenv.Component, "Inverse kinematics failed: {}".format(e))  # noqa: F821
+            msg = "Inverse kinematics failed: {}".format(e)
+            hint = _collision_diagnostic(planner, start_state)
+            if hint:
+                msg += "\n" + hint
+            error(ghenv.Component, msg)  # noqa: F821
             return (None, None)
 
         if configuration is None:
