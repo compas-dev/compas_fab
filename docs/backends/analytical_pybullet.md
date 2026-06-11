@@ -7,7 +7,7 @@ paired with [AnalyticalPyBulletClient][compas_fab.backends.AnalyticalPyBulletCli
 
 ## When to use
 
-- You need **fast IK** *and* **collision checking** without standing up ROS.
+- You need **fast IK** *and* **collision checking** without starting up ROS.
 - Your robot is in the analytical solver's supported set (Universal Robots,
   Staubli TX2, ABB IRB4600 40/255).
 - You want to filter or rank analytical IK solutions against a real

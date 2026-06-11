@@ -12,7 +12,7 @@ planning.
 
 ## When to use
 
-- You want fast IK + collision checking without standing up ROS.
+- You want fast IK + collision checking without starting up ROS.
 - You want to simulate multiple robots or kinematic tools in one scene.
 - You are running headless (CI, batch planning) or from VS Code.
 - You want a PyBullet GUI to visualize the planning scene.
