@@ -28,17 +28,6 @@ const ICONS = {
     '<path class="ac" d="M15.5 11.2 a3 3 0 0 1 0 -4 M17.8 12 a6 6 0 0 0 0 -7.5"/>' +
     '<circle class="adot" cx="15" cy="6.4" r="1.2"/>',
 
-  // add a tool (cone) to the cell
-  addTool:
-    '<path d="M5 7 H13 L9 16 Z"/>' +
-    '<circle class="dot" cx="9" cy="16" r="1.2"/>' +
-    '<path class="ac" d="M18 5 V9 M16 7 H20"/>',
-
-  // add a rigid body (box) to the cell
-  addBody:
-    '<rect x="5" y="8" width="9" height="9" rx="1"/>' +
-    '<path class="ac" d="M18 5 V9 M16 7 H20"/>',
-
   // rigid body built from a mesh (triangulated patch)
   bodyFromMesh:
     '<path d="M6 7 H18 V19 H6 Z"/>' +
@@ -66,6 +55,15 @@ const ICONS = {
     '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
     '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
 
+  // deconstruct a cell into model / bodies / tools / state (cube -> parts)
+  deconstructRobotCell:
+    '<path d="M7 6.5 L10 8.2 L7 9.9 L4 8.2 Z"/>' +
+    '<path d="M4 8.2 V12.6 L7 14.3 L10 12.6 V8.2 M7 9.9 V14.3"/>' +
+    '<path class="ac" d="M11.5 10.4 L16 6.9 M11.5 10.4 L17 11 M11.5 10.4 L16 14.9"/>' +
+    '<circle class="adot" cx="17.2" cy="6.6" r="1.2"/>' +
+    '<circle class="adot" cx="18" cy="11" r="1.2"/>' +
+    '<circle class="adot" cx="17.2" cy="15.2" r="1.2"/>',
+
   /* ---------------- CELL STATE ---------------- */
   // default state: robot at home (articulated arm at rest)
   defaultState:
@@ -90,14 +88,6 @@ const ICONS = {
     '<path d="M9 8.8 V10.6"/>' +
     '<circle class="adot" cx="9" cy="12" r="1.5"/>' +
     '<path d="M6 13.5 H12 L9 20 Z"/>',
-
-  // add a tool to the cell AND attach it (shortcut)
-  addAttachTool:
-    '<circle cx="8" cy="6.4" r="2.2"/>' +
-    '<path d="M8 8.6 V10.2"/>' +
-    '<circle class="adot" cx="8" cy="11.6" r="1.4"/>' +
-    '<path d="M5 13 H11 L8 19.4 Z"/>' +
-    '<path class="ac" d="M17 6.2 V10.2 M15 8.2 H19"/>',
 
   // attach a rigid body to a robot link
   attachBodyLink:
@@ -240,14 +230,38 @@ const ICONS = {
   analyticalPlanner:
     '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
     '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
-    '<path class="ac" d="M9.4 15.4 L12 8.6 L14.6 15.4"/>' +
-    '<path class="ac" d="M10.45 12.9 H13.55"/>',
+    '<path class="ac lt" d="M9.4 15.4 L12 8.6 L14.6 15.4"/>' +
+    '<path class="ac lt" d="M10.45 12.9 H13.55"/>',
 
   // MoveIt / ROS-backed planner chip — labelled "M"
   moveitPlanner:
     '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
     '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
-    '<path class="ac" d="M8.8 15.4 V8.6 L12 12.6 L15.2 8.6 V15.4"/>',
+    '<path class="ac lt" d="M8.8 15.4 V8.6 L12 12.6 L15.2 8.6 V15.4"/>',
+
+  // PyBullet physics-server planner chip — labelled "PB"
+  pyBulletPlanner:
+    '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
+    '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
+    '<path class="ac lt" d="M7 15.4 V8.6 H9.2 Q10.9 8.6 10.9 10.4 Q10.9 12.2 9.2 12.2 H7"/>' +
+    '<path class="ac lt" d="M12.4 15.4 V8.6 H14.4 Q16 8.6 16 10.1 Q16 11.5 14.4 11.5 H12.4 M12.4 11.5 H14.7 Q16.4 11.5 16.4 13.45 Q16.4 15.4 14.7 15.4 H12.4"/>',
+
+  // analytical IK + PyBullet collision — split chip "A | P"
+  analyticalPyBulletPlanner:
+    '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
+    '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
+    '<path d="M12 6.6 V17.4"/>' +
+    '<path class="ac lt" d="M6.7 15.4 L8.5 8.6 L10.3 15.4 M7.45 12.7 H9.55"/>' +
+    '<path class="ac lt" d="M14 15.4 V8.6 H16.1 Q17.7 8.6 17.7 10.5 Q17.7 12.4 16.1 12.4 H14"/>',
+
+  // deconstruct a planner into cell / state / model (chip -> parts)
+  deconstructPlanner:
+    '<rect x="3.5" y="7.5" width="6" height="9" rx="1"/>' +
+    '<path d="M3.5 10.5 H1.8 M3.5 13.5 H1.8" stroke-width="1.4"/>' +
+    '<path class="ac" d="M11 12 L16 7 M11 12 L17 12 M11 12 L16 17"/>' +
+    '<circle class="adot" cx="17" cy="6.7" r="1.2"/>' +
+    '<circle class="adot" cx="18" cy="12" r="1.2"/>' +
+    '<circle class="adot" cx="17" cy="17.3" r="1.2"/>',
 
   // ROS bridge client (connection)
   rosClient:
