@@ -55,9 +55,9 @@ class MoveItSetRobotCellState(SetRobotCellState):
 
         Parameters
         ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The robot cell state to set.
-        options : dict, optional
+        options
             Unused.
 
         """

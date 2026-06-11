@@ -27,7 +27,7 @@ class AnalyticalKinematics:
         The end-effector frame of the robot relative to the last joint of the analytical robot.
         This should match the end effector of the robot in the URDF model.
         Defaults to no offset.
-    joint_offsets : list of float, Optional
+    joint_offsets
         The offset to be added to each joint value of the analytical robot to match the URDF model.
         ``J_robotmodel = J_analytical + joint_offsets``
         Defaults to no offset.
@@ -49,7 +49,7 @@ class AnalyticalKinematics:
 
         Parameters
         ----------
-        joint_values : list of float
+        joint_values
             The joint configuration values.
             Joint values must be in radians.
 
@@ -65,7 +65,7 @@ class AnalyticalKinematics:
 
         Parameters
         ----------
-        frame_rcf : :class:`compas.geometry.Frame`
+        frame_rcf
             The frame of the end-effector.
 
         Returns

@@ -17,9 +17,9 @@ def forward_kinematics_offset_wrist(joint_values: list[float], params: list[floa
 
     Parameters
     ----------
-    joint_values : list of float
+    joint_values
         List of 6 joint values in radians.
-    params : list of float
+    params
         The offset wrist parameters that specify the robot.
 
     Returns
@@ -70,9 +70,9 @@ def inverse_kinematics_offset_wrist(frame: Frame, params: list[float], q6_des: f
 
     Parameters
     ----------
-    frame : :class:`compas.geometry.Frame`
+    frame
         The frame we want to calculate the inverse kinematics for.
-    params : list of float
+    params
         The offset wrist parameters that specify the robot.
 
     Returns

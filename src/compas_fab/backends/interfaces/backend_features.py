@@ -54,15 +54,15 @@ class BackendFeature:
 
         Parameters
         ----------
-        joint_positions : list of float
+        joint_positions
             All joint values for the full configuration.
-        joint_names : list of str
+        joint_names
             The joint names corresponding to the joint values.
-        group : str
+        group
             The name of the planning group.
-        return_full_configuration : bool
+        return_full_configuration
             If True, the full configuration is returned, otherwise only the group configuration is returned.
-        start_configuration : :class:`compas_robots.Configuration`, optional
+        start_configuration
             If return_full_configuration is True, this configuration is used to fill in the missing values.
 
         Notes
@@ -139,9 +139,9 @@ class CheckCollision(BackendFeature):
 
         Parameters
         ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The robot cell state to check for collision.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
@@ -181,21 +181,21 @@ class ForwardKinematics(BackendFeature):
 
         Parameters
         ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The robot cell state describing the robot cell.
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
             The robot cell state should also reflect the attachment of tools, if any.
-        target_mode : :class:`compas_fab.robots.TargetMode`
+        target_mode
             The target mode to select which frame to return.
-        group : str, optional
+        group
             The planning group of the robot.
             Defaults to the robot's main planning group.
-        native_scale : float, optional
+        native_scale
             The scaling factor to apply to the resulting frame.
             It is defined as `user_object_value * native_scale = meter_object_value`.
             For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
-        options : dict, optional
+        options
             Dictionary containing planner-specific options.
             See the planner's `ForwardKinematics` documentation for supported options.
 
@@ -228,17 +228,17 @@ class ForwardKinematics(BackendFeature):
 
         Parameters
         ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The robot cell state describing the robot cell.
-        link_name : str, optional
+        link_name
             The name of the link to calculate the forward kinematics for.
             Defaults to the last link of the provided planning group.
-        native_scale : float, optional
+        native_scale
             The scaling factor to apply to the resulting frame.
             It is defined as `user_object_value * native_scale = meter_object_value`.
             For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
-        options : dict, optional
+        options
             Dictionary containing planner-specific options.
             See the planner's `ForwardKinematics` documentation for supported options.
         """
@@ -276,14 +276,14 @@ class InverseKinematics(BackendFeature):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.Target`
+        target
             The target to calculate the inverse kinematics for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
-        group : str, optional
+        group
             The planning group used for calculation.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
@@ -346,15 +346,15 @@ class InverseKinematics(BackendFeature):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.Target`
+        target
             The target to calculate the inverse kinematics for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
-        group: str, optional
+        group
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        options: dict, optional
+        options
             Dictionary containing planner-specific arguments.
             See the planner's documentation for supported options.
             One of the supported options related to the iterator is:
@@ -405,15 +405,15 @@ class PlanMotion(BackendFeature):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.Target`
+        target
             The goal for the robot to achieve.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group : str, optional
+        group
             The name of the group to plan for. Defaults to the robot's main
             planning group.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
@@ -442,14 +442,14 @@ class PlanCartesianMotion(BackendFeature):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.Waypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group : str, optional
+        group
             The planning group used for calculation.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 

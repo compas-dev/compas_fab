@@ -91,15 +91,15 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.Waypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group: str, optional
+        group
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        options: dict, optional
+        options
             Dictionary containing additional options, see specific planner for details.
 
             - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
@@ -235,14 +235,14 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.PointAxisWaypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group: str
+        group
             The planning group used for calculation.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"max_step_distance"``: (:obj:`float`, optional)
@@ -575,14 +575,14 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.FrameWaypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group: str
+        group
             The planning group used for calculation.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"max_step_distance"``: (:obj:`float`, optional)

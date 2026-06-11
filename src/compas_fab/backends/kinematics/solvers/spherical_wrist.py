@@ -14,9 +14,9 @@ def forward_kinematics_spherical_wrist(joint_values: list[float], points: list[P
 
     Parameters
     ----------
-    joint_values : list of float
+    joint_values
         A list of 6 joint values in radians.
-    points : list of point
+    points
         A list of 4 points specifying the robot's joint positions.
 
     Returns
@@ -90,7 +90,7 @@ def inverse_kinematics_spherical_wrist(target_frame: Frame, points: list[Point])
     ----------
     frame : :class:`compas.geometry.Frame`
         The frame we search the inverse kinematics for.
-    points : list of point
+    points
         A list of 4 points specifying the robot's joint positions.
 
     Returns

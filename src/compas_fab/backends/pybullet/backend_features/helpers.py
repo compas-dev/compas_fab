@@ -20,15 +20,15 @@ def check_max_jump(
 
     Parameters
     ----------
-    joint_names : list of str
+    joint_names
         List of joint names.
-    joint_types : list of int
+    joint_types
         List of joint types.
-    start_joint_values : list of float
+    start_joint_values
         List of joint values for the start configuration.
-    end_joint_values : list of float
+    end_joint_values
         List of joint values for the end configuration.
-    options : dict
+    options
         Dictionary containing the following key-value pairs:
 
         - ``"max_jump_prismatic"``: (:obj:`float`, optional)

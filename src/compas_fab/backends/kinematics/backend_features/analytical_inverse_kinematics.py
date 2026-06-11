@@ -99,12 +99,12 @@ class AnalyticalInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        frame_WCF: :class:`compas.geometry.Frame`
+        frame_WCF
             The frame to calculate the inverse for.
-        group: str, optional
+        group
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
-        options: dict
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"solver"``: (:obj:`str`) The solver to use to calculate IK.

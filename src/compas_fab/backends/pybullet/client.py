@@ -79,17 +79,17 @@ class PyBulletBase:
 
         Parameters
         ----------
-        shadows : :obj:`bool`
+        shadows
             Display shadows in the GUI. Defaults to ``True``.
-        color : :obj:`tuple` of :obj:`float`
+        color
             Set the background color of the GUI. Defaults to ``None``.
-        width : :obj:`int`
+        width
             Set the width in pixels of the GUI. Defaults to ``None``.
-        height : :obj:`int`
+        height
             Set the height in pixels of GUI. Defaults to ``None``.
-        verbose : :obj:`bool`
+        verbose
             Enable verbose output. Defaults to ``False``.
-        enable_debug_gui : :obj:`bool`
+        enable_debug_gui
             Enable the GUI sidebar and parameter views. Defaults to ``False``.
 
         Returns
@@ -166,20 +166,20 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     Parameters
     ----------
-    connection_type : :obj:`str`
+    connection_type
         Sets the connection type.
         ``'gui'`` for a graphical user interface (default).
         ``'direct'`` mode will create a headless physics engine and directly communicates with it.
         ``'shared_memory'``, ``'udp'``, and ``'tcp'`` are not supported.
 
-    verbose : :obj:`bool`
+    verbose
         Use verbose logging. Defaults to ``False``.
 
     Attributes
     ----------
-    verbose : :obj:`bool`
+    verbose
         Use verbose logging.
-    rigid_bodies_puids : :obj:`dict` of (:obj:`str`, :obj:`list` of :obj:`int`)
+    rigid_bodies_puids
         Dictionary of rigid bodies and their PyBullet ids.
 
     Examples
@@ -296,11 +296,11 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        robot_model : :class:`compas_robots.RobotModel`
+        robot_model
             The robot model to be loaded into PyBullet.
-        robot_semantics : :class:`compas_fab.robots.RobotSemantics`
+        robot_semantics
             The robot semantics to be loaded into PyBullet.
-        concavity : :obj:`bool`, optional.
+        concavity
             When ``True``, the mesh will be loaded as its concave hull
             for collision checking purposes. Defaults to ``False``.
 
@@ -342,9 +342,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        name : :obj:`str`
+        name
             The name of the tool.
-        tool_model : :class:`compas_robot.ToolModel`
+        tool_model
             The tool_model to be loaded into PyBullet.
 
         """
@@ -357,7 +357,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        name : :obj:`str`
+        name
             The name of the tool.
         """
         assert name in self.tools_puids
@@ -408,7 +408,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        name : :obj:`str`
+        name
             The name of the rigid body.
         """
         if name not in self.rigid_bodies_puids:
@@ -422,7 +422,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        urdf_file : :obj:`str`
+        urdf_file
             The file path to the URDF file.
 
         Returns
@@ -459,9 +459,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        robot_model : :class:`compas_fab.robots.RobotModel`
+        robot_model
             The robot_model to be saved for use with PyBullet.
-        concavity : :obj:`bool`
+        concavity
             When ``False`` (the default), the mesh will be loaded as its
             convex hull for collision checking purposes.  When ``True``,
             a non-static mesh will be decomposed into convex parts using v-HACD.
@@ -561,17 +561,17 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        body_1_id : :obj:`int`
+        body_1_id
             The unique id (issued by Pybullet) of the first body.
-        body_1_name : :obj:`str`
+        body_1_name
             The name of the first body. Used for logging and error reporting only.
-        body_2_id : :obj:`int`
+        body_2_id
             The unique id (issued by Pybullet) of the second body.
-        body_2_name : :obj:`str`
+        body_2_name
             The name of the second body. Used for logging and error reporting only.
-        link_index_1 : :obj:`int`, optional
+        link_index_1
             The link index if the first body is a robot. Defaults to ``None``.
-        link_index_2 : :obj:`int`, optional
+        link_index_2
             The link index if the second body is a robot. Defaults to ``None``.
         """
         kwargs = {
@@ -618,7 +618,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        configuration : :class:`compas_fab.robots.Configuration`
+        configuration
             The configuration to be converted.
 
         Returns
@@ -730,7 +730,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        configuration : :class:`compas_fab.robots.Configuration`
+        configuration
             The configuration to be set, ``joint_names`` must be included in the configuration.
         group : :obj:`str`, optional
             The planning group used for calculation. Defaults to the robot's
@@ -766,9 +766,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        tool_name : :obj:`str`
+        tool_name
             Name of the tool to be configured.
-        configuration : :class:`compas_fab.robots.Configuration`
+        configuration
             The configuration to be set, ``joint_names`` must be included in the configuration.
 
         """
@@ -831,9 +831,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        tool_name : :obj:`str`
+        tool_name
             Name of the tool.
-        frame : :class:`compas.geometry.Frame`
+        frame
             The frame to which the tool should be moved.
         """
         tool_id = self.tools_puids[tool_name]
@@ -844,9 +844,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
         Parameters
         ----------
-        rigid_body_name : :obj:`str`
+        rigid_body_name
             Name of the rigid body.
-        frame : :class:`compas.geometry.Frame`
+        frame
             The frame to which the rigid body should be moved.
         """
         body_ids = self.rigid_bodies_puids[rigid_body_name]

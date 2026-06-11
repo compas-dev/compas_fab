@@ -56,11 +56,11 @@ class MoveItSetRobotCell(SetRobotCell):
 
         Parameters
         ----------
-        robot_cell : :class:`compas_fab.robots.RobotCell`
+        robot_cell
             The robot cell instance to set on the client.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`, optional
+        robot_cell_state
             The robot cell state instance to set on the client after setting the robot cell.
-        options : dict, optional
+        options
             Unused.
         """
         planner: MoveItPlanner = self

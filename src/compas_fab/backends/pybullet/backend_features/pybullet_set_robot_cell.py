@@ -22,11 +22,11 @@ class PyBulletSetRobotCell(SetRobotCell):
 
         Parameters
         ----------
-        robot_cell : RobotCell
+        robot_cell
             The robot cell object containing the robot, tools, and other objects.
-        robot_cell_state : RobotCellState, optional
+        robot_cell_state
             The state of the robot cell, including the robot's configuration.
-        options : dict, optional
+        options
             Dictionary containing additional options.
             Unused at the moment.
 

@@ -71,15 +71,15 @@ class MoveItInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
+        target
             The target to calculate the inverse kinematics for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
-        group : str, optional
+        group
             The planning group used for calculation.
             Defaults to the robot's main planning group.
-        options : dict, optional
+        options
             Dictionary containing arguments specific to the solver.
             See the `options` parameter in :meth:`iter_inverse_kinematics` for details.
 
@@ -134,14 +134,14 @@ class MoveItInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
+        target
             The target to calculate the inverse kinematics for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
-        group: str, optional
+        group
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"max_results"``: (:obj:`int`) Maximum number of results to return.

@@ -243,20 +243,20 @@ class RosClient(Ros, ClientInterface):
 
         Parameters
         ----------
-        load_geometry : bool, optional
+        load_geometry
             ``True`` to load the robot's geometry, otherwise ``False`` to load only the model and semantics.
-        urdf_param_name : str, optional
+        urdf_param_name
             Parameter name where the URDF is defined. If not defined, it will default to ``/robot_description``.
-        srdf_param_name : str, optional
+        srdf_param_name
             Parameter name where the SRDF is defined. If not defined, it will default to ``/robot_description_semantic``.
-        precision : int
+        precision
             Defines precision for importing/loading meshes. Defaults to ``compas.tolerance.TOL.precision``.
-        local_cache_directory : str, optional
+        local_cache_directory
             Directory where the robot description (URDF, SRDF and meshes) are stored.
             This differs from the directory taken as parameter by the :class:`RosFileServerLoader`
             in that it points directly to the specific robot package, not to a global workspace storage
             for all robots. If not assigned, the robot will not be cached locally.
-        http_file_server_base_url : str, optional
+        http_file_server_base_url
             Base URL of the HTTP file server used by ROS 2 to resolve ``package://`` mesh URLs.
             Defaults to ``http://<rosbridge-host>:9190``.
 

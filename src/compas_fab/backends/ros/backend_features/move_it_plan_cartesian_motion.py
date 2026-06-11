@@ -53,15 +53,15 @@ class MoveItPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.Waypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group: str, optional
+        group
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.

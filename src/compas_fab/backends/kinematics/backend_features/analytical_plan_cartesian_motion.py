@@ -33,14 +33,14 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
 
         Parameters
         ----------
-        waypoints : :class:`compas_fab.robots.Waypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group : str, optional
+        group
             The planning group used for calculation.
-        options : dict, optional
+        options
             Dictionary containing the key-value pairs that are passed to [`PlannerInterface.iter_inverse_kinematics`][compas_fab.backends.interfaces.PlannerInterface.iter_inverse_kinematics]
 
         Returns

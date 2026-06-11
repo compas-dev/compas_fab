@@ -51,15 +51,15 @@ class MoveItPlanMotion(PlanMotion):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.Target`
+        target
             The goal for the robot to achieve.
-        start_state : :class:`compas_fab.robots.RobotCellState`
+        start_state
             The starting state of the robot cell at the beginning of the motion.
             The attribute `robot_configuration`, must be provided.
-        group: str, optional
+        group
             The name of the group to plan for. Defaults to the robot's main
             planning group.
-        options : dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.

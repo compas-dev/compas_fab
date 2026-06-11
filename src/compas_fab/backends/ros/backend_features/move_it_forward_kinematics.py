@@ -52,21 +52,21 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         Parameters
         ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The robot cell state describing the robot cell.
             The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
             The robot cell state should also reflect the attachment of tools, if any.
-        target_mode : :class:`compas_fab.robots.TargetMode`
+        target_mode
             The target mode to select which frame to return.
-        group : str, optional
+        group
             The planning group of the robot.
             Defaults to the robot's main planning group.
-        native_scale : float, optional
+        native_scale
             The scaling factor to apply to the resulting frame.
             It is defined as `user_object_value * native_scale = meter_object_value`.
             For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
-        options : dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.
@@ -120,17 +120,17 @@ class MoveItForwardKinematics(ForwardKinematics):
 
         Parameters
         ----------
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The robot cell state describing the robot cell.
-        link_name : str, optional
+        link_name
             The name of the link to calculate the forward kinematics for.
             Defaults to the last link of the provided planning group.
-        native_scale : float, optional
+        native_scale
             The scaling factor to apply to the resulting frame.
             It is defined as `user_object_value * native_scale = meter_object_value`.
             For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Defaults to None, which means no scaling is applied.
-        options : dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.

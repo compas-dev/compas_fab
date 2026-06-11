@@ -68,15 +68,15 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target : :class:`compas_fab.robots.FrameTarget` or :class:`compas_fab.robots.PointAxisTarget`
+        target
             The target to calculate the inverse kinematics for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
             The robot's configuration in the scene is taken as the starting configuration.
-        group : str, optional
+        group
             The planning group used for calculation.
             Defaults to the robot's main planning group.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the underlying function being called.
             See the target-specific function's documentation for details.
@@ -120,14 +120,14 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target: :class:`compas.geometry.FrameTarget`
+        target
             The Frame Target to calculate the inverse for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
-        group: str, optional
+        group
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
         Raises
@@ -206,14 +206,14 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target: :class:`compas.geometry.FrameTarget`
+        target
             The Frame Target to calculate the inverse for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
-        group: str
+        group
             The planning group used for determining the end effector and labeling
             the ``start_configuration``. Defaults to the robot's main planning group.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"semi-constrained"``: (:obj:`bool`, optional) When ``True``, only the
@@ -462,13 +462,13 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        target: :class:`compas.geometry.PointAxisTarget`
+        target
             The PointAxis Target to calculate the inverse for.
-        robot_cell_state : :class:`compas_fab.robots.RobotCellState`
+        robot_cell_state
             The starting state to calculate the inverse kinematics for.
-        group: str
+        group
             The planning group used for calculation.
-        options: dict, optional
+        options
             Dictionary containing the following key-value pairs, that are unique to this function:
 
             - ``"num_rotation_steps"``: (:obj:`int`, optional)
@@ -757,11 +757,11 @@ class PyBulletInverseKinematics(InverseKinematics):
 
         Parameters
         ----------
-        start_configuration : :class:`compas_robots.Configuration`
+        start_configuration
             The initial configuration.
-        configuration : :class:`compas_robots.Configuration`
+        configuration
             The configuration to check.
-        group : str
+        group
             The planning group to check. Not optional, must be specified.
 
         Raises
@@ -795,10 +795,10 @@ class UniqueResultChecker:
 
     Attributes
     ----------
-    sorted_uniqueness_thresholds : list of float
+    sorted_uniqueness_thresholds
         The thresholds for each joint to consider the solution unique.
         One value for each joint in the same order as the joint_positions.
-    results : list of :class:`compas_robots.Configuration`
+    results
         The past accepted configurations to compare with.
         This list will be appended automatically when calling the check method.
         Only those that passes the check will be added to this list.
@@ -817,9 +817,9 @@ class UniqueResultChecker:
 
         Parameters
         ----------
-        configuration : :class:`compas_robots.Configuration`
+        configuration
             The configuration to be checked.
-        options : dict
+        options
             The options for the uniqueness thresholds.
             It should contain the following keys:
 
@@ -857,7 +857,7 @@ class UniqueResultChecker:
 
         Parameters
         ----------
-        configuration : :class:`compas_robots.Configuration`
+        configuration
             A configuration that contains a ordered list of joints and their types.
         """
         joint_types = configuration.joint_types

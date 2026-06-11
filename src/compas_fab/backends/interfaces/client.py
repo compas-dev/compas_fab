@@ -10,13 +10,13 @@ class ClientInterface:
 
     Attributes
     ----------
-    robot_cell : :class:`compas_fab.robots.RobotCell`, read-only
+    robot_cell
         The robot cell instance last set on the client.
-    robot_cell_state : :class:`compas_fab.robots.RobotCellState`, read-only
+    robot_cell_state
         The robot cell state instance last set on the client.
-    robot_model : :class:`compas_robots.RobotModel`, read-only
+    robot_model
         Equivalent to `robot_cell.robot_model`.
-    robot_semantics : :class:`compas_fab.robots.RobotSemantics`, read-only
+    robot_semantics
         Equivalent to `robot_cell.robot_semantics`.
     """
 

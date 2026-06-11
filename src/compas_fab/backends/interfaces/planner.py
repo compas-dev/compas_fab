@@ -19,7 +19,7 @@ class PlannerInterface:
 
     Attributes
     ----------
-    client : :class:`compas_fab.backends.interfaces.ClientInterface`, read-only
+    client
         The client instance associated with the planner.
         It cannot be changed after initialization.
         The client also keeps the `.robot_cell` and `.robot_cell_state` in memory.

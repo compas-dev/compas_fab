@@ -55,11 +55,11 @@ class PyBulletCheckCollision(CheckCollision):
 
         Parameters
         ----------
-        state : :class:`compas_fab.robots.RobotCellState`
+        state
             The robot cell state describing the robot cell.
             The attribute `robot_configuration`, must contain the full configuration
             of the robot corresponding to the planning group.
-        options : dict, optional
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"verbose"``: (:obj:`bool`, optional) When ``True``, additional information is printed.
