@@ -3,12 +3,18 @@ from compas.geometry import Frame
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 from compas_fab.robots import FrameTarget
+from compas_fab.robots import RigidBodyLibrary
 from compas_fab.robots import RobotCellLibrary
 from compas_fab.robots import TargetMode
 
 with PyBulletClient() as client:
     # Create a robot cell with a UR5 robot
     robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+
+    # Add a floor
+    floor = RigidBodyLibrary.floor()
+    robot_cell.rigid_body_models["floor"] = floor
+    robot_cell_state = robot_cell.default_cell_state()
 
     planner = PyBulletPlanner(client)
     planner.set_robot_cell(robot_cell)
