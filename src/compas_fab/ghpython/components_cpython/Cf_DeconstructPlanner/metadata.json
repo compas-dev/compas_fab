@@ -4,7 +4,7 @@
     "category": "COMPAS FAB",
     "subcategory": "Backends",
     "description": "Deconstruct a planner into the robot cell it currently holds: its robot_cell, robot_cell_state, and robot_model. Read from the planner's client; each output is None until a cell has been loaded.",
-    "exposure": 2,
+    "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
         "iconDisplay": 2,
