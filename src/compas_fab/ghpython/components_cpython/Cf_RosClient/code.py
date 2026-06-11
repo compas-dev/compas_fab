@@ -18,10 +18,13 @@ from compas_ghpython import warning
 from scriptcontext import sticky as st
 
 from compas_fab.backends import RosClient
+from compas_fab.ghpython import ensure_boolean_toggle
 
 
 class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
     def RunScript(self, host: str, port: int, connect: bool, transport: str):
+        ensure_boolean_toggle(ghenv.Component, "connect", default=False)  # noqa: F821
+
         host = host or "127.0.0.1"
         port = port or 9090
         transport = transport.strip() if transport else None

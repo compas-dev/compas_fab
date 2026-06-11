@@ -21,7 +21,7 @@
             },
             {
                 "name": "connect",
-                "description": "If True, (re)connects. If False, disconnects.",
+                "description": "If True, (re)connects. If False, disconnects. A Boolean Toggle (defaulting to False) is auto-created on this input when nothing is wired.",
                 "typeHintID": "bool"
             },
             {
