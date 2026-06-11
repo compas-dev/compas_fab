@@ -6,6 +6,7 @@ Internal implementation of the planner backend interface for MoveIt!
 from compas_fab.backends.interfaces.planner import PlannerInterface
 from compas_fab.backends.ros.backend_features import MoveItSetRobotCell
 from compas_fab.backends.ros.backend_features import MoveItSetRobotCellState
+from compas_fab.backends.ros.backend_features.move_it_check_collision import MoveItCheckCollision
 from compas_fab.backends.ros.backend_features.move_it_forward_kinematics import MoveItForwardKinematics
 from compas_fab.backends.ros.backend_features.move_it_inverse_kinematics import MoveItInverseKinematics
 from compas_fab.backends.ros.backend_features.move_it_plan_cartesian_motion import MoveItPlanCartesianMotion
@@ -22,6 +23,7 @@ class MoveItPlanner(
     MoveItPlanningScene,
     MoveItSetRobotCell,
     MoveItSetRobotCellState,
+    MoveItCheckCollision,
     MoveItForwardKinematics,
     MoveItInverseKinematics,
     MoveItPlanMotion,

@@ -80,6 +80,47 @@ class GetPositionFKResponse(ROSmsg):
         return cls(pose_stamped, fk_link_names, error_code)
 
 
+class GetStateValidityRequest(ROSmsg):
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetStateValidity.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetStateValidity.html
+    """
+
+    ROS_MSG_TYPE = "moveit_msgs/GetStateValidityRequest"
+
+    def __init__(self, robot_state=None, group_name="", constraints=None):
+        self.robot_state = robot_state or RobotState()
+        self.group_name = group_name
+        self.constraints = constraints or Constraints()
+
+    def filter_fields_for_distro(self, ros_distro):
+        self.robot_state.filter_fields_for_distro(ros_distro)
+
+
+class GetStateValidityResponse(ROSmsg):
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetStateValidity.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetStateValidity.html
+    """
+
+    ROS_MSG_TYPE = "moveit_msgs/GetStateValidityResponse"
+
+    def __init__(self, valid=False, contacts=None, cost_sources=None, constraint_result=None):
+        self.valid = valid
+        # `contacts` are moveit_msgs/ContactInformation; kept as raw dicts since we
+        # only need the colliding body names for the report.
+        self.contacts = contacts or []
+        self.cost_sources = cost_sources or []
+        self.constraint_result = constraint_result or []
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(
+            valid=msg.get("valid", False),
+            contacts=msg.get("contacts", []),
+            cost_sources=msg.get("cost_sources", []),
+            constraint_result=msg.get("constraint_result", []),
+        )
+
+
 class GetCartesianPathRequest(ROSmsg):
     """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetCartesianPath.html
     ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetCartesianPath.html
