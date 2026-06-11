@@ -46,10 +46,10 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
     ):
         key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
-        def _viz(trajectory):
+        def _viz(trajectory, target_mode):
             if trajectory is None:
                 return [], None
-            frames, polyline = trajectory.to_frames_and_polyline(planner.robot_cell, start_state, group or None)
+            frames, polyline = trajectory.to_frames_and_polyline(planner.robot_cell, start_state, group or None, target_mode)
             planes = [frame_to_rhino_plane(f) for f in frames]
             polyline = polyline_to_rhino(polyline) if polyline else None
             return planes, polyline
@@ -70,9 +70,9 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
             cached = st.get(key)
             if cached is None:
                 return (None, [], None, "")
-            trajectory, error_msg = cached
+            trajectory, error_msg, target_mode = cached
             debug_info = _diagnose(error_msg, trajectory is not None)
-            planes, polyline = _viz(trajectory)
+            planes, polyline = _viz(trajectory, target_mode)
             return (trajectory, planes, polyline, debug_info)
 
         options = {}
@@ -105,7 +105,8 @@ class PlanMotion(Grasshopper.Kernel.GH_ScriptInstance):
             if hint:
                 error_msg += "\n" + hint
 
+        target_mode = getattr(target, "target_mode", None)
         debug_info = _diagnose(error_msg, trajectory is not None)
-        st[key] = (trajectory, error_msg)
-        planes, polyline = _viz(trajectory)
+        st[key] = (trajectory, error_msg, target_mode)
+        planes, polyline = _viz(trajectory, target_mode)
         return (trajectory, planes, polyline, debug_info)

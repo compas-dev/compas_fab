@@ -363,24 +363,29 @@ class JointTrajectory(Trajectory):
 
         return self.points[-1].time_from_start.seconds
 
-    def to_frames_and_polyline(self, robot_cell: "RobotCell", start_state: Optional["RobotCellState"], group=None):
+    def to_frames_and_polyline(self, robot_cell: "RobotCell", start_state: Optional["RobotCellState"], group=None, target_mode: "TargetMode" = TargetMode.ROBOT):
         """Compute frames and a connecting polyline from a trajectory.
 
         For each trajectory point, the helper substitutes the point's joint
         values into a single working copy of `start_state` and runs **local**
-        forward kinematics via `RobotCell.forward_kinematics_target_frame`
-        (`target_mode=ROBOT`), i.e. the URDF kinematic chain in-process, with
-        no backend round trip. A polyline through their origins is computed
-        as well.
+        forward kinematics via `RobotCell.forward_kinematics_target_frame`,
+        i.e. the URDF kinematic chain in-process, with no backend round trip.
+        A polyline through their origins is computed as well.
 
         `start_state` may be `None`; in that case the trajectory's own
         `start_state` (populated by the planner that produced it) is used.
+
+        `target_mode` selects which frame each point is reported at (the robot's
+        planner coordinate frame, the attached tool's TCF, or the workpiece);
+        defaults to `TargetMode.ROBOT`. Pass the mode of the planned target /
+        waypoints so the visualized path matches what was planned.
 
         Returns `(frames, polyline)`. `polyline` is `None` when there are
         fewer than two points. Any failure along the way returns `([], None)`
         rather than raising.
         """
         start_state = start_state or self.start_state
+        target_mode = target_mode or TargetMode.ROBOT
 
         if robot_cell is None:
             return ([], None)
@@ -426,7 +431,7 @@ class JointTrajectory(Trajectory):
                 frames.append(
                     robot_cell.forward_kinematics_target_frame(
                         robot_cell_state=working_state,
-                        target_mode=TargetMode.ROBOT,
+                        target_mode=target_mode,
                         group=group or None,
                     )
                 )

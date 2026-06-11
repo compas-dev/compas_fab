@@ -44,10 +44,10 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
     ):
         key = create_id(ghenv.Component, "trajectory")  # noqa: F821
 
-        def _viz(trajectory : JointTrajectory):
+        def _viz(trajectory: JointTrajectory, target_mode):
             if trajectory is None:
                 return [], None
-            frames, polyline = trajectory.to_frames_and_polyline(planner.robot_cell, start_state, group or None)
+            frames, polyline = trajectory.to_frames_and_polyline(planner.robot_cell, start_state, group or None, target_mode)
             planes = [frame_to_rhino_plane(f) for f in frames]
             polyline = polyline_to_rhino(polyline) if polyline else None
             return planes, polyline
@@ -68,9 +68,9 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
             cached = st.get(key)
             if cached is None:
                 return (None, None, [], None, "")
-            trajectory, fraction, error_msg = cached
+            trajectory, fraction, error_msg, target_mode = cached
             debug_info = _diagnose(error_msg, trajectory is not None)
-            planes, polyline = _viz(trajectory)
+            planes, polyline = _viz(trajectory, target_mode)
             return (trajectory, fraction, planes, polyline, debug_info)
 
         options = {}
@@ -101,8 +101,9 @@ class PlanCartesianMotion(Grasshopper.Kernel.GH_ScriptInstance):
             if hint:
                 error_msg += "\n" + hint
 
+        target_mode = getattr(waypoints, "target_mode", None)
         debug_info = _diagnose(error_msg, trajectory is not None)
         fraction = trajectory.fraction if trajectory is not None else None
-        st[key] = (trajectory, fraction, error_msg)
-        planes, polyline = _viz(trajectory)
+        st[key] = (trajectory, fraction, error_msg, target_mode)
+        planes, polyline = _viz(trajectory, target_mode)
         return (trajectory, fraction, planes, polyline, debug_info)
