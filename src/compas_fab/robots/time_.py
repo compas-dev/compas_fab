@@ -1,3 +1,5 @@
+from typing import Union
+
 from compas.data import Data
 
 __all__ = [
@@ -11,20 +13,20 @@ class Duration(Data):
 
     Parameters
     ----------
-    secs : `int` or `float`
+    secs
         Integer representing number of seconds.
         If a float is passed, the integer portion is assigned to secs and
         the decimal portion of the secs variable is converted and added to nsecs.
-    nsecs : `int`
+    nsecs
         Integer representing number of nanoseconds.
 
     Attributes
     ----------
-    seconds : `float`, read-only
+    seconds
         Returns the total duration as floating-point seconds.
-    secs : `int` or `float`
+    secs
         Float representing number of seconds.
-    nsecs : `int`
+    nsecs
         Integer representing number of nanoseconds.
 
     Examples
@@ -45,8 +47,7 @@ class Duration(Data):
 
     """
 
-    def __init__(self, secs, nsecs):
-        # type: (int | float, int) -> None
+    def __init__(self, secs: Union[int, float], nsecs: int) -> None:
         super(Duration, self).__init__()
         sec_to_nano_factor = 1e9
         quotient, remainder = divmod(secs, 1)
@@ -75,8 +76,7 @@ class Duration(Data):
         return not self.__eq__(other)
 
     @property
-    def seconds(self):
-        # type: () -> float
+    def seconds(self) -> float:
         return self.secs + 1e-9 * self.nsecs
 
     @property

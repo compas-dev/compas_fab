@@ -21,7 +21,7 @@ class RobotSemantics(Data):
 
     Parameters
     ----------
-    groups : `dict` of (`str`, `dict` of (``links`` : `list` of `str`, ``joints`` : `list` of `str`)), optional
+    groups
         A nested dictionary defining planning groups.
         The dictionary structure is as follows:
 
@@ -31,17 +31,17 @@ class RobotSemantics(Data):
             -   ``links`` is a `list` of `str` containing link names
             -   ``joints`` is a `list` of `str` containing joint names.
 
-    main_group_name : `str`, optional
+    main_group_name
         The name of the main group.
-    passive_joints : `list` of `str`, optional
+    passive_joints
         A list of passive joint names.
-    end_effectors : `list` of `str`, optional
+    end_effectors
         A list of end effector link names.
-    disabled_collisions : `list` of `tuple` of (`str`, `str`), optional
+    disabled_collisions
         A set of disabled collision pairs.
         The order is not important, i.e. the pair `('link1', 'link2')` is the same as `('link2', 'link1')`.
         Only one pair is needed.
-    group_states : dict, optional
+    group_states
         A nested dictionary defining named states for a particular group, in terms of joint values.
         This is useful to define states such as "home" or "folded arms" for the robot.
         The dictionary structure is as follows:
@@ -52,9 +52,9 @@ class RobotSemantics(Data):
 
     Attributes
     ----------
-    group_names : `list` of `str`, read-only
+    group_names
         Get the names of all planning groups.
-    unordered_disabled_collisions : `set` of `frozenset`, read-only
+    unordered_disabled_collisions
         Get the disabled collision pairs as a set of frozensets.
 
 
@@ -126,9 +126,9 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        file : `str`
+        file
             The path to the SRDF file.
-        robot_model : [`RobotModel`][compas_robots.RobotModel]
+        robot_model
             The robot model is needed when loading the semantics.
 
         Examples
@@ -151,9 +151,9 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        text : `str`
+        text
             The SRDF data as a string.
-        robot_model : [`RobotModel`][compas_robots.RobotModel]
+        robot_model
             The robot model is needed when loading the semantics.
         """
 
@@ -167,9 +167,9 @@ class RobotSemantics(Data):
         Parameters
         ----------
 
-        xml : [`XML`][compas.files.XML]
+        xml
             The XML object containing the SRDF data.
-        robot_model : [`RobotModel`][compas_robots.RobotModel]
+        robot_model
             The robot model is needed when loading the semantics.
         """
 
@@ -196,7 +196,7 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -214,7 +214,7 @@ class RobotSemantics(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns

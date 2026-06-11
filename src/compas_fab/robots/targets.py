@@ -74,14 +74,14 @@ class Target(Data):
 
     Attributes
     ----------
-    name : str , optional, default = 'target'
+    name
         A human-readable name for identifying the target.
-    target_mode : `TargetMode`, optional
+    target_mode
         The target mode specifies which link or frame is referenced when specifying a target.
         This attribute is optional in this base class because some child
         classes (e.g: ConfigurationTarget) do not require it.
         See `TargetMode` for more details.
-    native_scale : float, optional
+    native_scale
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
         For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
@@ -150,25 +150,25 @@ class FrameTarget(Target):
 
     Attributes
     ----------
-    target_frame : [`Frame`][compas.geometry.Frame]
+    target_frame
         The target frame.
-    target_mode : `TargetMode`
+    target_mode
         The target mode specifies which link or frame is referenced when specifying a target.
         See `TargetMode` for more details.
-    native_scale : float, optional
+    native_scale
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
         For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
         Default is ``'1.0'``.
-    tolerance_position : float, optional
+    tolerance_position
         The tolerance for the position of the target point.
         Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
-    tolerance_orientation : float, optional
+    tolerance_orientation
         The tolerance for matching the target axis orientation.
         Unit must be in radians.
         If not specified, the default value from the planner is used.
-    name : str, optional
+    name
         The human-readable name of the target.
         Defaults to 'Frame Target'.
 
@@ -205,7 +205,7 @@ class FrameTarget(Target):
 
         Parameters
         ----------
-        data : dict
+        data
             The data dictionary.
 
         Returns
@@ -239,25 +239,25 @@ class FrameTarget(Target):
 
         Parameters
         ----------
-        transformation : [`Transformation`][compas.geometry.Transformation]
+        transformation
             The transformation matrix.
-        target_mode : `TargetMode`
+        target_mode
             The target mode specifies which link or frame is referenced when specifying a target.
             See `TargetMode` for more details.
-        native_scale : float, optional
+        native_scale
             The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
             In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
             For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Default is ``'1.0'``.
-        tolerance_position : float, optional
+        tolerance_position
             The tolerance for the position of the target point.
             Unit must be in meters, it is not affected by `native_scale`.
             If not specified, the default value from the planner is used.
-        tolerance_orientation : float, optional
+        tolerance_orientation
             The tolerance for matching the target axis orientation.
             Unit must be in radians.
             If not specified, the default value from the planner is used.
-        name : str, optional
+        name
             The human-readable name of the target.
             Defaults to 'Frame Target'.
 
@@ -334,29 +334,29 @@ class PointAxisTarget(Target):
 
     Attributes
     ----------
-    target_point : [`Point`][compas.geometry.Point]
+    target_point
         The target point defined relative to the world coordinate frame (WCF).
-    target_z_axis : [`Vector`][compas.geometry.Vector]
+    target_z_axis
         The target axis is defined by the target_point and pointing towards this vector.
         A unitized vector is recommended.
         The tool tip coordinate frame (TCF)'s Z axis can rotate around this axis.
-    target_mode : `TargetMode`
+    target_mode
         The target mode specifies which link or frame is referenced when specifying a target.
         See `TargetMode` for more details.
-    native_scale : float, optional
+    native_scale
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_point.scale(native_scale)` will convert the input point to meter unit.
         For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
         Default is ``'1.0'``.
-    tolerance_position : float, optional
+    tolerance_position
         The tolerance for the position of the target point.
         Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
-    tolerance_orientation : float, optional
+    tolerance_orientation
         The tolerance for matching the target axis orientation.
         Unit must be in radians.
         If not specified, the default value from the planner is used.
-    name : str, optional
+    name
         The human-readable name of the target.
         Defaults to 'Point-Axis Target'.
     """
@@ -396,7 +396,7 @@ class PointAxisTarget(Target):
 
         Parameters
         ----------
-        data : dict
+        data
             The data dictionary.
 
         Returns
@@ -477,20 +477,20 @@ class ConfigurationTarget(Target):
 
     Attributes
     ----------
-    target_configuration : [`Configuration`][compas_robots.Configuration]
+    target_configuration
         The target configuration. joint_names and joint_values must be specified.
         Defaults unit is radians for revolute and continuous joints, and meters for prismatic joints.
-    tolerance_above : `list` of `float`, optional
+    tolerance_above
         Acceptable deviation above the targeted configurations. One for each joint.
         Always use positive values.
         Units must be in meters for prismatic joints and radians for revolute and continuous joints.
         If not specified, the default value from the planner is used.
-    tolerance_below : `list` of `float`, optional
+    tolerance_below
         Acceptable deviation below the targeted configurations. One for each joint.
         Always use positive values.
         Units must be in meters for prismatic joints and radians for revolute and continuous joints.
         If not specified, the default value from the planner is used.
-    name : str, optional
+    name
         The human-readable name of the target.
         Defaults to 'Configuration Target'.
     """
@@ -538,10 +538,10 @@ class ConfigurationTarget(Target):
 
         Parameters
         ----------
-        tolerance_prismatic : obj:`float`
+        tolerance_prismatic
             The default tolerance applied to prismatic joints.
             Defaults unit is meters.
-        tolerance_revolute : obj:`float`
+        tolerance_revolute
             The default tolerance applied to revolute and continuous joints.
             Defaults unit is radians.
 
@@ -665,9 +665,9 @@ class ConstraintSetTarget(Target):
 
     Attributes
     ----------
-    constraint_set : `list` of [`Constraint`][compas_fab.robots.Constraint]
+    constraint_set
         A list of constraints to be satisfied.
-    name : str, optional
+    name
         The human-readable name of the target.
         Defaults to 'Constraint Set Target'.
     """
@@ -708,15 +708,15 @@ class Waypoints(Target):
 
     Attributes
     ----------
-    target_mode : `TargetMode`, optional
+    target_mode
         The target mode specifies which link or frame is referenced when specifying a target.
         See `TargetMode` for more details.
-    native_scale : float, optional
+    native_scale
         The native scale factor of the waypoint targets defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter units.
         For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
         Default is ``'1.0'``.
-    name : str , optional, default = 'target'
+    name
         A human-readable name for identifying the target.
 
     See Also
@@ -739,25 +739,25 @@ class FrameWaypoints(Waypoints):
 
     Attributes
     ----------
-    target_frames : `list` of [`Frame`][compas.geometry.Frame]
+    target_frames
         The target frames.
-    target_mode : `TargetMode`
+    target_mode
         The target mode specifies which link or frame is referenced when specifying a target.
         See `TargetMode` for more details.
-    native_scale : float, optional
+    native_scale
         The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_frame.scale(native_scale)` will convert the input frame to meter unit.
         For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
         Default is ``'1.0'``.
-    tolerance_position : float, optional
+    tolerance_position
         The tolerance for the position of the target point.
         Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
-    tolerance_orientation : float, optional
+    tolerance_orientation
         The tolerance for matching the target axis orientation.
         Unit must be in radians.
         If not specified, the default value from the planner is used.
-    name : str, optional
+    name
         The human-readable name of the target.
         Defaults to 'Frame Waypoints'.
 
@@ -802,25 +802,25 @@ class FrameWaypoints(Waypoints):
 
         Parameters
         ----------
-        transformations : `list` of [`Transformation`][compas.geometry.Transformation]
+        transformations
             The list of transformation matrices.
-        target_mode : `TargetMode`
+        target_mode
             The target mode specifies which link or frame is referenced when specifying a target.
             See `TargetMode` for more details.
-        native_scale : float, optional
+        native_scale
             The native scale factor of the target frames defined as `user_object_value * native_scale = meter_object_value`.
             In another words, `input_frame.scale(native_scale)` will convert the input frame to meter unit.
             For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
             Default is ``'1.0'``.
-        tolerance_position : float, optional
+        tolerance_position
             The tolerance for the position of the target point.
             Unit must be in meters, it is not affected by `native_scale`.
             If not specified, the default value from the planner is used.
-        tolerance_orientation : float, optional
+        tolerance_orientation
             The tolerance for matching the target axis orientation.
             Unit must be in radians.
             If not specified, the default value from the planner is used.
-        name : str, optional
+        name
             The human-readable name of the target.
             Defaults to 'Frame Target'.
 
@@ -884,27 +884,27 @@ class PointAxisWaypoints(Waypoints):
 
     Attributes
     ----------
-    target_points_and_axes : `list` of `tuple` of ([`Point`][compas.geometry.Point], [`Vector`][compas.geometry.Vector])
+    target_points_and_axes
         The target points and axes.
         Both values are defined relative to the world coordinate frame (WCF).
         Unitized vectors are recommended for the target axes.
-    target_mode : `TargetMode`
+    target_mode
         The target mode specifies which link or frame is referenced when specifying a target.
         See `TargetMode` for more details.
-    native_scale : float, optional
+    native_scale
         The native scale factor of the target points defined as `user_object_value * native_scale = meter_object_value`.
         In another words, `input_point.scale(native_scale)` will convert the input point to meter unit.
         For example, if the target is modeled in a millimeters environment, `native_scale` should be set to ``'0.001'``.
         Default is ``'1.0'``.
-    tolerance_position : float, optional
+    tolerance_position
         The tolerance for the position of the target point.
         Unit must be in meters, it is not affected by `native_scale`.
         If not specified, the default value from the planner is used.
-    tolerance_orientation : float, optional
+    tolerance_orientation
         The tolerance for matching the target axis orientation.
         Unit must be in radians.
         If not specified, the default value from the planner is used.
-    name : str, optional
+    name
         The human-readable name of the target.
         Defaults to 'Point-Axis Waypoints'.
 

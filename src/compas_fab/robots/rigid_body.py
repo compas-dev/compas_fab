@@ -36,20 +36,20 @@ class RigidBody(Data):
 
         Parameters
         ----------
-        visual_meshes : list of [`Mesh`][compas.datastructures.Mesh] | [`Mesh`][compas.datastructures.Mesh]
+        visual_meshes
             The visual meshes of the rigid body used for visualization purpose.
             They can be more detailed for realistic visualization without affecting planning performance.
             If left empty, the rigid body will not be visualized.
-        collision_meshes : list of [`Mesh`][compas.datastructures.Mesh] | [`Mesh`][compas.datastructures.Mesh]
+        collision_meshes
             The collision meshes of the rigid body used for collision checking.
             They should be less detailed (fewer polygons) for better planning performance.
             If `None`, or an empty list is passed, no collision checking will be performed for the rigid body.
-        native_scale : float, optional
+        native_scale
             The native scale factor of the meshes defined as `user_object_value * native_scale = meter_object_value`.
             In another words, `mesh.scale(native_scale)` will convert the input mesh to meters.
             For example, if the modeling environment is in millimeters, `native_scale` should be set to ``'0.001'``.
             Default is ``'1.0'``.
-        name : str, optional
+        name
             A human-readable identifier for the rigid body, stored via the base
             [`Data`][compas.data.Data] class.
             When the body is added to a [`RobotCell`][compas_fab.robots.RobotCell], this name is used as the
@@ -58,9 +58,9 @@ class RigidBody(Data):
 
         Attributes
         ----------
-        visual_meshes : list of [`Mesh`][compas.datastructures.Mesh]
+        visual_meshes
             A list of meshes for visualization purpose.
-        collision_meshes : list of [`Mesh`][compas.datastructures.Mesh]
+        collision_meshes
             A list of meshes for collision checking.
 
         Notes
@@ -122,11 +122,11 @@ class RigidBody(Data):
 
         Parameters
         ----------
-        mesh : [`Mesh`][compas.datastructures.Mesh]
+        mesh
             The mesh of the rigid body.
-        native_scale : float, optional
+        native_scale
             The native scale of the rigid body. Default is 1.0.
-        name : str, optional
+        name
             A human-readable identifier for the rigid body. Default is ``None``.
 
         Returns
@@ -152,11 +152,11 @@ class RigidBody(Data):
 
         Parameters
         ----------
-        meshes : list of [`Mesh`][compas.datastructures.Mesh]
+        meshes
             The meshes of the rigid body.
-        native_scale : float, optional
+        native_scale
             The native scale of the rigid body. Default is 1.0.
-        name : str, optional
+        name
             A human-readable identifier for the rigid body. Default is ``None``.
 
         Returns

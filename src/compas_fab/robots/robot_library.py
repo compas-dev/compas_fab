@@ -65,12 +65,12 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
-        radius: `float`, optional
+        radius
             Default is `0.02`, which means that the radius of the cone is 2cm.
-        length: `float`, optional
+        length
             Default is `0.1`, which means that the length of the cone is 10cm.
 
         Returns
@@ -108,10 +108,10 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
-        tool_size: `float`, optional
+        tool_size
             Default is `1.0`, which means that the tool tip is 1m away from the base frame.
         """
 
@@ -145,7 +145,7 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
 
@@ -194,7 +194,7 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
 
@@ -250,7 +250,7 @@ class ToolLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the tool.
 
@@ -351,7 +351,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
@@ -382,7 +382,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
@@ -410,7 +410,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
@@ -438,7 +438,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
@@ -466,7 +466,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
@@ -494,7 +494,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the geometry is loaded.
             `False` can be used to speed up the creation of the robot.
 
@@ -542,7 +542,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -607,7 +607,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -698,7 +698,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -762,7 +762,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners
@@ -852,7 +852,7 @@ class RobotCellLibrary:
 
         Parameters
         ----------
-        load_geometry: `bool`, optional
+        load_geometry
             Default is `True`, which means that the robot and tool geometry are loaded.
             `False` can be used to speed up the creation of the robot cell,
             but without geometry, the robot cell cannot be visualized and backend planners

@@ -13,7 +13,7 @@ def to_radians(degrees: list[float]) -> list[float]:
 
     Parameters
     ----------
-    degrees : `list` of `float`
+    degrees
         List of angle values in degrees.
 
     Returns
@@ -29,7 +29,7 @@ def to_degrees(radians: list[float]) -> list[float]:
 
     Parameters
     ----------
-    radians : `list` of `float`
+    radians
         List of angle values in radians.
 
     Returns

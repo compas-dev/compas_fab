@@ -80,7 +80,7 @@ class BoundingVolume(Data):
 
         Parameters
         ----------
-        box : [`Box`][compas.geometry.Box]
+        box
             Box to define `BoundingVolume` with.
 
         Returns
@@ -105,7 +105,7 @@ class BoundingVolume(Data):
 
         Parameters
         ----------
-        sphere : [`Sphere`][compas.geometry.Sphere]
+        sphere
             Sphere to define `BoundingVolume` with.
 
         Returns
@@ -121,7 +121,7 @@ class BoundingVolume(Data):
 
         Parameters
         ----------
-        mesh : [`Mesh`][compas.datastructures.Mesh]
+        mesh
 
         Returns
         -------
@@ -145,7 +145,7 @@ class BoundingVolume(Data):
 
         Parameters
         ----------
-        scale_factor : `float`
+        scale_factor
             Scale factor to use in scaling operation.
         """
         S = Scale.from_factors([scale_factor] * 3)
@@ -156,7 +156,7 @@ class BoundingVolume(Data):
 
         Parameters
         ----------
-        transformation : [`Transformation`][compas.geometry.Transformation]
+        transformation
             The transformation to apply on the `BoundingVolume`.
         """
         self.volume.transform(transformation)
@@ -184,7 +184,7 @@ class Constraint(Data):
     ----------
     constraint_type
         Constraint type, one of `Constraint.CONSTRAINT_TYPES`.
-    weight : `float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
@@ -193,7 +193,7 @@ class Constraint(Data):
     ----------
     constraint_type
         Constraint type, one of `Constraint.CONSTRAINT_TYPES`.
-    weight : `float`
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
@@ -244,7 +244,7 @@ class Constraint(Data):
 
         Parameters
         ----------
-        scale_factor : `float`
+        scale_factor
             Scale factor used to scale the `Constraint`.
         """
         c = self.copy()
@@ -267,30 +267,30 @@ class JointConstraint(Constraint):
 
     Parameters
     ----------
-    joint_name : `str`
+    joint_name
         The name of the joint this constraint refers to.
-    value : `float`
+    value
         The targeted value for that joint.
-    tolerance_above : `float`
+    tolerance_above
         Tolerance above the targeted joint value, in radians. Defaults to ``0``.
-    tolerance_below : `float`
+    tolerance_below
         Tolerance below the targeted joint value, in radians. Defaults to ``0``.
-    weight : `float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
     Attributes
     ----------
-    joint_name : `str`
+    joint_name
         The name of the joint this constraint refers to.
-    value : `float`
+    value
         The targeted value for that joint.
-    tolerance_above : `float`
+    tolerance_above
         Tolerance above the targeted joint value, in radians.
-    tolerance_below : `float`
+    tolerance_below
         Tolerance below the targeted joint value, in radians.
-    weight : `float`
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
@@ -324,7 +324,7 @@ class JointConstraint(Constraint):
 
         Parameters
         ----------
-        scale_factor : `float`
+        scale_factor
             Factor used to multiply the joint value and tolerance bounds with.
         """
         self.value *= scale_factor
@@ -352,14 +352,14 @@ class JointConstraint(Constraint):
 
         Parameters
         ----------
-        configuration: `Configuration`
+        configuration
             The target configuration.
-        tolerances_above: `list` of `float`
+        tolerances_above
             The tolerances above the targeted configuration's joint value on
             each of the joints, defining the upper bound in radians to be
             achieved. If only one value is passed in the list, it will be used to create
             upper bounds for all joint constraints.
-        tolerances_below: `list` of `float`
+        tolerances_below
             The tolerances below the targeted configuration's joint value on
             each of the joints, defining the upper bound in radians to be
             achieved. If only one value is passed, it will be used to create
@@ -423,34 +423,34 @@ class OrientationConstraint(Constraint):
 
     Parameters
     ----------
-    link_name : `str`
+    link_name
         The name of the link this constraint refers to.
-    quaternion : `list` of `float`
+    quaternion
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
-    tolerances : `list` of `float`, optional
+    tolerances
         Error tolerances :math:`t_{i}` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
         ``[0.01, 0.01, 0.01]``.
-    weight : `float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
     Attributes
     ----------
-    link_name : `str`
+    link_name
         The name of the link this constraint refers to.
-    quaternion : `list` of `float`
+    quaternion
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
-    tolerances : `list` of `float`, optional
+    tolerances
         Error tolerances :math:`t_{i}` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`.
         Defaults to ``[0.01, 0.01, 0.01]``.
-    weight : `float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
         Defaults to ``1.0``.
@@ -490,7 +490,7 @@ class OrientationConstraint(Constraint):
 
         Parameters
         ----------
-        transformation : [`Transformation`][compas.geometry.Transformation]
+        transformation
         """
         R = Rotation.from_quaternion(self.quaternion)
         R = transformation * R
@@ -519,14 +519,14 @@ class OrientationConstraint(Constraint):
 
         Parameters
         ----------
-        pcf_frame : [`Frame`][compas.geometry.Frame]
+        pcf_frame
             The Planner Coordinate Frame relative to the WCF.
-        tolerances_orientation: `list` of `float`
+        tolerances_orientation
             Error tolerances :math:`t_{i}` for each of the frame's axes in
             radians. If only one value is passed in the list it will be uses for all 3 axes.
-        link_name : `str`
+        link_name
             The name of the end-effector link. Necessary for creating the position constraint.
-        weight : `float`, optional
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to
             ``1``.
@@ -565,22 +565,22 @@ class PositionConstraint(Constraint):
 
     Parameters
     ----------
-    link_name : `str`
+    link_name
         The name of the link this constraint refers to.
-    bounding_volume : `BoundingVolume`
+    bounding_volume
         The volume this constraint refers to.
-    weight : `float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
     Attributes
     ----------
-    link_name : `str`
+    link_name
         The name of the link this constraint refers to.
-    bounding_volume : `BoundingVolume`
+    bounding_volume
         The volume this constraint refers to.
-    weight : `float`
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
@@ -613,14 +613,14 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        pcf_frame : [`Frame`][compas.geometry.Frame]
+        pcf_frame
             The Planner Coordinate Frame relative to the WCF.
-        tolerance_position : `float`
+        tolerance_position
             The allowed tolerance to the frame's position (defined in the
             robot's units).
-        link_name : `str`
+        link_name
             The name of the end-effector link. Necessary for creating the position constraint.
-        weight : `float`
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -646,11 +646,11 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name: `str`
+        link_name
             The name of the link this constraint refers to.
-        box : [`Box`][compas.geometry.Box]
+        box
             Box defining the bounding volume this constraint refers to.
-        weight : `float`, optional
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -674,11 +674,11 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name : `str`
+        link_name
             The name of the link this constraint refers to.
-        sphere : [`Sphere`][compas.geometry.Sphere]
+        sphere
             Sphere defining the bounding volume this constraint refers to.
-        weight : `float`
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -702,14 +702,14 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name : `str`
+        link_name
             The name of the link this constraint refers to.
-        point : [`Point`][compas.geometry.Point]
+        point
             Point defining the bounding volume this constraint refers to.
-        tolerance_position : `float`
+        tolerance_position
             The allowed tolerance to the point's position (defined in the
             robot's units).
-        weight : `float`
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
@@ -727,11 +727,11 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        link_name : `str`
+        link_name
             The name of the link this constraint refers to.
-        mesh : [`Mesh`][compas.datastructures.Mesh]
+        mesh
             Mesh defining the bounding volume this constraint refers to.
-        weight : `float`
+        weight
             A weighting factor for this constraint. Denotes relative importance
             to other constraints. Closer to zero means less important. Defaults
             to ``1``.
@@ -755,7 +755,7 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        scale_factor : `float`
+        scale_factor
             Factor to scale constraining `bounding_volume`.
         """
         self.bounding_volume.scale(scale_factor)
@@ -765,7 +765,7 @@ class PositionConstraint(Constraint):
 
         Parameters
         ----------
-        transformation : [`Transformation`][compas.geometry.Transformation]
+        transformation
         """
         self.bounding_volume.transform(transformation)
 

@@ -16,16 +16,16 @@ class Inertia:
 
     Attributes
     ----------
-    inertia_tensor : `list` of `float`
+    inertia_tensor
         A symmetric positive-definite 3x3 matrix:
         | ixx ixy ixz |
         | ixy iyy iyz |
         | ixz iyz izz |
         with [ixx, iyy, izz] as the principal moments of inertia and
         [ixy, ixz, iyz] as the products of inertia.
-    mass: `float`
+    mass
         The mass of the object in kg.
-    center_of_mass : [`Point`][compas.geometry.Point]
+    center_of_mass
         The center of mass of the object in meters.
 
     Examples
@@ -42,15 +42,13 @@ class Inertia:
     free software MeshLab, referring to this great [tutorial](http://gazebosim.org/tutorials?tut=inertia).
     """
 
-    def __init__(self, inertia_tensor, mass, center_of_mass):
-        # type: (list[float], float, Point) -> None
+    def __init__(self, inertia_tensor: list[float], mass: float, center_of_mass: Point) -> None:
         self.inertia_tensor = inertia_tensor
         self.mass = mass
         self.center_of_mass = Point(*center_of_mass)
 
     @property
-    def principal_moments(self):
-        # type: () -> list[float]
+    def principal_moments(self) -> list[float]:
         """Returns the diagonal elements of the inertia tensor [ixx, iyy, izz]"""
         inertia_tensor = self.inertia_tensor
         return [inertia_tensor[0][0], inertia_tensor[1][1], inertia_tensor[2][2]]

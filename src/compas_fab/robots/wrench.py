@@ -26,9 +26,9 @@ class Wrench(Data):
 
     Attributes
     ----------
-    force : `Vector`
+    force
         [Fx, Fy, Fz] force vector in Newtons
-    torque : `Vector`
+    torque
         [Tx, Ty, Tz] moments vector in Newton-meters
 
     Examples
@@ -65,7 +65,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        values : `list` of `float`
+        values
             The list of 6 values representing a wrench.
 
         Returns
@@ -88,9 +88,9 @@ class Wrench(Data):
 
         Parameters
         ----------
-        wrenches : list of `Wrench`
+        wrenches
             List of wrenches.
-        proportion_to_cut : `float`
+        proportion_to_cut
             Fraction to cut off of both tails of the distribution
 
         Returns
@@ -182,7 +182,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        n : float
+        n
             The multiplication factor.
 
         Returns
@@ -198,7 +198,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        other : wrench
+        other
             The wrench to add.
 
         Returns
@@ -214,7 +214,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        other : wrench
+        other
             The wrench to subtract.
 
         Returns
@@ -259,7 +259,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        transformation : `Transformation`
+        transformation
             The transformation to transform the `Wrench`.
 
         Returns
@@ -280,7 +280,7 @@ class Wrench(Data):
 
         Parameters
         ----------
-        transformation : `Transformation`
+        transformation
             The transformation to transform the `Wrench`.
 
         Returns
@@ -303,11 +303,11 @@ class Wrench(Data):
 
         Parameters
         ----------
-        ft_sensor_frame : [`Frame`][compas.geometry.Frame]
+        ft_sensor_frame
             The coordinate frame of the force torque sensor.
-        mass : float
+        mass
             The mass of the object in kg.
-        center_of_mass : [`Point`][compas.geometry.Point]
+        center_of_mass
             The center of mass of the object in meters.
 
         Returns

@@ -105,9 +105,9 @@ class RobotCellState(Data):
 
         Parameters
         ----------
-        robot_cell : [`RobotCell`][compas_fab.robots.RobotCell]
+        robot_cell
             The robot cell.
-        robot_configuration : [`Configuration`][compas_fab.Configuration], optional
+        robot_configuration
             The configuration of the robot. If the configuration is not provided, the robot's zero configuration will be used.
         """
         robot_configuration = robot_configuration or robot_cell.zero_full_configuration()
@@ -204,14 +204,14 @@ class RobotCellState(Data):
 
         Parameters
         ----------
-        tool_id : str
+        tool_id
             The id of the tool.
-        group : str
+        group
             The name of the planning group to which the tool is attached.
-        attachment_frame : [`Frame`][compas.geometry.Frame], optional
+        attachment_frame
             The frame of the tool relative to the end frame of the planning group.
             Defaults to None, which means that the tool's frame coincides with the end frame of the planning group.
-        touch_links : list of str, optional
+        touch_links
             The names of the robot links that are allowed to collide with the tool.
 
         """
@@ -233,12 +233,12 @@ class RobotCellState(Data):
 
         Parameters
         ----------
-        tool_id : str
+        tool_id
             The id of the tool.
-        frame : [`Frame`][compas.geometry.Frame], optional
+        frame
             The frame of the tool (relative to the world coordinate frame) after detaching.
             Defaults to None, which means that the tool's frame is not changed.
-        touch_links : list of str, optional
+        touch_links
             The names of the robot links that are allowed to collide with the tool.
             Defaults to None, which means that the tool's touch links are reset to an empty list.
             If this behavior is not desired, consider modifying the tool_states directly
@@ -273,14 +273,14 @@ class RobotCellState(Data):
 
         Parameters
         ----------
-        rigid_body_id : str
+        rigid_body_id
             The id of the rigid body.
-        link_name : str
+        link_name
             The name of the link to which the rigid body is attached.
-        attachment_frame : [`Frame`][compas.geometry.Frame] or [`Transformation`][compas.geometry.Transformation], optional
+        attachment_frame
             The frame of the rigid body relative to the link.
             Defaults to None, which means that the rigid body is at the base of the link.
-        touch_links : list of str, optional
+        touch_links
             The names of the robot links that are allowed to collide with the rigid body.
         """
         if not attachment_frame:
@@ -302,11 +302,11 @@ class RobotCellState(Data):
 
         Parameters
         ----------
-        rigid_body_id : str
+        rigid_body_id
             The id of the rigid body.
-        tool_id : str
+        tool_id
             The id of the tool to which the rigid body is attached.
-        attachment_frame : [`Frame`][compas.geometry.Frame], optional
+        attachment_frame
             The attachment (grasp) frame of the rigid body relative to the tool.
             Defaults to None, which means that the rigid body is at the tip of the tool.
         """
@@ -335,9 +335,9 @@ class RobotCellState(Data):
 
         Parameters
         ----------
-        target_mode : [`TargetMode`][compas_fab.robots.TargetMode] or None
+        target_mode
             The target or waypoints to check.
-        group : str
+        group
             The planning group to check. Must be specified.
 
         Raises
@@ -391,19 +391,19 @@ class ToolState(Data):
 
     Attributes
     ----------
-    frame : [`Frame`][compas.geometry.Frame] | [`Transformation`][compas.geometry.Transformation]
+    frame
         The base frame of the tool relative to the world coordinate frame.
         If the tool is attached to a planning group, this frame can be set to None.'
         In that case, the planner or visualization tool will use the end frame of the planning group.
-    attached_to_group : `str`, optional
+    attached_to_group
         The name of the robot planning group to which the tool is attached. Defaults to ``None``.
-    attachment_frame : [`Frame`][compas.geometry.Frame] | [`Transformation`][compas.geometry.Transformation], optional
+    attachment_frame
         The frame of the tool relative to the frame of the attached link. Defaults to ``None``.
-    touch_links : `list` of `str`
+    touch_links
         The names of the robot links that are allowed to collide with the tool.
-    configuration : [`Configuration`][compas_robots.Configuration], optional
+    configuration
         The configuration of the tool if the tool is kinematic. Defaults to ``None``.
-    is_hidden : `bool`, optional
+    is_hidden
         Whether the tool is hidden in the scene. Collision checking will be turned off
         for hidden objects. Defaults to ``False``.
     """
@@ -508,50 +508,50 @@ class RigidBodyState(Data):
 
     Attributes
     ----------
-    frame : [`Frame`][compas.geometry.Frame]
+    frame
         The base frame of the rigid body relative to the world coordinate frame.
-    attached_to_link : `str`, optional
+    attached_to_link
         The name of the robot link to which the rigid body is attached.
         ``None`` if not attached to a link.
-    attached_to_tool : `str`, optional
+    attached_to_tool
         The id of the tool to which the rigid body is attached.
         ``None`` if not attached to a tool.
-    touch_links : `list` of `str`
+    touch_links
         The names of the robot links that are allowed to collide with the rigid body.
         ``[]`` if the rigid body is not allowed to collide with any robot links.
-    touch_bodies : `list` of `str`
+    touch_bodies
         The names of other rigid bodies (including tools) that are allowed to collide with the rigid body.
         ``[]`` if the rigid body is not allowed to collide with any other rigid bodies.
-    attachment_frame : [`Frame`][compas.geometry.Frame] | [`Transformation`][compas.geometry.Transformation], optional
+    attachment_frame
         The attachment (grasp) frame of the rigid body relative to (the base frame of) the attached link or
         (the tool tip frame of) the tool.
         ``None`` if the rigid body is not attached to a link or a tool.
-    is_hidden : `bool`
+    is_hidden
         Whether the rigid body is hidden in the scene. Collision checking will be turned off
         for hidden objects.
         Defaults to ``False``.
 
     Parameters
     ----------
-    frame : [`Frame`][compas.geometry.Frame] | [`Transformation`][compas.geometry.Transformation]
+    frame
         The base frame of the rigid body relative to the world coordinate frame.
-    attached_to_link : `str` , optional
+    attached_to_link
         The name of the robot link to which the rigid body is attached.
         Defaults to ``None``, meaning that the rigid body is not attached to a link.
-    attached_to_tool : `str` , optional
+    attached_to_tool
         The id of the tool to which the rigid body is attached.
         Defaults to ``None``, meaning that the rigid body is not attached to a tool.
-    touch_links : `list` of `str`, optional
+    touch_links
         The names of the robot links that are allowed to collide with the rigid body.
         Defaults to ``[]``, meaning that the rigid body is not allowed to collide with any robot links.
-    touch_bodies : `list` of `str`, optional
+    touch_bodies
         The names of other rigid bodies (including tools) that are allowed to collide with the rigid body.
         Defaults to ``[]``, meaning that the rigid body is not allowed to collide with any other rigid bodies.
-    attachment_frame : [`Frame`][compas.geometry.Frame] | [`Transformation`][compas.geometry.Transformation], optional
+    attachment_frame
         The attachment (grasp) frame of the rigid body relative to (the base frame of) the attached link or
         (the tool tip frame of) the tool.
         Defaults to ``None``, meaning that the rigid body is not attached to a link or a tool.
-    is_hidden : `bool`, optional
+    is_hidden
         Whether the rigid body is hidden in the scene. Collision checking will be turned off
         for hidden objects.
         Defaults to ``False``.

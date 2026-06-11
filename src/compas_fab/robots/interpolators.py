@@ -30,21 +30,21 @@ class FrameInterpolator:
 
     Parameters
     ----------
-    start_frame : [`Frame`][compas.geometry.Frame]
+    start_frame
         The start frame.
-    end_frame : [`Frame`][compas.geometry.Frame]
+    end_frame
         The end frame.
-    max_step_distance : float, optional
+    max_step_distance
         The maximum Cartesian distance between two consecutive interpolated frames,
         in the frames' own unit. Default is ``0.01``.
-    max_step_angle : float, optional
+    max_step_angle
         The maximum angular distance (radians) between two consecutive interpolated
         frames. Default is ``0.1``.
-    min_step_distance : float, optional
+    min_step_distance
         The minimum Cartesian distance below which a segment can no longer be
         subdivided (see [`check_if_subdivision_possible`][compas_fab.robots.FrameInterpolator.check_if_subdivision_possible]).
         Default is ``0.0001``.
-    min_step_angle : float, optional
+    min_step_angle
         The minimum angular distance (radians) below which a segment can no longer
         be subdivided. Default is ``0.0001``.
 
@@ -122,7 +122,7 @@ class FrameInterpolator:
 
         Parameters
         ----------
-        t : float
+        t
             The interpolation parameter, 0 <= t <= 1.
 
         Returns
@@ -147,9 +147,9 @@ class FrameInterpolator:
 
         Parameters
         ----------
-        t1 : float
+        t1
             The start parameter.
-        t2 : float
+        t2
             The end parameter.
 
         Returns
@@ -179,14 +179,14 @@ class PointAxisInterpolator:
 
     Parameters
     ----------
-    start_point_axis : tuple of [`Point`][compas.geometry.Point] and [`Vector`][compas.geometry.Vector]
+    start_point_axis
         The start point-axis pair.
-    end_point_axis : tuple of [`Point`][compas.geometry.Point] and [`Vector`][compas.geometry.Vector]
+    end_point_axis
         The end point-axis pair.
-    max_step_distance : float, optional
+    max_step_distance
         The maximum Cartesian distance between two consecutive interpolated points,
         in the points' own unit. Default is ``0.01``.
-    max_step_angle : float, optional
+    max_step_angle
         The maximum angular distance (radians) between two consecutive interpolated
         axes. Default is ``0.1``.
 
@@ -260,7 +260,7 @@ class PointAxisInterpolator:
 
         Parameters
         ----------
-        t : float
+        t
             The interpolation parameter, 0 <= t <= 1.
 
         Returns

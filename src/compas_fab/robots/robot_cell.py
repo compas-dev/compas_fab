@@ -45,34 +45,34 @@ class RobotCell(Data):
 
     Attributes
     ----------
-    robot_model : [`RobotModel`][compas_robots.RobotModel]
+    robot_model
         The robot model in the robot cell.
         Note that there can only be one robot in the robot cell.
         This is equivalent to the URDF in ROS MoveIt workflows.
-    robot_semantics : [`RobotSemantics`][compas_fab.robots.RobotSemantics]
+    robot_semantics
         Semantics describing planning groups, disabled collisions, pre-defined poses etc.
         for the robot model.
         This is equivalent to the SRDF in ROS MoveIt workflows.
-    tool_models : dict of str and [`ToolModel`][compas_robots.ToolModel]
+    tool_models
         The tools in the robot cell.
         The key is the unique identifier for the tool.
-    rigid_body_models : dict of str and [`RigidBody`][compas_fab.robots.RigidBody]
+    rigid_body_models
         The rigid bodies in the robot cell.
         The key is the unique identifier for the rigid body.
-    root_name : str
+    root_name
         The name of the robot's root link.
-    main_group_name: str
+    main_group_name
         The name of the main planning group of the robot.
-    group_names: list of str
+    group_names
         The names of all planning groups of the robot.
-    group_states: dict of str and dict of str and dict of str and float
+    group_states
         The group states of the robot.
         The first key is the group name, the second key is the group state name.
         At this level you get a joint dictionary.
         The third key is the joint name, and the value is the joint value.
-    tool_ids: list of str
+    tool_ids
         The ids of the tools in the robot cell.
-    rigid_body_ids: list of str
+    rigid_body_ids
         The ids of the rigid bodies in the robot cell.
 
 
@@ -127,7 +127,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        data : dict
+        data
             The data dictionary.
 
         Returns
@@ -150,11 +150,11 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        urdf_filename : `str`
+        urdf_filename
             Path to the URDF file.
-        srdf_filename : `str`
+        srdf_filename
             Path to the SRDF file to load semantics.
-        local_package_mesh_folder : `str`, optional
+        local_package_mesh_folder
             Path to the local package mesh folder.
             If the path is provided, the geometry of the robot is loaded from this folder.
             Default is `None`, which means that the geometry is not loaded.
@@ -286,7 +286,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the group. Defaults to the main planning group.
 
         Returns
@@ -306,7 +306,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -377,7 +377,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -397,7 +397,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -419,7 +419,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -504,7 +504,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -534,7 +534,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -555,7 +555,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -582,7 +582,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`
+        group
             The name of the planning group.
 
         Returns
@@ -608,9 +608,9 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`
+        group
             The name of the planning group.
-        group_state_name : `str`
+        group_state_name
             The name of the group_state.
 
         Returns
@@ -665,7 +665,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -715,7 +715,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to the main planning group.
 
         Returns
@@ -748,10 +748,10 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        configuration : [`Configuration`][compas_robots.Configuration]
+        configuration
             The configuration of the group.
             The attributes `joint_names` and `joint_types` must be provided.
-        full_configuration : [`Configuration`][compas_robots.Configuration], optional
+        full_configuration
             The full configuration of the robot.
             If not provided, the full configuration is created using `zero_full_configuration`.
 
@@ -771,10 +771,10 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        full_configuration : [`Configuration`][compas_robots.Configuration]
+        full_configuration
             A full configuration (with all configurable joints of the robot).
             Note that this object is not modified.
-        group : `str`
+        group
             The name of the planning group.
 
         Returns
@@ -806,9 +806,9 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        configuration : [`Configuration`][compas_robots.Configuration], optional
+        configuration
             The configuration to fill with joint names and types.
-        group : `str`, optional
+        group
             The name of the planning group. Defaults to None.
 
         Returns
@@ -868,10 +868,10 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
             The tool attachment information is stored in the tool_states attribute.
-        group : str
+        group
             The name of the planning group to which the tool is attached.
             This is not optional because the robot cell and and the state do not have
             knowledge of the main group name.
@@ -924,7 +924,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        tool_id : str
+        tool_id
             The id of a tool found in `self.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
@@ -948,7 +948,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        tool_id : str
+        tool_id
             The id of a tool found in `self.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
@@ -977,7 +977,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        workpiece_id : str
+        workpiece_id
             The id of a workpiece found in `self.rigid_body_models`.
             The workpiece must be attached to a tool, and the tool must be attached to the robot.
 
@@ -1020,11 +1020,11 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
-        tcf_frames : list of [`Frame`][compas.geometry.Frame]
+        tcf_frames
             Tool Coordinate Frames (TCF) relative to the World Coordinate Frame (WCF).
-        tool_id : str
+        tool_id
             The id of a tool found in `client.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
@@ -1063,11 +1063,11 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
-        pcf_frames : list of [`Frame`][compas.geometry.Frame]
+        pcf_frames
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
-        tool_id : str
+        tool_id
             The id of a tool found in `client.robot_cell.tool_models`.
             The tool must be attached to the robot.
 
@@ -1105,11 +1105,11 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
-        ocf_frames : list of [`Frame`][compas.geometry.Frame]
+        ocf_frames
             Object Coordinate Frames (OCF) relative to the World Coordinate Frame (WCF).
-        workpiece_id : str
+        workpiece_id
             The id of a workpiece found in `client.robot_cell.rigid_body_models`.
             The workpiece must be attached to a tool, and the tool must be attached to the robot.
 
@@ -1154,11 +1154,11 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
-        pcf_frames : list of [`Frame`][compas.geometry.Frame]
+        pcf_frames
             Planner Coordinate Frames (PCF) (also T0CF) relative to the World Coordinate Frame (WCF).
-        workpiece_id : str
+        workpiece_id
             The id of a workpiece found in `client.robot_cell.rigid_body_models`.
             The workpiece must be attached to a tool, and the tool must be attached to the robot.
 
@@ -1199,13 +1199,13 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
-        frame_or_frames : [`Frame`][compas.geometry.Frame] or list of [`Frame`][compas.geometry.Frame]
+        frame_or_frames
             The frame or frames to convert.
-        target_mode : [`TargetMode`][compas_fab.robots.TargetMode]
+        target_mode
             The target mode of the frame or frames.
-        group : str
+        group
             The planning group to check. Must be specified.
 
         Returns
@@ -1255,13 +1255,13 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
-        frame_or_frames : [`Frame`][compas.geometry.Frame] or list of [`Frame`][compas.geometry.Frame]
+        frame_or_frames
             The PCF frame or frames to convert.
-        target_mode : [`TargetMode`][compas_fab.robots.TargetMode]
+        target_mode
             The target mode of the frame or frames.
-        group : str
+        group
             The planning group to check. Must be specified.
 
         Returns
@@ -1315,13 +1315,13 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
             The robot configuration must be set in the robot state.
-        target_mode : [`TargetMode`][compas_fab.robots.TargetMode]
+        target_mode
             The target mode of the frame.
             The target mode must be supported by the robot cell state.
-        group : str, optional
+        group
             The name of the planning group.
             Defaults to the main planning group.
 
@@ -1367,7 +1367,7 @@ class RobotCell(Data):
 
         Parameters
         ----------
-        robot_cell_state : [`RobotCellState`][compas_fab.robots.RobotCellState]
+        robot_cell_state
             The state of the robot cell.
             The robot configuration must be set in the robot state.
 
