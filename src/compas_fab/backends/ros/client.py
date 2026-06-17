@@ -156,14 +156,16 @@ class RosClient(Ros, ClientInterface):
         Port of the ROS Bridge. Defaults to ``9090``.
     is_secure
         ``True`` to indicate it should use a secure web socket, otherwise ``False``.
-    transport
-        Per-connection roslibpy transport backend: ``"twisted"`` (default
-        on most platforms), ``"asyncio"`` (opt-in, requires
-        ``pip install roslibpy[asyncio]``), or ``"cli"`` (auto-selected on
-        IronPython). When ``None`` (default) the choice falls through to
-        the ``ROSLIBPY_TRANSPORT`` env var and
+    **kwargs
+        Additional keyword arguments forwarded as-is to ``roslibpy.Ros``.
+        Notably ``transport`` (roslibpy >= 2.1) selects the per-connection
+        transport backend: ``"twisted"`` (default on most platforms),
+        ``"asyncio"`` (opt-in, requires ``pip install roslibpy[asyncio]``),
+        or ``"cli"`` (auto-selected on IronPython). When omitted the choice
+        falls through to the ``ROSLIBPY_TRANSPORT`` env var and
         :func:`roslibpy.set_default_transport`. See ``roslibpy.comm`` for
-        the full precedence rules.
+        the full precedence rules. Only pass arguments your installed
+        roslibpy version supports.
 
     Examples
     --------
@@ -172,13 +174,13 @@ class RosClient(Ros, ClientInterface):
     Connected: True
     """
 
-    def __init__(self, host: str = "localhost", port: int = 9090, is_secure: bool = False, transport: Optional[str] = None):
+    def __init__(self, host: str = "localhost", port: int = 9090, is_secure: bool = False, **kwargs):
         # `Ros.__init__` is called via super, but `ClientInterface.__init__`
         # is bypassed because `Ros` is the first base in the MRO and does
         # not call `super().__init__()`. We initialise the ClientInterface
         # attributes manually so `self.robot_cell` etc. work before any
         # `load_robot_cell` call.
-        super(RosClient, self).__init__(host, port, is_secure, transport=transport)
+        super(RosClient, self).__init__(host, port, is_secure, **kwargs)
         ClientInterface.__init__(self)
         self.host = host
         self.port = port

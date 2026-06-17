@@ -11,6 +11,7 @@ COMPAS FAB v1.1.0
 
 import Grasshopper
 import Rhino
+import roslibpy
 import System
 from compas_ghpython import create_id
 from compas_ghpython import remark
@@ -19,6 +20,15 @@ from scriptcontext import sticky as st
 
 from compas_fab.backends import RosClient
 from compas_fab.ghpython import ensure_boolean_toggle
+
+
+def _roslibpy_supports_transport():
+    """The ``transport`` argument was introduced in roslibpy 2.1."""
+    try:
+        major, minor = (int(part) for part in roslibpy.__version__.split(".")[:2])
+        return (major, minor) >= (2, 1)
+    except Exception:
+        return False
 
 
 class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
@@ -40,8 +50,15 @@ class RosClientComponent(Grasshopper.Kernel.GH_ScriptInstance):
             st.pop(key, None)
             ros_client = None
 
+        if transport and not _roslibpy_supports_transport():
+            warning(ghenv.Component, "The 'transport' input requires roslibpy >= 2.1; ignoring it.")  # noqa: F821
+            transport = None
+
         if connect:
-            ros_client = RosClient(host, port, transport=transport)
+            if transport:
+                ros_client = RosClient(host, port, transport=transport)
+            else:
+                ros_client = RosClient(host, port)
             ros_client.run(5)
             st[key] = ros_client
 
