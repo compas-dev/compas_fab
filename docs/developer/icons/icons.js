@@ -6,13 +6,13 @@
 
 const ICONS = {
   /* ---------------- ROBOT CELL ---------------- */
-  // iso-cube (the cell) sitting on a stack of books (the library)
+  // iso-cube (the cell) presented from an open book (the library)
   cellLibrary:
-    '<path d="M11 3.5 L15 6 L11 8.5 L7 6 Z"/>' +
-    '<path d="M7 6 V10.5 L11 13 L15 10.5 V6 M11 8.5 V13"/>' +
-    '<path class="ac" d="M4 20 H16 V17.6 H4 Z"/>' +
-    '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
-    '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
+    '<path d="M11 3 L15 5.4 L11 7.8 L7 5.4 Z"/>' +
+    '<path d="M7 5.4 V9.7 L11 12.1 L15 9.7 V5.4 M11 7.8 V12.1"/>' +
+    '<path class="ac" d="M11 15.6 V20.4"/>' +
+    '<path class="ac" d="M11 15.6 C 8.6 14.4 6 14.4 3.7 15.1 V19.5 C 6 18.8 8.6 18.8 11 20.4"/>' +
+    '<path class="ac" d="M11 15.6 C 13.4 14.4 16 14.4 18.3 15.1 V19.5 C 16 18.8 13.4 18.8 11 20.4"/>',
 
   // cell loaded from a URDF/SRDF document
   cellUrdf:
@@ -20,13 +20,6 @@ const ICONS = {
     '<path d="M14 4 V7 H17"/>' +
     '<path class="ac" d="M10 16.5 H14.5 M10 16.5 V12"/>' +
     '<circle class="adot" cx="10" cy="16.5" r="1.3"/>',
-
-  // cell streamed from a ROS bridge
-  cellRos:
-    '<path d="M9 9 L12.5 11 L9 13 L5.5 11 Z"/>' +
-    '<path d="M5.5 11 V14.6 L9 16.6 L12.5 14.6 V11 M9 13 V16.6"/>' +
-    '<path class="ac" d="M15.5 11.2 a3 3 0 0 1 0 -4 M17.8 12 a6 6 0 0 0 0 -7.5"/>' +
-    '<circle class="adot" cx="15" cy="6.4" r="1.2"/>',
 
   // rigid body built from a mesh (triangulated patch)
   bodyFromMesh:
@@ -40,20 +33,20 @@ const ICONS = {
     '<path d="M5.5 7 L11 11 L16.5 7 M11 11 L8.2 7 M11 11 L13.8 7 M11 11 V17.5"/>' +
     '<circle class="adot" cx="11" cy="17.5" r="1.3"/>',
 
-  // tool (cone) pulled from a stack of books (the library)
+  // tool (cone) presented from an open book (the library)
   toolFromLibrary:
-    '<path d="M6.5 4 H15.5 L11 12 Z"/>' +
-    '<circle class="dot" cx="11" cy="12" r="1.1"/>' +
-    '<path class="ac" d="M4 20 H16 V17.6 H4 Z"/>' +
-    '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
-    '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
+    '<path d="M6.5 3.4 H15.5 L11 11 Z"/>' +
+    '<circle class="dot" cx="11" cy="11" r="1.1"/>' +
+    '<path class="ac" d="M11 15.6 V20.4"/>' +
+    '<path class="ac" d="M11 15.6 C 8.6 14.4 6 14.4 3.7 15.1 V19.5 C 6 18.8 8.6 18.8 11 20.4"/>' +
+    '<path class="ac" d="M11 15.6 C 13.4 14.4 16 14.4 18.3 15.1 V19.5 C 16 18.8 13.4 18.8 11 20.4"/>',
 
-  // rigid body (box) pulled from a stack of books (the library)
+  // rigid body (box) presented from an open book (the library)
   bodyFromLibrary:
-    '<rect x="7" y="3.5" width="8" height="8" rx="1"/>' +
-    '<path class="ac" d="M4 20 H16 V17.6 H4 Z"/>' +
-    '<path class="ac" d="M5.6 17.6 V15.3 H17.6 V17.6"/>' +
-    '<path class="ac" d="M6.5 20 V17.6 M8 17.6 V15.3"/>',
+    '<rect x="7.2" y="3.2" width="7.6" height="7.6" rx="1"/>' +
+    '<path class="ac" d="M11 15.6 V20.4"/>' +
+    '<path class="ac" d="M11 15.6 C 8.6 14.4 6 14.4 3.7 15.1 V19.5 C 6 18.8 8.6 18.8 11 20.4"/>' +
+    '<path class="ac" d="M11 15.6 C 13.4 14.4 16 14.4 18.3 15.1 V19.5 C 16 18.8 13.4 18.8 11 20.4"/>',
 
   // deconstruct a cell into model / bodies / tools / state (cube -> parts)
   deconstructRobotCell:
@@ -238,6 +231,12 @@ const ICONS = {
     '<rect x="5" y="6" width="14" height="12" rx="1.5"/>' +
     '<path d="M5 9.5 H3 M5 14.5 H3 M19 9.5 H21 M19 14.5 H21"/>' +
     '<path class="ac lt" d="M8.8 15.4 V8.6 L12 12.6 L15.2 8.6 V15.4"/>',
+
+  // advanced load options bundled for a planner — a config gear
+  moveitPlannerOptions:
+    '<circle cx="12" cy="12" r="4.3"/>' +
+    '<path d="M16.3 12 H18 M15.05 15.05 L16.25 16.25 M12 16.3 V18 M8.95 15.05 L7.75 16.25 M7.7 12 H6 M8.95 8.95 L7.75 7.75 M12 7.7 V6 M15.05 8.95 L16.25 7.75"/>' +
+    '<circle class="adot" cx="12" cy="12" r="1.7"/>',
 
   // PyBullet physics-server planner chip — labelled "PB"
   pyBulletPlanner:

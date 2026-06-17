@@ -263,13 +263,13 @@
   /* primitive kit legend */
   const KIT = [
     ['cellLibrary','Cube','robot cell / volume'],
-    ['addBody','Square','rigid body'],
-    ['addTool','Cone','tool · TCF'],
+    ['bodyFromMesh','Square','rigid body'],
+    ['toolFromMesh','Cone','tool · TCF'],
     ['frameTarget','Triad','coordinate frame'],
     ['robotConfig','Sliders','joint config'],
     ['planCartesian','Polyline','motion path'],
     ['configTarget','Ring','goal / target'],
-    ['toolFromLibrary','Books','library'],
+    ['toolFromLibrary','Open book','library'],
     ['analyticalPlanner','Labelled chip','solver backend'],
     ['rosClient','Nodes','connection'],
   ];
@@ -297,7 +297,6 @@
     ['01','Robot Cell','build the workspace',[
       ['cellLibrary','Load Robot Cell From Library','Cell from Library','Pre-defined cell + default state from the RobotCellLibrary.'],
       ['cellUrdf','Load Robot Cell From URDF/SRDF','Cell from URDF','Load a cell from URDF + SRDF files on disk. No ROS.'],
-      ['cellRos','Load Robot Cell From ROS','Cell from ROS','Stream the cell description from a connected ROS bridge.'],
       ['bodyFromMesh','Rigid Body From Mesh','Body From Mesh','Construct a RigidBody from a Rhino mesh.'],
       ['toolFromMesh','Tool From Mesh','Tool From Mesh','Construct a ToolModel from a Rhino mesh + TCP plane.'],
       ['toolFromLibrary','Tool From Library','Tool From Library','Load a pre-defined ToolModel (cone, gripper…).'],
@@ -336,9 +335,10 @@
       ['pyBulletPlanner','PyBullet Planner','PyBullet Planner','In-process PyBullet physics server: collision checking + FK/IK/Cartesian.'],
       ['analyticalPyBulletPlanner','Analytical PyBullet Planner','Analytical PyBullet','Closed-form IK gated by PyBullet collision checking.'],
       ['moveitPlanner','MoveIt Planner','MoveIt Planner','Full motion planning over a connected RosClient.'],
+      ['moveitPlannerOptions','MoveIt Planner Options','MoveIt Planner Options','Bundle advanced load options (URDF/SRDF params, file-server URL) for the MoveIt Planner.'],
       ['deconstructPlanner','Deconstruct Planner','Deconstruct Planner','Read the cell, state and model currently held by a planner.'],
     ]],
-    ['06','ROS','talk to topics',[
+    ['06','ROS','connect & talk to topics',[
       ['rosClient','ROS Client','ROS Client','Connect to a ROS 1 / ROS 2 bridge. Auto-detects distro.'],
       ['publish','Publish to topic','Publish','Publish messages to a ROS topic.'],
       ['subscribe','Subscribe to topic','Subscribe','Receive messages from a ROS topic.'],
