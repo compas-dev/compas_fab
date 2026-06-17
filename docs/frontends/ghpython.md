@@ -39,11 +39,11 @@ No backend server, no setup beyond the components.
 
 ![Load a UR5, drive its joints with sliders, and visualize it](ghpython/files/01_visualize_and_pose.png)
 
-**Load Robot Cell From Library** (`ur5`) → **Set Robot Configuration** (which
+**Load Robot Cell From Library** (`ur5`) → **Robot Configuration** (which
 drops a slider per joint) → **Visualize Robot Cell**. Drag the sliders and the
 robot moves live in the viewport.
 
-[Download `01_visualize_and_pose.gh`](ghpython/files/01_visualize_and_pose.gh){: download="01_visualize_and_pose.gh" }
+[Download `01_visualize_and_pose.ghx`](ghpython/files/01_visualize_and_pose.ghx){: download="01_visualize_and_pose.ghx" }
 
 ## More examples
 
