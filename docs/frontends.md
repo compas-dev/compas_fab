@@ -25,6 +25,9 @@ The Grasshopper components are installed via the Rhino Package Manager. Search f
 `compas_fab` in the Rhino Package Manager and install it. After installing it, the
 components appear in the Grasshopper toolbar.
 
+See [Grasshopper](frontends/ghpython.md) for usage examples, building robot
+cells, solving kinematics, and planning motions on the canvas.
+
 For developing the components, see
 [Developer guide › Grasshopper components](developer/grasshopper.md).
 
