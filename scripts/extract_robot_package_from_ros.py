@@ -33,9 +33,9 @@ HERE = os.path.dirname(__file__)
 
 with RosClient() as client:
     # Standard way to load a robot from a MoveIt! instance.
-    robot = client.load_robot()
-    robot.info()
-    print(robot.name)
+    robot_cell = client.load_robot_cell()
+    robot_cell.print_info()
+    print(robot_cell.robot_model.name)
 
     # The RosFileServerLoader is used with a modified local_cache_directory argument
     local_cache_directory = os.path.join(HERE, "robot_packages")

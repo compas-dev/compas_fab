@@ -1,11 +1,4 @@
-"""
-********************************************************************************
-compas_fab.blender
-********************************************************************************
-
-.. currentmodule:: compas_fab.blender
-
-"""
+"""Blender bindings for compas_fab. Only imports when run inside Blender."""
 
 try:
     import bpy  # noqa: F401

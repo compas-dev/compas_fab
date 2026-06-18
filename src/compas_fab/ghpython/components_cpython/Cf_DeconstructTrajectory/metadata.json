@@ -1,0 +1,40 @@
+{
+    "name": "Deconstruct Trajectory",
+    "nickname": "Deconstruct Trajectory",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Expand a JointTrajectory into per-point Configurations and RobotCellStates ready to feed VisualizeRobotCell, plus DataTrees of velocities/accelerations/efforts for plotting the trajectory profile. Pair `cell_states` with a Stream Filter / Index slider to scrub through frames.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "trajectory",
+                "description": "A JointTrajectory (typically the output of PlanMotion or PlanCartesianMotion). The per-point `cell_states` are derived from `trajectory.start_state`, which the planner sets automatically."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "configurations",
+                "description": "One Configuration per trajectory point, in order."
+            },
+            {
+                "name": "cell_states",
+                "description": "One RobotCellState per trajectory point: a copy of `trajectory.start_state` with `robot_configuration` set to the corresponding point. Empty when the trajectory has no `start_state`."
+            },
+            {
+                "name": "velocities",
+                "description": "DataTree of joint velocities — one branch per trajectory point, each branch ordered to match the trajectory's `joint_names`. Zeros when the backend didn't populate this field."
+            },
+            {
+                "name": "accelerations",
+                "description": "DataTree of joint accelerations — one branch per trajectory point, ordered to match `joint_names`. Zeros when the backend didn't populate this field."
+            },
+            {
+                "name": "efforts",
+                "description": "DataTree of joint efforts — one branch per trajectory point, ordered to match `joint_names`. Zeros when the backend didn't populate this field."
+            }
+        ]
+    }
+}

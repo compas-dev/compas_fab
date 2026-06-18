@@ -43,12 +43,12 @@ class ReachabilityMapObject(RhinoSceneObject):
             for frames in self.reachability_map.frames:
                 xframes.append([])
                 for frame in frames:
-                    xframes[-1].extend(SceneObject(frame, layer=self.layer, scale=self.scale).draw())
+                    xframes[-1].extend(SceneObject(item=frame, layer=self.layer, scale=self.scale).draw())
 
             return xframes
         else:
             frames, _ = self.reachability_map.reachable_frames_and_configurations_at_ik_index(ik_index)
-            return [SceneObject(f, layer=self.layer, scale=self.scale).draw() for f in frames]
+            return [SceneObject(item=f, layer=self.layer, scale=self.scale).draw() for f in frames]
 
     def draw(self, colormap="viridis"):
         return self.draw_cloud(colormap)
@@ -82,7 +82,7 @@ class ReachabilityMapObject(RhinoSceneObject):
         guids = []
         for num, pt in zip(score, points):
             color = cmap(num, minv, maxv)
-            sceneobject = SceneObject(pt, layer=self.layer)
+            sceneobject = SceneObject(item=pt, layer=self.layer)
             guids.extend(sceneobject.draw(color))
 
         return guids

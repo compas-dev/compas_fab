@@ -1,47 +1,157 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import TYPE_CHECKING
+from typing import Optional
 
+from compas.geometry import Frame
+from compas.geometry import Transformation
+
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
 from compas_fab.backends.interfaces import ForwardKinematics
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
+
+if TYPE_CHECKING:
+    from compas_fab.backends import PyBulletClient
+    from compas_fab.backends import PyBulletPlanner
 
 
 class PyBulletForwardKinematics(ForwardKinematics):
-    """Callable to calculate the robot's forward kinematic."""
+    """Mix-in function to calculate the robot's forward kinematic."""
 
-    def forward_kinematics(self, robot, configuration, group=None, options=None):
-        """Calculate the robot's forward kinematic.
+    def forward_kinematics(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: TargetMode,
+        group: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ) -> Frame:
+        """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
+
+        The returned coordinate frame is dependent on the chosen ``target_mode``:
+
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
+        - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
+          if a workpiece is attached (via an attached tool).
+
+        Collision checking is not performed during the calculation. Consider using the
+        :meth:`compas_fab.backends.PyBulletCheckCollision.check_collision` method to check for collisions.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
-        configuration : :class:`compas_fab.robots.Configuration`
-            The full configuration to calculate the forward kinematic for. If no
-            full configuration is passed, the zero-joint state for the other
-            configurable joints is assumed.
-        group : str, optional
-            The planning group used for determining the end effector and labeling
-            the ``configuration``. Defaults to the robot's main planning group.
-        options : dict, optional
-            Dictionary containing the following key-value pairs:
+        robot_cell_state
+            The robot cell state describing the robot cell.
+            The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
+            The Configuration object must include ``joint_names``.
+            The robot cell state should also reflect the attachment of tools, if any.
+        target_mode
+            The target mode to select which frame to return.
+        group
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        native_scale
+            The scaling factor to apply to the resulting frame.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Defaults to None, which means no scaling is applied.
+        options
+            Dictionary for passing planner specific options.
+            Currently unused.
 
-            - ``"link"``: (:obj:`str`, optional) The name of the link to
-              calculate the forward kinematics for. Defaults to the end effector.
-            - ``"check_collision"``: (:obj:`str`, optional) When ``True``,
-              :meth:`compas_fab.backends.PyBulletClient.check_collisions` will be called.
-              Defaults to ``False``.
 
         Returns
         -------
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
+
+        Raises
+        ------
+        :class:`compas_fab.backends.TargetModeMismatchError`
+            If the selected TargetMode is not possible with the provided robot cell state.
+
         """
-        link_name = options.get("link") or robot.get_end_effector_link_name(group)
-        cached_robot_model = self.client.get_cached_robot_model(robot)
-        body_id = self.client.get_uid(cached_robot_model)
-        link_id = self.client._get_link_id_by_name(link_name, cached_robot_model)
-        self.client.set_robot_configuration(robot, configuration, group)
-        frame = self.client._get_link_frame(link_id, body_id)
-        if options.get("check_collision"):
-            self.client.check_collisions(robot, configuration)
-        return frame
+        # Housekeeping for intellisense
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
+        group = group or robot_cell.main_group_name
+
+        # Check if the target mode is valid for the robot cell state
+        robot_cell_state.assert_target_mode_match(target_mode, group)
+
+        # Check if the planning group is supported by the planner
+        if group not in robot_cell.group_names:
+            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
+
+        # Setting the entire robot cell state, including the robot configuration
+        planner.set_robot_cell_state(robot_cell_state)
+
+        # Retrieve the PCF of the group
+        link_name = robot_cell.get_end_effector_link_name(group)
+        link_id = client.robot_link_puids[link_name]
+        pcf_frame = client._get_link_frame(link_id, client.robot_puid)
+
+        # Convert PCF to the target frame
+        target_frame = client.robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, group)
+        t_rcf_target = Transformation.from_frame(target_frame)
+
+        # Convert target frame to WCF
+        t_wcf_rcf = Transformation.from_frame(robot_cell_state.robot_base_frame)
+        t_wcf_target = t_wcf_rcf * t_rcf_target
+        wcf_target_frame = Frame.from_transformation(t_wcf_target)
+
+        # Scale resulting frame to user units
+        if native_scale:
+            wcf_target_frame.scale(1 / native_scale)
+
+        return wcf_target_frame
+
+    def forward_kinematics_to_link(
+        self,
+        robot_cell_state: RobotCellState,
+        link_name: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ):
+        """Calculate the Link Coordinate Frame (LCF) to return. frame of the specified robot link from the provided RobotCellState.
+
+        This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
+        but allows the user to specify which link's
+        link relative to the world coordinate frame (WCF).
+
+        This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
+        robot's links and the user needs to know the position of the object relative to the world coordinate frame.
+
+        Parameters
+        ----------
+        robot_cell_state
+            The robot cell state describing the robot cell.
+        link_name
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the last link of the provided planning group.
+        native_scale
+            The scaling factor to apply to the resulting frame.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Defaults to None, which means no scaling is applied.
+        options
+            Dictionary for passing planner specific options.
+            Currently unused.
+        """
+        # Housekeeping for intellisense
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+
+        # Setting the entire robot cell state, including the robot configuration
+        planner.set_robot_cell_state(robot_cell_state)
+
+        # Retrieve the PCF of the group
+        link_id = client.robot_link_puids[link_name]
+        link_frame = client._get_link_frame(link_id, client.robot_puid)
+
+        # Scale resulting frame to user units
+        if native_scale:
+            link_frame.scale(1 / native_scale)
+
+        return link_frame

@@ -1,13 +1,12 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import threading
 
-__all__ = ["FutureResult", "CancellableFutureResult"]
+__all__ = [
+    "FutureResult",
+    "CancellableFutureResult",
+]
 
 
-class FutureResult(object):
+class FutureResult:
     """Represents a future result value.
 
     Futures are the result of asynchronous operations

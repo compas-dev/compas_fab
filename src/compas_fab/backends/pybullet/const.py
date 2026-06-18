@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from collections import namedtuple
 
 PYBULLET_GUI = 1
@@ -32,6 +28,14 @@ STATIC_MASS = 0
 GREY = (0.5, 0.5, 0.5, 1)
 RED = (1, 0, 0, 1)
 
+JOINT_REVOLUTE = 0
+JOINT_PRISMATIC = 1
+JOINT_SPHERICAL = 2
+JOINT_PLANAR = 3
+JOINT_FIXED = 4
+JOINT_POINT2POINT = 5
+JOINT_GEAR = 6
+
 BodyInfo = namedtuple("BodyInfo", ["base_name", "body_name"])
 ConstraintInfo = namedtuple("ConstraintInfo", ["constraint_id", "body_id", "robot_uid"])
 JointInfo = namedtuple(
@@ -56,9 +60,7 @@ JointInfo = namedtuple(
         "parentIndex",
     ],
 )
-JointState = namedtuple(
-    "JointState", ["jointPosition", "jointVelocity", "jointReactionForces", "appliedJointMotorTorque"]
-)
+JointState = namedtuple("JointState", ["jointPosition", "jointVelocity", "jointReactionForces", "appliedJointMotorTorque"])
 LinkState = namedtuple(
     "LinkState",
     [

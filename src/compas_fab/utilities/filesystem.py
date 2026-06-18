@@ -1,18 +1,19 @@
 import os
+from typing import Optional
 
 __all__ = ["list_files_in_directory"]
 
 
-def list_files_in_directory(directory, fullpath=False, extensions=None):
+def list_files_in_directory(directory: str, fullpath: bool = False, extensions: Optional[list[str]] = None) -> list[str]:
     """This function lists just the files in a directory, not sub-directories.
 
     Parameters
     ----------
-    directory : :obj:`str`
+    directory
         The directory to search for files.
-    fullpath : :obj:`bool`, optional
+    fullpath
         Specifies if the returned list of strings is with the full path.
-    extensions : :obj:`list` of :obj:`str`, optional
+    extensions
         A list of allowed extensions, e.g. ["jpg", "png"] if you just want to list images.
 
     Returns
@@ -39,6 +40,7 @@ def list_files_in_directory(directory, fullpath=False, extensions=None):
 
 
 if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(__file__), "..", "robots", "ur", "ur10", "model")
+    path = os.path.join(os.path.dirname(__file__), "..", "data", "robot_library", "rfl", "rfl_description", "meshes", "visual")
     os.listdir(path)
-    print(list_files_in_directory(path, fullpath=True, extensions=["obj"]))
+    for file in list_files_in_directory(path, fullpath=True, extensions=["stl"]):
+        print(file)

@@ -1,102 +1,9 @@
-"""
-********************************************************************************
-compas_fab.robots
-********************************************************************************
+"""Classes for robot modeling, used by the simulation, planning and
+execution backends to exchange information.
 
-.. currentmodule:: compas_fab.robots
-
-This package contains classes for robot modeling and they are used by the
-simulation, planning and execution backends to exchange information.
-
-Main classes
-------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    Robot
-    RobotSemantics
-    Tool
-    Duration
-    Wrench
-    Inertia
-    ReachabilityMap
-    DeviationVectorsGenerator
-    OrthonormalVectorsFromAxisGenerator
-
-Path planning
--------------
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    JointTrajectory
-    JointTrajectoryPoint
-    Trajectory
-
-Planning scene
---------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    AttachedCollisionMesh
-    CollisionMesh
-    PlanningScene
-
-Targets and Waypoints
----------------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    Target
-    FrameTarget
-    PointAxisTarget
-    ConfigurationTarget
-    ConstraintSetTarget
-    Waypoints
-    FrameWaypoints
-    PointAxisWaypoints
-
-Constraints
------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    BoundingVolume
-    Constraint
-    JointConstraint
-    OrientationConstraint
-    PositionConstraint
-
-Built-in robots
----------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    RobotLibrary
-
-Unit conversion
----------------
-
-The unit systems most commonly used in **COMPAS FAB** are **meters** and **radians**.
-The following functions help with converting units from one system to the other.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    to_degrees
-    to_radians
-
+The unit systems most commonly used in COMPAS FAB are **meters** and
+**radians**; helpers like [`to_degrees`][compas_fab.robots.to_degrees] and
+[`to_radians`][compas_fab.robots.to_radians] convert between systems.
 """
 
 from .constraints import (
@@ -106,11 +13,7 @@ from .constraints import (
     OrientationConstraint,
     PositionConstraint,
 )
-from .planning_scene import (
-    AttachedCollisionMesh,
-    CollisionMesh,
-    PlanningScene,
-)
+
 from .units import (
     to_degrees,
     to_radians,
@@ -120,35 +23,49 @@ from .reachability_map import (
     DeviationVectorsGenerator,
     OrthonormalVectorsFromAxisGenerator,
 )
-from .robot import (
-    Robot,
+
+from .robot_cell import (
+    RobotCell,
 )
+from .state import (
+    RigidBodyState,
+    RobotCellState,
+    ToolState,
+)
+from .rigid_body import (
+    RigidBody,
+)
+
 from .robot_library import (
-    RobotLibrary,
+    RigidBodyLibrary,
+    RobotCellLibrary,
+    ToolLibrary,
 )
 from .semantics import (
     RobotSemantics,
 )
 from .targets import (
-    Target,
-    FrameTarget,
-    PointAxisTarget,
     ConfigurationTarget,
     ConstraintSetTarget,
-    Waypoints,
+    FrameTarget,
     FrameWaypoints,
+    PointAxisTarget,
     PointAxisWaypoints,
+    Target,
+    TargetMode,
+    Waypoints,
 )
 from .time_ import (
     Duration,
-)
-from .tool import (
-    Tool,
 )
 from .trajectory import (
     JointTrajectory,
     JointTrajectoryPoint,
     Trajectory,
+)
+from .action import (
+    Action,
+    ActionChain,
 )
 from .wrench import (
     Wrench,
@@ -156,37 +73,63 @@ from .wrench import (
 from .inertia import (
     Inertia,
 )
+from .interpolators import (
+    FrameInterpolator,
+    PointAxisInterpolator,
+)
 
 __all__ = [
-    "AttachedCollisionMesh",
+    # Constraints
     "BoundingVolume",
-    "CollisionMesh",
-    "ConfigurationTarget",
     "Constraint",
-    "ConstraintSetTarget",
-    "Duration",
-    "FrameTarget",
-    "FrameWaypoints",
-    "Inertia",
     "JointConstraint",
-    "JointTrajectory",
-    "JointTrajectoryPoint",
     "OrientationConstraint",
-    "PlanningScene",
-    "PointAxisTarget",
-    "PointAxisWaypoints",
     "PositionConstraint",
+    # Units
+    "to_degrees",
+    "to_radians",
+    # Reachability Map
     "ReachabilityMap",
     "DeviationVectorsGenerator",
     "OrthonormalVectorsFromAxisGenerator",
-    "Robot",
-    "RobotLibrary",
+    # Robot Cell
+    "RobotCell",
+    # Rigid Body
+    "RigidBody",
+    # State
+    "RigidBodyState",
+    "RobotCellState",
+    "ToolState",
+    # Robot Library
+    "ToolLibrary",
+    "RigidBodyLibrary",
+    "RobotCellLibrary",
+    # Semantics
     "RobotSemantics",
+    # Targets
+    "ConfigurationTarget",
+    "ConstraintSetTarget",
+    "FrameTarget",
+    "FrameWaypoints",
+    "PointAxisTarget",
+    "PointAxisWaypoints",
     "Target",
-    "Tool",
-    "Trajectory",
+    "TargetMode",
     "Waypoints",
+    # Time
+    "Duration",
+    # Trajectory
+    "JointTrajectory",
+    "JointTrajectoryPoint",
+    "Trajectory",
+    # Interpolators
+    "FrameInterpolator",
+    "PointAxisInterpolator",
+    # Action Chain
+    "Action",
+    "ActionChain",
+    # Wrench
     "Wrench",
-    "to_degrees",
-    "to_radians",
+    # Inertia
+    "Inertia",
 ]

@@ -1,11 +1,12 @@
-from __future__ import absolute_import
-
 from .std_msgs import Header
 from .std_msgs import ROSmsg
+from .std_msgs import format_header_for_distro
 
 
 class JointState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/JointState.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/sensor_msgs/interfaces/msg/JointState.html
+    """
 
     ROS_MSG_TYPE = "sensor_msgs/JointState"
 
@@ -37,9 +38,14 @@ class JointState(ROSmsg):
         effort = msg["effort"]
         return cls(header, name, position, velocity, effort)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class MultiDOFJointState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/sensor_msgs/html/msg/MultiDOFJointState.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/MultiDOFJointState.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/sensor_msgs/interfaces/msg/MultiDOFJointState.html
+    """
 
     ROS_MSG_TYPE = "sensor_msgs/MultiDOFJointState"
 
@@ -49,3 +55,6 @@ class MultiDOFJointState(ROSmsg):
         self.transforms = transforms if transforms else []
         self.twist = twist if twist else []
         self.wrench = wrench if wrench else []
+
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)

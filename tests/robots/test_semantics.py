@@ -3,8 +3,9 @@ import os
 import pytest
 from compas_robots import RobotModel
 
+from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotSemantics
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RobotCellLibrary
 
 BASE_FOLDER = os.path.dirname(__file__)
 
@@ -22,11 +23,12 @@ def panda_urdf():
 def test_panda_srdf_file(panda_srdf, panda_urdf):
     model = RobotModel.from_urdf_file(panda_urdf)
     semantics = RobotSemantics.from_srdf_file(panda_srdf, model)
+    robot_cell = RobotCell(model, semantics)
     assert sorted(semantics.group_names) == sorted(["panda_arm", "hand", "panda_arm_hand"])
     assert semantics.main_group_name == "panda_arm_hand"
     assert semantics.get_base_link_name("panda_arm") == "panda_link0"
     assert semantics.get_end_effector_link_name("panda_arm") == "panda_link8"
-    assert semantics.get_configurable_joint_names("panda_arm") == [
+    assert robot_cell.get_configurable_joint_names("panda_arm") == [
         "panda_joint1",
         "panda_joint2",
         "panda_joint3",
@@ -35,7 +37,7 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
         "panda_joint6",
         "panda_joint7",
     ]
-    all_configurable_joint_names = [j.name for j in semantics.get_all_configurable_joints()]
+    all_configurable_joint_names = [j.name for j in robot_cell.get_all_configurable_joints()]
     assert all_configurable_joint_names == [
         "panda_joint1",
         "panda_joint2",
@@ -46,7 +48,7 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
         "panda_joint7",
         "panda_finger_joint1",
     ]
-    configurable_joints = semantics.get_configurable_joints("panda_arm_hand")
+    configurable_joints = robot_cell.get_configurable_joints("panda_arm_hand")
     assert [j.type for j in configurable_joints] == [0, 0, 0, 0, 0, 0, 0, 2]
     set_joints = set(semantics.group_states["panda_arm"]["ready"].keys())
     assert set_joints == {
@@ -61,13 +63,13 @@ def test_panda_srdf_file(panda_srdf, panda_urdf):
 
 
 def test_ur5_semantics():
-    robot = RobotLibrary.ur5(load_geometry=False)
-    semantics = robot.semantics
-    assert sorted(semantics.group_names) == sorted(["manipulator", "endeffector"])
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
+    semantics = robot_cell.robot_semantics
+    assert semantics.group_names == ["manipulator", "endeffector"]
     assert semantics.main_group_name == "manipulator"
     assert semantics.get_base_link_name() == "base_link"
     assert semantics.get_end_effector_link_name() == "tool0"
-    assert semantics.get_configurable_joint_names() == [
+    assert robot_cell.get_configurable_joint_names() == [
         "shoulder_pan_joint",
         "shoulder_lift_joint",
         "elbow_joint",

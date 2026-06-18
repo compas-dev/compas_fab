@@ -1,0 +1,33 @@
+{
+    "name": "Set Rigid Body Frame",
+    "nickname": "Place Body",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Place an unattached RigidBody at a frame in the world (WCF). Use for static scene objects. If the body was previously attached to a link/tool, the attachment is cleared.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "cell_state",
+                "description": "The RobotCellState to modify."
+            },
+            {
+                "name": "rigid_body_id",
+                "description": "Id of the rigid body inside the RobotCell.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "plane",
+                "description": "Rhino Plane or COMPAS Frame describing the body's pose in the world (WCF)."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "cell_state",
+                "description": "New RobotCellState with the body placed at the given frame."
+            }
+        ]
+    }
+}

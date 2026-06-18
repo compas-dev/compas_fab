@@ -1,3 +1,6 @@
+from compas.geometry import Frame
+
+from .analytical_kinematics import AnalyticalKinematics
 from .offset_wrist import forward_kinematics_offset_wrist
 from .offset_wrist import inverse_kinematics_offset_wrist
 
@@ -60,16 +63,17 @@ UR3e_PARAMS = {
 }
 
 
-class OffsetWristKinematics(object):
+class OffsetWristKinematics(AnalyticalKinematics):
     """ """
 
     def __init__(self, params):
+        super(OffsetWristKinematics, self).__init__()
         self.params = params
 
-    def forward(self, joint_values):
+    def forward(self, joint_values: list[float]) -> Frame:
         return forward_kinematics_offset_wrist(joint_values, self.params)
 
-    def inverse(self, frame_rcf):
+    def inverse(self, frame_rcf: Frame) -> list[list[float]]:
         return inverse_kinematics_offset_wrist(frame_rcf, self.params)
 
 

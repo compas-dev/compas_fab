@@ -1,0 +1,33 @@
+{
+    "name": "Tool From Library",
+    "nickname": "Tool From Library",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a pre-defined ToolModel from ToolLibrary (e.g. 'cone', 'printing_tool', 'static_gripper', 'kinematic_gripper').",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Name of the ToolLibrary classmethod to call (e.g. 'cone', 'printing_tool', 'static_gripper', 'static_gripper_small', 'kinematic_gripper').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "load_geometry",
+                "description": "Whether to load the tool's mesh geometry. Defaults to True when unwired."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "tool",
+                "description": "ToolModel."
+            },
+            {
+                "name": "visual_meshes",
+                "description": "Rhino meshes of the tool's visual geometry, drawn in the tool's own base frame. Useful for previewing the tool before attaching it to a robot."
+            }
+        ]
+    }
+}

@@ -1,6 +1,3 @@
-numpy >= 1.15.4, < 2
-compas >= 2.0.4, < 3
-compas_robots >= 0.3, < 1
-roslibpy >= 1.1.0
-pybullet
-pyserial
+compas >= 2.3, < 3
+compas_robots >= 1, < 2
+roslibpy[asyncio] @ git+https://github.com/gramaziokohler/roslibpy.git@websockets-asyncio

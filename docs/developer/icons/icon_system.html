@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>COMPAS FAB — Grasshopper Component Icons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --paper:oklch(0.987 0.003 250);
+    --panel:oklch(1 0 0);
+    --grid:oklch(0.925 0.006 255);
+    --grid-strong:oklch(0.88 0.008 255);
+    --ink:oklch(0.32 0.014 256);
+    --ink-soft:oklch(0.50 0.012 256);
+    --ink-faint:oklch(0.66 0.010 256);
+    --hair:oklch(0.90 0.006 255);
+    --accent:oklch(0.595 0.105 215);
+    --accent-soft:oklch(0.595 0.105 215 / 0.10);
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --sans:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .sheet{
+    max-width:1180px;
+    margin:0 auto;
+    padding:56px 48px 96px;
+    /* faint engineering grid */
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:24px 24px;
+    background-position:0 0;
+  }
+
+  /* ---- icon primitive ---- */
+  .ic{display:block;}
+  .ic path,.ic rect,.ic line,.ic circle{
+    fill:none;
+    stroke:var(--ink);
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+  }
+  .ic .dot{fill:var(--ink);stroke:none;}
+  .ic .ac{stroke:var(--accent);}
+  .ic .lt{stroke-width:1.5;}
+  .ic .adot{fill:var(--accent);stroke:none;}
+
+  /* ---- masthead ---- */
+  .mast{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:32px;border-bottom:1.5px solid var(--ink);padding-bottom:22px;
+  }
+  .mast > div:first-child{display:flex;flex-direction:column;gap:12px;flex:1 1 auto;min-width:0;}
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--accent);font-weight:500;
+  }
+  h1{
+    font-family:var(--mono);font-weight:600;
+    font-size:29px;letter-spacing:-.01em;margin:0;line-height:1.15;
+  }
+  .mast p{margin:0;color:var(--ink-soft);max-width:48ch;font-size:14px;}
+  .stamp{
+    font-family:var(--mono);font-size:11px;color:var(--ink-soft);
+    text-align:right;line-height:1.9;white-space:nowrap;flex:none;
+  }
+  .stamp b{color:var(--ink);font-weight:600;}
+
+  /* ---- spec band ---- */
+  .specs{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--hair);border:1px solid var(--hair);
+    margin-top:28px;
+  }
+  .spec{background:var(--panel);padding:16px 18px;}
+  .spec .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-faint);}
+  .spec .v{font-family:var(--mono);font-size:13px;margin-top:7px;color:var(--ink);}
+  .swatchrow{display:flex;gap:7px;margin-top:9px;align-items:center;}
+  .sw{width:16px;height:16px;border-radius:3px;border:1px solid oklch(0 0 0 /.08);}
+
+  /* ---- section heading ---- */
+  .h{display:flex;align-items:baseline;gap:14px;margin:52px 0 20px;}
+  .h .n{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:600;}
+  .h h2{font-family:var(--mono);font-size:15px;font-weight:600;margin:0;letter-spacing:.01em;}
+  .h .c{font-size:12px;color:var(--ink-faint);font-family:var(--mono);}
+  .h .rule{flex:1;height:1px;background:var(--hair);align-self:center;}
+
+  /* ---- kit legend ---- */
+  .kit{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:1px;
+    background:var(--hair);border:1px solid var(--hair);
+  }
+  .kit .cell{background:var(--panel);padding:14px 14px 12px;display:flex;gap:11px;align-items:center;}
+  .kit .cell svg{flex:none;}
+  .kit .lab{font-family:var(--mono);font-size:11px;line-height:1.35;}
+  .kit .lab b{display:block;color:var(--ink);font-weight:600;}
+  .kit .lab span{color:var(--ink-faint);}
+
+  /* ---- icon grid ---- */
+  .grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--hair);border:1px solid var(--hair);
+  }
+  .card{
+    background:var(--panel);padding:20px 18px 16px;
+    display:flex;flex-direction:column;gap:14px;position:relative;
+    transition:background .15s;
+  }
+  .card:hover{background:oklch(0.595 0.105 215 / 0.045);}
+  .card .top{display:flex;align-items:center;gap:16px;}
+  .big{
+    width:52px;height:52px;flex:none;border:1px solid var(--hair);border-radius:6px;
+    display:grid;place-items:center;background:var(--paper);
+  }
+  .true{
+    display:flex;flex-direction:column;gap:6px;align-items:center;
+  }
+  .true .px{width:24px;height:24px;display:grid;place-items:center;
+    border:1px solid var(--hair);border-radius:4px;background:var(--panel);}
+  .true .px svg{width:24px;height:24px;}
+  .true .lbl{font-family:var(--mono);font-size:8.5px;color:var(--ink-faint);letter-spacing:.04em;}
+  .meta .name{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink);}
+  .meta .nick{font-family:var(--mono);font-size:10.5px;color:var(--accent);margin-top:3px;letter-spacing:.02em;}
+  .meta .desc{font-size:11.5px;color:var(--ink-soft);margin-top:8px;line-height:1.45;}
+  .idx{position:absolute;top:12px;right:14px;font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.05em;}
+
+  /* ---- grasshopper context ---- */
+  .ghwrap{
+    margin-top:30px;border:1px solid var(--hair);background:
+      linear-gradient(oklch(0.95 0.004 255) 1px,transparent 1px),
+      linear-gradient(90deg,oklch(0.95 0.004 255) 1px,transparent 1px),
+      oklch(0.965 0.004 255);
+    background-size:22px 22px;padding:34px 30px;position:relative;overflow:hidden;
+  }
+  .ghcap{position:absolute;top:12px;left:16px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);}
+  .pipe{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;}
+  .gh{
+    display:flex;align-items:stretch;background:oklch(0.90 0.006 250);
+    border:1px solid oklch(0.74 0.01 255);border-radius:3px;
+    box-shadow:0 1px 0 oklch(1 0 0 /.6) inset, 0 1px 3px oklch(0 0 0 /.12);
+    height:58px;
+  }
+  .gh .pins{display:flex;flex-direction:column;justify-content:space-around;
+    padding:5px 0;width:13px;}
+  .gh .pins.out{align-items:flex-end;}
+  .gh .pin{width:7px;height:7px;border:1px solid oklch(0.55 0.01 255);
+    background:oklch(0.97 0 0);border-radius:1px;}
+  .gh .body{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:5px;padding:0 4px;min-width:62px;border-left:1px solid oklch(0.78 0.01 255);
+    border-right:1px solid oklch(0.78 0.01 255);background:oklch(0.93 0.005 250);
+  }
+  .gh .body svg{width:24px;height:24px;}
+  .gh .body .t{font-family:var(--mono);font-size:8px;color:oklch(0.35 0.01 255);
+    letter-spacing:.02em;text-align:center;line-height:1;}
+  .wire{width:46px;height:2px;flex:none;align-self:center;
+    background:linear-gradient(90deg,oklch(0.6 0.02 255),oklch(0.6 0.02 255));
+    position:relative;}
+  .wire::after{content:"";position:absolute;right:-1px;top:-2px;width:6px;height:6px;
+    border-radius:50%;background:var(--accent);}
+
+  .foot{margin-top:46px;border-top:1px solid var(--hair);padding-top:18px;
+    display:flex;justify-content:space-between;font-family:var(--mono);
+    font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px;}
+
+  @media(max-width:900px){
+    .grid,.specs,.kit{grid-template-columns:repeat(2,1fr);}
+    .sheet{padding:40px 22px 70px;}
+    .mast{flex-direction:column;align-items:flex-start;gap:16px;}
+    .stamp{text-align:left;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- masthead -->
+  <header class="mast">
+    <div>
+      <div class="eyebrow">COMPAS FAB · Robotic Fabrication</div>
+      <h1>Grasshopper Icon System</h1>
+      <p>A unified 24&times;24 icon set for the COMPAS&nbsp;FAB component toolbar — built from one geometric kit so the whole library reads as a family.</p>
+    </div>
+    <div class="stamp">
+      <div><b>38</b> components</div>
+      <div><b>24&times;24</b> px · PNG/SVG</div>
+      <div><b>7</b> subcategories</div>
+      <div>rev <b>A</b> · 2026-06</div>
+    </div>
+  </header>
+
+  <!-- spec band -->
+  <section class="specs">
+    <div class="spec">
+      <div class="k">Grid</div>
+      <div class="v">24 px artboard<br/>3 px keyline · 18² live</div>
+    </div>
+    <div class="spec">
+      <div class="k">Stroke</div>
+      <div class="v">1.8 px monoline<br/>round cap · round join</div>
+    </div>
+    <div class="spec">
+      <div class="k">Ink / Accent</div>
+      <div class="swatchrow">
+        <span class="sw" style="background:var(--ink)"></span>
+        <span class="sw" style="background:var(--accent)"></span>
+        <span class="v" style="margin:0;font-size:11px">slate&nbsp;·&nbsp;teal-215</span>
+      </div>
+    </div>
+    <div class="spec">
+      <div class="k">Accent rule</div>
+      <div class="v" style="font-size:11.5px">color marks the<br/>semantic subject</div>
+    </div>
+  </section>
+
+  <!-- primitive kit -->
+  <div class="h">
+    <span class="n">00</span><h2>Primitive Kit</h2>
+    <span class="c">shared vocabulary</span><span class="rule"></span>
+  </div>
+  <section class="kit" id="kit"></section>
+
+  <!-- in grasshopper -->
+  <div class="h">
+    <span class="n">↳</span><h2>In Grasshopper</h2>
+    <span class="c">cartesian-motion pipeline</span><span class="rule"></span>
+  </div>
+  <div class="ghwrap">
+    <span class="ghcap">Components on canvas · icons at true 24px</span>
+    <div class="pipe" id="pipe"></div>
+  </div>
+
+  <!-- catalog sections injected here -->
+  <div id="catalog"></div>
+
+  <footer class="foot">
+    <span>COMPAS FAB — compas.dev/compas_fab</span>
+    <span>Icon system · proposal rev A</span>
+  </footer>
+
+</div>
+
+<script src="icons.js"></script>
+<script>
+  const svg = (id, cls) =>
+    `<svg class="ic ${cls||''}" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">${ICONS[id]}</svg>`;
+
+  /* primitive kit legend */
+  const KIT = [
+    ['cellLibrary','Cube','robot cell / volume'],
+    ['bodyFromMesh','Square','rigid body'],
+    ['toolFromMesh','Cone','tool · TCF'],
+    ['frameTarget','Triad','coordinate frame'],
+    ['robotConfig','Sliders','joint config'],
+    ['planCartesian','Polyline','motion path'],
+    ['configTarget','Ring','goal / target'],
+    ['toolFromLibrary','Open book','library'],
+    ['analyticalPlanner','Labelled chip','solver backend'],
+    ['rosClient','Nodes','connection'],
+  ];
+  document.getElementById('kit').innerHTML = KIT.map(([id,b,s])=>
+    `<div class="cell">${svg(id)}<div class="lab"><b>${b}</b><span>${s}</span></div></div>`
+  ).join('');
+
+  /* grasshopper context pipeline (user's chosen workflow) */
+  const PIPE = [
+    ['cellLibrary','Cell'],
+    ['frameWaypoints','Waypts'],
+    ['planCartesian','Cartesian'],
+    ['visualize','Visualize'],
+  ];
+  document.getElementById('pipe').innerHTML = PIPE.map(([id,t],i)=>{
+    const node = `<div class="gh">`+
+      `<div class="pins in"><span class="pin"></span><span class="pin"></span></div>`+
+      `<div class="body">${svg(id)}<span class="t">${t}</span></div>`+
+      `<div class="pins out"><span class="pin"></span></div></div>`;
+    return node + (i<PIPE.length-1 ? `<span class="wire"></span>` : '');
+  }).join('');
+
+  /* full catalog */
+  const SECTIONS = [
+    ['01','Robot Cell','build the workspace',[
+      ['cellLibrary','Load Robot Cell From Library','Cell from Library','Pre-defined cell + default state from the RobotCellLibrary.'],
+      ['cellUrdf','Load Robot Cell From URDF/SRDF','Cell from URDF','Load a cell from URDF + SRDF files on disk. No ROS.'],
+      ['bodyFromMesh','Rigid Body From Mesh','Body From Mesh','Construct a RigidBody from a Rhino mesh.'],
+      ['toolFromMesh','Tool From Mesh','Tool From Mesh','Construct a ToolModel from a Rhino mesh + TCP plane.'],
+      ['toolFromLibrary','Tool From Library','Tool From Library','Load a pre-defined ToolModel (cone, gripper…).'],
+      ['bodyFromLibrary','Rigid Body From Library','Body From Library','Load a pre-defined RigidBody (target_marker…).'],
+      ['deconstructRobotCell','Deconstruct Robot Cell','Deconstruct Robot Cell','Explode a cell into its model, rigid bodies, tools and default state.'],
+    ]],
+    ['02','Cell State','snapshot what is where',[
+      ['defaultState','Default Cell State','Default State','Default state: robot at zero config, nothing attached.'],
+      ['setConfig','Set Robot Configuration','Set Config','Override robot_configuration; bridges IK back into a state.'],
+      ['attachTool','Attach Tool To Robot','Attach Tool','Attach a tool to a planning group in a state.'],
+      ['attachBodyLink','Attach Rigid Body To Link','Attach Body to Link','Mount a body on a robot link (dress-pack, camera…).'],
+      ['attachBodyTool','Attach Rigid Body To Tool','Attach Body to Tool','Grasp a workpiece with a tool (WORKPIECE mode).'],
+      ['placeBody','Set Rigid Body Frame','Place Body','Place an unattached body at a world frame.'],
+      ['touchLinks','Set Touch Links','Touch Links','Set allowed-collision links on a body state.'],
+    ]],
+    ['03','Targets','define where to go',[
+      ['frameTarget','Frame Target','Frame Target','Fully-constrained pose from a plane or COMPAS Frame.'],
+      ['pointAxisTarget','Point Axis Target','Point Axis Target','Point + axis; rotation about Z is free (drill, print).'],
+      ['configTarget','Configuration Target','Configuration Target','Goal defined by joint values — home / named poses.'],
+      ['frameWaypoints','Frame Waypoints','Frame Waypoints','Ordered planes for cartesian motion.'],
+      ['pointAxisWaypoints','Point Axis Waypoints','Point Axis Waypoints','Ordered point + axis poses for symmetric tools.'],
+      ['robotConfig','Robot Configuration','Robot Config','Auto-built joint sliders → a Configuration.'],
+    ]],
+    ['04','Planning','solve & plan',[
+      ['fk','Forward Kinematics','FK','Configuration → frame for a cell state.'],
+      ['ik','Inverse Kinematics','IK','Target → configuration for a cell state.'],
+      ['planMotion','Plan Motion','Plan Motion','Free-space, joint-interpolated motion to a target.'],
+      ['planCartesian','Plan Cartesian Motion','Cartesian Motion','Linear-in-tool-space motion through waypoints.'],
+      ['trajectoryAction','Trajectory Action','Trajectory Action','Wrap a JointTrajectory into a named Action.'],
+      ['stateChangeAction','State Change Action','State Change Action','Wrap a state change (grasp, release, tool swap) into an Action.'],
+      ['actionChain','Action Chain','Action Chain','Assemble ordered Actions into one ActionChain.'],
+      ['deconstructTrajectory','Deconstruct Trajectory','Deconstruct Trajectory','Explode a trajectory into per-point states + velocity/accel data.'],
+    ]],
+    ['05','Backends','choose an engine',[
+      ['analyticalPlanner','Analytical Kinematics Planner','Analytical Planner','Closed-form FK/IK in-process. No ROS or PyBullet.'],
+      ['pyBulletPlanner','PyBullet Planner','PyBullet Planner','In-process PyBullet physics server: collision checking + FK/IK/Cartesian.'],
+      ['analyticalPyBulletPlanner','Analytical PyBullet Planner','Analytical PyBullet','Closed-form IK gated by PyBullet collision checking.'],
+      ['moveitPlanner','MoveIt Planner','MoveIt Planner','Full motion planning over a connected RosClient.'],
+      ['moveitPlannerOptions','MoveIt Planner Options','MoveIt Planner Options','Bundle advanced load options (URDF/SRDF params, file-server URL) for the MoveIt Planner.'],
+      ['deconstructPlanner','Deconstruct Planner','Deconstruct Planner','Read the cell, state and model currently held by a planner.'],
+    ]],
+    ['06','ROS','connect & talk to topics',[
+      ['rosClient','ROS Client','ROS Client','Connect to a ROS 1 / ROS 2 bridge. Auto-detects distro.'],
+      ['publish','Publish to topic','Publish','Publish messages to a ROS topic.'],
+      ['subscribe','Subscribe to topic','Subscribe','Receive messages from a ROS topic.'],
+    ]],
+    ['07','Display','draw the result',[
+      ['visualize','Visualize Robot Cell','Visualize','Draw the cell at the configuration of a cell state.'],
+    ]],
+  ];
+
+  let n = 0;
+  document.getElementById('catalog').innerHTML = SECTIONS.map(([num,title,sub,items])=>{
+    const cards = items.map(([id,name,nick,desc])=>{
+      n++;
+      const idx = String(n).padStart(2,'0');
+      return `<div class="card">
+        <span class="idx">${idx}</span>
+        <div class="top">
+          <div class="big">${svg(id).replace('width="24" height="24"','width="34" height="34"')}</div>
+          <div class="true">
+            <div class="px">${svg(id)}</div>
+            <span class="lbl">24px</span>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name">${name}</div>
+          <div class="nick">${nick}</div>
+          <div class="desc">${desc}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="h"><span class="n">${num}</span><h2>${title}</h2>
+      <span class="c">${sub}</span><span class="rule"></span></div>
+      <section class="grid">${cards}</section>`;
+  }).join('');
+</script>
+</body>
+</html>

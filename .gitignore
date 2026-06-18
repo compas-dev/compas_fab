@@ -117,6 +117,7 @@ docs/generated/*
 
 temp/**
 !temp/.gitkeep
+.DS_Store
 
 # Grasshopper generated objects
-src/compas_fab/ghpython/components/ghuser/*.ghuser
+src/compas_fab/ghpython/components_cpython/ghuser/*.ghuser

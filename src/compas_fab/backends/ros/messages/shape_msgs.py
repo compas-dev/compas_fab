@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import compas.datastructures
 
 from compas_fab.backends.ros.messages.geometry_msgs import Point
@@ -7,7 +5,9 @@ from compas_fab.backends.ros.messages.std_msgs import ROSmsg
 
 
 class SolidPrimitive(ROSmsg):
-    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/SolidPrimitive.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/shape_msgs/html/msg/SolidPrimitive.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/shape_msgs/interfaces/msg/SolidPrimitive.html
+    """
 
     ROS_MSG_TYPE = "shape_msgs/SolidPrimitive"
 
@@ -75,7 +75,9 @@ class SolidPrimitive(ROSmsg):
 
 
 class Mesh(ROSmsg):
-    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Mesh.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/shape_msgs/html/msg/Mesh.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/shape_msgs/interfaces/msg/Mesh.html
+    """
 
     ROS_MSG_TYPE = "shape_msgs/Mesh"
 
@@ -107,7 +109,9 @@ class Mesh(ROSmsg):
 
 
 class MeshTriangle(ROSmsg):
-    """https://docs.ros.org/api/shape_msgs/html/msg/MeshTriangle.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/shape_msgs/html/msg/MeshTriangle.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/shape_msgs/interfaces/msg/MeshTriangle.html
+    """
 
     ROS_MSG_TYPE = "shape_msgs/MeshTriangle"
 
@@ -123,7 +127,9 @@ class MeshTriangle(ROSmsg):
 
 
 class Plane(ROSmsg):
-    """https://docs.ros.org/kinetic/api/shape_msgs/html/msg/Plane.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/shape_msgs/html/msg/Plane.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/shape_msgs/interfaces/msg/Plane.html
+    """
 
     ROS_MSG_TYPE = "shape_msgs/Plane"
 

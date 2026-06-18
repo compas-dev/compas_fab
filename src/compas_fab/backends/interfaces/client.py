@@ -1,228 +1,41 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from compas_fab.backends.exceptions import BackendFeatureNotSupportedError
+from compas_robots import RobotModel
+
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import RobotSemantics
 
 
-def forward_docstring(backend_feature):
-    def dec(obj):
-        obj.__doc__ = backend_feature.__dict__[obj.__name__].__doc__
-        return obj
+class ClientInterface:
+    """Interface for implementing backend clients.
 
-    return dec
-
-
-class ClientInterface(object):
-    """Interface for all backend clients.  Forwards all planning services and
-    planning scene management to the planner.
+    Attributes
+    ----------
+    robot_cell
+        The robot cell instance last set on the client.
+    robot_cell_state
+        The robot cell state instance last set on the client.
+    robot_model
+        Equivalent to `robot_cell.robot_model`.
+    robot_semantics
+        Equivalent to `robot_cell.robot_semantics`.
     """
 
     def __init__(self):
-        self.planner = PlannerInterface(self)
-        # self.control = ControlInterface()
+        self._robot_cell = None
+        self._robot_cell_state = None
 
-    # ==========================================================================
-    # planning services
-    # ==========================================================================
+    @property
+    def robot_cell(self) -> RobotCell:
+        return self._robot_cell
 
-    def inverse_kinematics(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.inverse_kinematics(*args, **kwargs)
+    @property
+    def robot_cell_state(self) -> RobotCellState:
+        return self._robot_cell_state
 
-    def forward_kinematics(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.forward_kinematics(*args, **kwargs)
+    @property
+    def robot_model(self) -> RobotModel:
+        return self.robot_cell.robot_model
 
-    def plan_cartesian_motion(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.plan_cartesian_motion(*args, **kwargs)
-
-    def plan_motion(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.plan_motion(*args, **kwargs)
-
-    # ==========================================================================
-    # collision objects and planning scene
-    # ==========================================================================
-
-    def get_planning_scene(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.get_planning_scene(*args, **kwargs)
-
-    def reset_planning_scene(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.reset_planning_scene(*args, **kwargs)
-
-    def add_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.add_collision_mesh(*args, **kwargs)
-
-    def remove_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.remove_collision_mesh(*args, **kwargs)
-
-    def append_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.append_collision_mesh(*args, **kwargs)
-
-    def add_attached_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.add_attached_collision_mesh(*args, **kwargs)
-
-    def remove_attached_collision_mesh(self, *args, **kwargs):
-        """Forwards call to appropriate method in the planner."""
-        return self.planner.remove_attached_collision_mesh(*args, **kwargs)
-
-
-#     # ==========================================================================
-#     # executing
-#     # ==========================================================================
-#
-#     def execute_joint_trajectory(self, *args, **kwargs):
-#         self.control.execute_joint_trajectory(*args, **kwargs)
-#
-#     def follow_joint_trajectory(self, *args, **kwargs):
-#         self.control.follow_joint_trajectory(*args, **kwargs)
-#
-#     def get_configuration(self, *args, **kwargs):
-#         self.control.get_configuration(*args, **kwargs)
-#
-#
-# class ControlInterface(object):
-#     def execute_joint_trajectory(self, *args, **kwargs):
-#         raise NotImplementedError('Assigned control does not have this feature.')
-#
-#     def follow_joint_trajectory(self, *args, **kwargs):
-#         raise NotImplementedError('Assigned control does not have this feature.')
-#
-#     def get_configuration(self, *args, **kwargs):
-#         raise NotImplementedError('Assigned control does not have this feature.')
-
-
-class PlannerInterface(object):
-    """Interface for all planners associated with a backend client.  Provides default
-    behavior for all planning services and planning scene management methods.  To be
-    use in conjunction with backend feature interfaces.
-    """
-
-    def __init__(self, client):
-        # super(PlannerInterface, self).__init__()
-        self.client = client
-
-    # ==========================================================================
-    # planning services
-    # ==========================================================================
-
-    def inverse_kinematics(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def forward_kinematics(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def plan_motion(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def plan_cartesian_motion(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    # ==========================================================================
-    # collision objects and planning scene
-    # ==========================================================================
-
-    def get_planning_scene(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def reset_planning_scene(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def add_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def remove_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def append_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def add_attached_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
-
-    def remove_attached_collision_mesh(self, *args, **kwargs):
-        """Default method for planner.
-
-        Raises
-        ------
-        BackendFeatureNotSupportedError
-            Planner does not have this feature.
-        """
-        raise BackendFeatureNotSupportedError("Assigned planner does not have this feature.")
+    @property
+    def robot_semantics(self) -> RobotSemantics:
+        return self.robot_cell.robot_semantics

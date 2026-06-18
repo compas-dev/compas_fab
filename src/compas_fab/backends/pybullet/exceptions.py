@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from compas_fab.backends.exceptions import BackendError
 
 
@@ -12,11 +8,22 @@ class PyBulletError(BackendError):
         super(PyBulletError, self).__init__(message)
 
 
-class CollisionError(PyBulletError):
-    """Exception raised when two objects have been found to be in collision in PyBullet."""
+class PlanningGroupNotSupported(PyBulletError):
+    """Exception raised when a problem is caused by a planning group.
 
-    def __init__(self, name1, name2):
-        message = "Collision between '{}' and '{}'".format(name1, name2)
-        super(CollisionError, self).__init__(message)
-        self.name1 = name1
-        self.name2 = name2
+    Attributes
+    ----------
+    group_name : str
+        The name of the planning group.
+    joint_names : list of str
+        The names of the joints in the planning group.
+    link_names : list of str
+        The names of the links in the planning group.
+
+    """
+
+    def __init__(self, group_name, joint_names, link_names):
+        super(PlanningGroupNotSupported, self).__init__("Planning group '{}' not supported by PyBullet".format(group_name))
+        self.group_name = group_name
+        self.joint_names = joint_names
+        self.link_names = link_names

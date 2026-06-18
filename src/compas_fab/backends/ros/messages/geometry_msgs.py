@@ -1,15 +1,13 @@
-from __future__ import absolute_import
-
 from compas.geometry import Frame
-
-import compas_fab.robots
 
 from .std_msgs import Header
 from .std_msgs import ROSmsg
 
 
 class Point(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Point.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Point.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Point.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Point"
 
@@ -25,7 +23,9 @@ class Point(ROSmsg):
 
 
 class Quaternion(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Quaternion.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Quaternion.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Quaternion.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Quaternion"
 
@@ -42,7 +42,9 @@ class Quaternion(ROSmsg):
 
 
 class Pose(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Pose.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Pose.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Pose.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Pose"
 
@@ -55,6 +57,11 @@ class Pose(ROSmsg):
         point = frame.point
         qw, qx, qy, qz = frame.quaternion
         return cls(Point(*list(point)), Quaternion(qx, qy, qz, qw))
+
+    @classmethod
+    def from_transformation(cls, transformation):
+        frame = Frame.from_transformation(transformation)
+        return cls.from_frame(frame)
 
     @property
     def frame(self):
@@ -70,7 +77,9 @@ class Pose(ROSmsg):
 
 
 class PoseStamped(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseStamped.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/PoseStamped.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/PoseStamped"
 
@@ -86,7 +95,9 @@ class PoseStamped(ROSmsg):
 
 
 class PoseArray(ROSmsg):
-    """http://docs.ros.org/en/api/geometry_msgs/html/msg/PoseArray.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/PoseArray.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/PoseArray.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/PoseArray"
 
@@ -102,7 +113,9 @@ class PoseArray(ROSmsg):
 
 
 class Vector3(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Vector3.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Vector3.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Vector3.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Vector3"
 
@@ -118,7 +131,9 @@ class Vector3(ROSmsg):
 
 
 class Transform(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Transform.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Transform.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Transform.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Transform"
 
@@ -128,7 +143,9 @@ class Transform(ROSmsg):
 
 
 class Twist(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Twist.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Twist.html
+    """
 
     ROS_MSG_TYPE = "geometry_msgs/Twist"
 
@@ -138,12 +155,14 @@ class Twist(ROSmsg):
 
 
 class Wrench(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Wrench.html
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Wrench.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Wrench.html
 
     This represents force in free space, separated into its linear and angular parts.
 
     Examples
     --------
+    >>> import compas_fab.robots
     >>> wrench = compas_fab.robots.Wrench([0, 0, -98], [0, 0, 0])
     >>> ros_wrench = Wrench.from_wrench(wrench)
     >>> ros_wrench.msg
@@ -172,13 +191,16 @@ class Wrench(ROSmsg):
 
     @property
     def wrench(self):
+        from compas_fab.robots import Wrench as compas_fab_Wrench
+
         force = [self.force.x, self.force.y, self.force.z]
         torque = [self.torque.x, self.torque.y, self.torque.z]
-        return compas_fab.robots.Wrench(force, torque)
+        return compas_fab_Wrench(force, torque)
 
 
 class WrenchStamped(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/WrenchStamped.html
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/WrenchStamped.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/WrenchStamped.html
 
     A wrench with reference coordinate frame and timestamp.
     """
@@ -197,11 +219,14 @@ class WrenchStamped(ROSmsg):
 
 
 class Inertia(ROSmsg):
-    """https://docs.ros.org/api/geometry_msgs/html/msg/Inertia.html
+    """ROS 1: https://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Inertia.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/geometry_msgs/interfaces/msg/Inertia.html
 
     Examples
     --------
-    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1., [0.1, 3.1, 4.4])
+
+    >>> import compas_fab.robots
+    >>> inertia = compas_fab.robots.Inertia([[0] * 3] * 3, 1.0, [0.1, 3.1, 4.4])
     >>> ros_inertia = Inertia.from_inertia(inertia)
     >>> ros_inertia.msg
     {'m': 1.0, 'com': {'x': 0.1, 'y': 3.1, 'z': 4.4}, 'ixx': 0.0, 'ixy': 0.0, 'ixz': 0.0, 'iyy': 0.0, 'iyz': 0.0, 'izz': 0.0}
@@ -237,12 +262,14 @@ class Inertia(ROSmsg):
 
     @property
     def inertia(self):
+        from compas_fab.robots import Inertia as compas_fab_Inertia
+
         inertia_tensor = [
             [self.ixx, self.ixy, self.ixz],
             [self.ixy, self.iyy, self.iyz],
             [self.ixz, self.iyz, self.izz],
         ]
-        return compas_fab.robots.Inertia(inertia_tensor, self.m, [self.com.x, self.com.y, self.com.z])
+        return compas_fab_Inertia(inertia_tensor, self.m, [self.com.x, self.com.y, self.com.z])
 
 
 if __name__ == "__main__":

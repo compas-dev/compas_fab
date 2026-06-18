@@ -1,15 +1,24 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import Optional
+from typing import Union
 
 from compas.data import Data
+from compas.datastructures import Mesh
+from compas.geometry import Box
+from compas.geometry import Frame
+from compas.geometry import Point
 from compas.geometry import Rotation
 from compas.geometry import Scale
 from compas.geometry import Sphere
+from compas.geometry import Transformation
+from compas_robots import Configuration
 
-from compas_fab.utilities import from_tcf_to_t0cf
-
-__all__ = ["BoundingVolume", "Constraint", "JointConstraint", "OrientationConstraint", "PositionConstraint"]
+__all__ = [
+    "BoundingVolume",
+    "Constraint",
+    "JointConstraint",
+    "OrientationConstraint",
+    "PositionConstraint",
+]
 
 
 class BoundingVolume(Data):
@@ -18,20 +27,18 @@ class BoundingVolume(Data):
     Parameters
     ----------
     volume_type
-        The type of bounding volume, one of :attr:`BoundingVolume.VOLUME_TYPES`.
-    volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`
-        The volume can be either a :class:`compas.geometry.Box`, a
-        :class:`compas.geometry.Sphere`, or a
-        :class:`compas.datastructures.Mesh`.
+        The type of bounding volume, one of `BoundingVolume.VOLUME_TYPES`.
+    volume
+        The volume can be either a [Box][], a
+        [Sphere][], or a [Mesh][].
 
     Attributes
     ----------
     volume_type
-        The type of bounding volume, one of :attr:`BoundingVolume.VOLUME_TYPES`.
-    volume : :class:`compas.datastructures.Mesh` or :class:`compas.geometry.Primitive`
-        The volume can be either a :class:`compas.geometry.Box`, a
-        :class:`compas.geometry.Sphere`, or a
-        :class:`compas.datastructures.Mesh`.
+        The type of bounding volume, one of `BoundingVolume.VOLUME_TYPES`.
+    volume
+        The volume can be either a [Box][], a
+        [Sphere][], or a [Mesh][].
 
     Notes
     -----
@@ -55,37 +62,37 @@ class BoundingVolume(Data):
     #: List of supported volume types
     VOLUME_TYPES = (BOX, SPHERE, MESH)
 
-    def __init__(self, volume_type, volume):
+    def __init__(self, volume_type: int, volume: Union[Box, Sphere, Mesh]):
         if volume_type not in self.VOLUME_TYPES:
             raise ValueError("Type must be one of {}".format(self.VOLUME_TYPES))
         self.type = volume_type
         self.volume = volume
 
-    def __data__(self):
+    def __data__(self) -> dict:
         return {
             "volume_type": self.type,
             "volume": self.volume,
         }
 
     @classmethod
-    def from_box(cls, box):
-        """Create a :class:`BoundingVolume` from a :class:`compas.geometry.Box`.
+    def from_box(cls, box: Box) -> "BoundingVolume":
+        """Create a `BoundingVolume` from a [`Box`][compas.geometry.Box].
 
         Parameters
         ----------
-        box : :class:`compas.geometry.Box`
-            Box to define :class:`BoundingVolume` with.
+        box
+            Box to define `BoundingVolume` with.
 
         Returns
         -------
-        :class:`BoundingVolume`
+        `BoundingVolume`
 
         Examples
         --------
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
         >>> from compas_fab.robots import BoundingVolume
-        >>> box = Box(1., 1., 1.)
+        >>> box = Box(1.0, 1.0, 1.0)
         >>> bv = BoundingVolume.from_box(box)
         >>> bv.type
         1
@@ -93,85 +100,77 @@ class BoundingVolume(Data):
         return cls(cls.BOX, box)
 
     @classmethod
-    def from_sphere(cls, sphere):
-        """Create a :class:`BoundingVolume` from a :class:`compas.geometry.Sphere`.
+    def from_sphere(cls, sphere: Sphere) -> "BoundingVolume":
+        """Create a `BoundingVolume` from a [`Sphere`][compas.geometry.Sphere].
 
         Parameters
         ----------
-        sphere : :class:`compas.geometry.Sphere`
-            Sphere to define :class:`BoundingVolume` with.
+        sphere
+            Sphere to define `BoundingVolume` with.
 
         Returns
         -------
-        :class:`BoundingVolume`
+        `BoundingVolume`
 
-        Examples
-        --------
-        >>> from compas.geometry import Sphere
-        >>> from compas_fab.robots import BoundingVolume
-        >>> sphere = Sphere(5.0, Frame.worldXY())
-        >>> bv = BoundingVolume.from_sphere(sphere)
-        >>> bv.type
-        2
         """
         return cls(cls.SPHERE, sphere)
 
     @classmethod
-    def from_mesh(cls, mesh):
-        """Create a :class:`BoundingVolume` from a :class:`compas.datastructures.Mesh`.
+    def from_mesh(cls, mesh: Mesh) -> "BoundingVolume":
+        """Create a `BoundingVolume` from a [`Mesh`][compas.datastructures.Mesh].
 
         Parameters
         ----------
-        mesh : :class:`compas.datastructures.Mesh`
+        mesh
 
         Returns
         -------
-        :class:`BoundingVolume`
-            Mesh to define :class:`BoundingVolume` with.
+        `BoundingVolume`
+            Mesh to define `BoundingVolume` with.
 
         Examples
         --------
         >>> import compas
         >>> from compas.datastructures import Mesh
         >>> from compas_fab.robots import BoundingVolume
-        >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
+        >>> mesh = Mesh.from_obj(compas.get("faces.obj"))
         >>> bv = BoundingVolume.from_mesh(Mesh)
         >>> bv.type
         3
         """
         return cls(cls.MESH, mesh)
 
-    def scale(self, scale_factor):
+    def scale(self, scale_factor: float) -> None:
         """Scale the volume uniformly.
 
         Parameters
         ----------
-        scale_factor : :obj:`float`
+        scale_factor
             Scale factor to use in scaling operation.
         """
         S = Scale.from_factors([scale_factor] * 3)
         self.transform(S)
 
-    def transform(self, transformation):
-        """Transform the volume using a :class:`compas.geometry.Transformation`.
+    def transform(self, transformation: Transformation) -> None:
+        """Transform the volume using a [`Transformation`][compas.geometry.Transformation].
 
         Parameters
         ----------
-        transformation : :class:`compas.geometry.Transformation`
-            The transformation to apply on the :class:`BoundingVolume`.
+        transformation
+            The transformation to apply on the `BoundingVolume`.
         """
         self.volume.transform(transformation)
 
     def __repr__(self):
-        """Printable representation of :class:`BoundingVolume`."""
+        """Printable representation of `BoundingVolume`."""
         return "BoundingVolume({!r}, {!r})".format(self.type, self.volume)
 
-    def copy(self):
-        """Make a copy of this :class:`BoundingVolume`.
+    def copy(self) -> "BoundingVolume":
+        """Make a copy of this `BoundingVolume`.
 
         Returns
         -------
-        :class:`BoundingVolume`
+        `BoundingVolume`
             A copy.
         """
         cls = type(self)
@@ -184,8 +183,8 @@ class Constraint(Data):
     Parameters
     ----------
     constraint_type
-        Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.
-    weight : :obj:`float`, optional
+        Constraint type, one of `Constraint.CONSTRAINT_TYPES`.
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
@@ -193,8 +192,8 @@ class Constraint(Data):
     Attributes
     ----------
     constraint_type
-        Constraint type, one of :attr:`Constraint.CONSTRAINT_TYPES`.
-    weight : :obj:`float`
+        Constraint type, one of `Constraint.CONSTRAINT_TYPES`.
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
@@ -220,7 +219,7 @@ class Constraint(Data):
     #:  List of possible constraint types.
     CONSTRAINT_TYPES = (JOINT, POSITION, ORIENTATION)
 
-    def __init__(self, constraint_type, weight=1.0):
+    def __init__(self, constraint_type: int, weight: Optional[float] = 1.0) -> None:
         if constraint_type not in self.CONSTRAINT_TYPES:
             raise ValueError("Type must be %d, %d or %d" % self.CONSTRAINT_TYPES)
         self.type = constraint_type
@@ -232,32 +231,32 @@ class Constraint(Data):
             "weight": self.weight,
         }
 
-    def transform(self, transformation):
-        """Transform the :class:`Constraint`."""
+    def transform(self, transformation: Transformation) -> None:
+        """Transform the `Constraint`."""
         pass
 
-    def scale(self, scale_factor):
-        """Scale the :class:`Constraint`."""
+    def scale(self, scale_factor: float) -> None:
+        """Scale the `Constraint`."""
         pass
 
-    def scaled(self, scale_factor):
-        """Get a scaled copy of this :class:`Constraint`.
+    def scaled(self, scale_factor: float) -> "Constraint":
+        """Get a scaled copy of this `Constraint`.
 
         Parameters
         ----------
-        scale_factor : :obj:`float`
-            Scale factor used to scale the :class:`Constraint`.
+        scale_factor
+            Scale factor used to scale the `Constraint`.
         """
         c = self.copy()
         c.scale(scale_factor)
         return c
 
-    def copy(self):
-        """Create a copy of this :class:`Constraint`.
+    def copy(self) -> "Constraint":
+        """Create a copy of this `Constraint`.
 
         Returns
         -------
-        :class:`BoundingVolume`
+        `BoundingVolume`
         """
         cls = type(self)
         return cls(self.type, self.weight)
@@ -268,40 +267,43 @@ class JointConstraint(Constraint):
 
     Parameters
     ----------
-    joint_name : :obj:`str`
-        The name of the joint this contraint refers to.
-    value : :obj:`float`
+    joint_name
+        The name of the joint this constraint refers to.
+    value
         The targeted value for that joint.
-    tolerance_above : :obj:`float`
+    tolerance_above
         Tolerance above the targeted joint value, in radians. Defaults to ``0``.
-    tolerance_below : :obj:`float`
+    tolerance_below
         Tolerance below the targeted joint value, in radians. Defaults to ``0``.
-    weight : :obj:`float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
     Attributes
     ----------
-    joint_name : :obj:`str`
-        The name of the joint this contraint refers to.
-    value : :obj:`float`
+    joint_name
+        The name of the joint this constraint refers to.
+    value
         The targeted value for that joint.
-    tolerance_above : :obj:`float`
+    tolerance_above
         Tolerance above the targeted joint value, in radians.
-    tolerance_below : :obj:`float`
+    tolerance_below
         Tolerance below the targeted joint value, in radians.
-    weight : :obj:`float`
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
-    Examples
-    --------
-    >>> from compas_fab.robots import JointConstraint
-    >>> jc = JointConstraint("joint_0", 1.4, 0.1, 0.1, 1.0)
     """
 
-    def __init__(self, joint_name, value, tolerance_above=0.0, tolerance_below=0.0, weight=1.0):
+    def __init__(
+        self,
+        joint_name: str,
+        value: float,
+        tolerance_above: Optional[float] = 0.0,
+        tolerance_below: Optional[float] = 0.0,
+        weight: Optional[float] = 1.0,
+    ) -> None:
         super(JointConstraint, self).__init__(self.JOINT, weight)
         self.joint_name = joint_name
         self.value = value
@@ -317,12 +319,12 @@ class JointConstraint(Constraint):
             "weight": self.weight,
         }
 
-    def scale(self, scale_factor):
+    def scale(self, scale_factor: float) -> None:
         """Scale (multiply) the constraint with a factor.
 
         Parameters
         ----------
-        scale_factor : :obj:`float`
+        scale_factor
             Factor used to multiply the joint value and tolerance bounds with.
         """
         self.value *= scale_factor
@@ -330,36 +332,34 @@ class JointConstraint(Constraint):
         self.tolerance_below *= scale_factor
 
     def __repr__(self):
-        """Printable representation of :class:`JointConstraint`."""
-        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(
-            self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight
-        )
+        """Printable representation of `JointConstraint`."""
+        return "JointConstraint({!r}, {!r}, {!r}, {!r}, {!r})".format(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
-    def copy(self):
-        """Create a copy of this :class:`JointConstraint`.
+    def copy(self) -> "JointConstraint":
+        """Create a copy of this `JointConstraint`.
 
         Returns
         -------
-        :class:`JointConstraint`
+        `JointConstraint`
         """
         cls = type(self)
         return cls(self.joint_name, self.value, self.tolerance_above, self.tolerance_below, self.weight)
 
     @classmethod
-    def joint_constraints_from_configuration(cls, configuration, tolerances_above, tolerances_below):
+    def joint_constraints_from_configuration(cls, configuration: Configuration, tolerances_above: list[float], tolerances_below: list[float]) -> list["JointConstraint"]:
         """Create joint constraints for all joints of the configuration.
         One constraint is created for each joint.
 
         Parameters
         ----------
-        configuration: :class:`Configuration`
+        configuration
             The target configuration.
-        tolerances_above: :obj:`list` of :obj:`float`
+        tolerances_above
             The tolerances above the targeted configuration's joint value on
             each of the joints, defining the upper bound in radians to be
             achieved. If only one value is passed in the list, it will be used to create
             upper bounds for all joint constraints.
-        tolerances_below: :obj:`list` of :obj:`float`
+        tolerances_below
             The tolerances below the targeted configuration's joint value on
             each of the joints, defining the upper bound in radians to be
             achieved. If only one value is passed, it will be used to create
@@ -367,13 +367,13 @@ class JointConstraint(Constraint):
 
         Returns
         -------
-        :obj:`list` of :class:`JointConstraint`
+        `list` of `JointConstraint`
 
         Raises
         ------
-        :exc:`ValueError`
+        `ValueError`
             If the passed configuration does not have joint names.
-        :exc:`ValueError`
+        `ValueError`
             If the passed list of tolerance values have a different length than
             the configuration.
 
@@ -389,11 +389,12 @@ class JointConstraint(Constraint):
             raise ValueError("The passed configuration has no joint_names")
 
         if len(joint_names) != len(configuration.joint_values):
-            raise ValueError(
-                "The passed configuration has {} joint_names but {} joint_values".format(
-                    len(joint_names), len(joint_values)
-                )
-            )
+            raise ValueError("The passed configuration has {} joint_names but {} joint_values".format(len(joint_names), len(joint_values)))
+        if not isinstance(tolerances_above, list):
+            tolerances_above = [tolerances_above]
+        if not isinstance(tolerances_below, list):
+            tolerances_below = [tolerances_below]
+
         if len(tolerances_above) == 1:
             tolerances_above = tolerances_above * len(joint_names)
         elif len(tolerances_above) != len(configuration.joint_values):
@@ -412,9 +413,7 @@ class JointConstraint(Constraint):
             )
 
         constraints = []
-        for name, value, tolerance_above, tolerance_below in zip(
-            joint_names, configuration.joint_values, tolerances_above, tolerances_below
-        ):
+        for name, value, tolerance_above, tolerance_below in zip(joint_names, configuration.joint_values, tolerances_above, tolerances_below):
             constraints.append(JointConstraint(name, value, tolerance_above, tolerance_below))
         return constraints
 
@@ -424,35 +423,37 @@ class OrientationConstraint(Constraint):
 
     Parameters
     ----------
-    link_name : :obj:`str`
-        The name of the link this contraint refers to.
-    quaternion : :obj:`list` of :obj:`float`
+    link_name
+        The name of the link this constraint refers to.
+    quaternion
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
-    tolerances : :obj:`list` of :obj:`float`, optional
+    tolerances
         Error tolerances :math:`t_{i}` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`. Defaults to
         ``[0.01, 0.01, 0.01]``.
-    weight : :obj:`float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
     Attributes
     ----------
-    link_name : :obj:`str`
-        The name of the link this contraint refers to.
-    quaternion : :obj:`list` of :obj:`float`
+    link_name
+        The name of the link this constraint refers to.
+    quaternion
         The desired orientation of the link specified by a quaternion in the
         order of ``[w, x, y, z]``.
-    tolerances : :obj:`list` of :obj:`float`
+    tolerances
         Error tolerances :math:`t_{i}` for each of the frame's axes. If only one
         value is passed it will be used for all 3 axes. The respective bound to
         be achieved is :math:`(a_{i} - t_{i}, a_{i} + t_{i})`.
-    weight : :obj:`float`
+        Defaults to ``[0.01, 0.01, 0.01]``.
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
+        Defaults to ``1.0``.
 
     Notes
     -----
@@ -463,19 +464,18 @@ class OrientationConstraint(Constraint):
     that the frame's x-axis and y-axis are allowed to rotate about the z-axis
     by an angle of 6.3 radians, whereas the z-axis can only change 0.01.
 
-    Examples
-    --------
-    >>> from compas.geometry import Frame
-    >>> from compas_fab.robots import OrientationConstraint
-    >>> frame = Frame([1, 1, 1], [0.68, 0.68, 0.27], [-0.67, 0.73, -0.15])
-    >>> oc = OrientationConstraint("link_0", frame.quaternion)
     """
 
-    def __init__(self, link_name, quaternion, tolerances=None, weight=1.0):
+    def __init__(self, link_name: str, quaternion: list[float], tolerances: list[float] = None, weight: list[float] = 1.0) -> None:
         super(OrientationConstraint, self).__init__(self.ORIENTATION, weight)
         self.link_name = link_name
         self.quaternion = [float(a) for a in list(quaternion)]
-        self.tolerances = [float(a) for a in list(tolerances)] if tolerances else [0.01] * 3
+        if isinstance(tolerances, list):
+            self.tolerances = [float(a) for a in list(tolerances)]
+        elif isinstance(tolerances, float):
+            self.tolerances = [tolerances] * 3
+        else:
+            self.tolerances = [0.01, 0.01, 0.01]
 
     def __data__(self):
         return {
@@ -485,12 +485,12 @@ class OrientationConstraint(Constraint):
             "weight": self.weight,
         }
 
-    def transform(self, transformation):
-        """Transform the volume using a :class:`compas.geometry.Transformation`.
+    def transform(self, transformation: Transformation) -> None:
+        """Transform the volume using a [`Transformation`][compas.geometry.Transformation].
 
         Parameters
         ----------
-        transformation : :class:`compas.geometry.Transformation`
+        transformation
         """
         R = Rotation.from_quaternion(self.quaternion)
         R = transformation * R
@@ -498,51 +498,46 @@ class OrientationConstraint(Constraint):
         self.quaternion = R.rotation.quaternion
 
     def __repr__(self):
-        """Printable representation of :class:`OrientationConstraint`."""
-        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(
-            self.link_name, self.quaternion, self.tolerances, self.weight
-        )
+        """Printable representation of `OrientationConstraint`."""
+        return "OrientationConstraint({!r}, {!r}, {!r}, {!r})".format(self.link_name, self.quaternion, self.tolerances, self.weight)
 
-    def copy(self):
-        """Create a copy of this :class:`OrientationConstraint`.
+    def copy(self) -> "OrientationConstraint":
+        """Create a copy of this `OrientationConstraint`.
 
         Returns
         -------
-        :class:`OrientationConstraint`
+        `OrientationConstraint`
         """
         cls = type(self)
         return cls(self.link_name, self.quaternion[:], self.tolerances[:], self.weight)
 
     @classmethod
-    def from_frame(cls, frame_WCF, tolerances_orientation, link_name, tool_coordinate_frame=None, weight=1.0):
-        """Create an :class:`OrientationConstraint` from a frame on the group's end-effector link.
+    def from_frame(cls, pcf_frame: Frame, tolerances_orientation: list[float], link_name: str, weight: Optional[float] = 1.0) -> "OrientationConstraint":
+        """Create an `OrientationConstraint` from a frame on the group's end-effector link.
         Only the orientation of the frame is considered for the constraint, expressed
         as a quaternion.
 
         Parameters
         ----------
-        frame_WCF: :class:`compas.geometry.Frame`
-            The frame from which we create the orientation constraint.
-        tolerances_orientation: :obj:`list` of :obj:`float`
+        pcf_frame
+            The Planner Coordinate Frame relative to the WCF.
+        tolerances_orientation
             Error tolerances :math:`t_{i}` for each of the frame's axes in
             radians. If only one value is passed in the list it will be uses for all 3 axes.
-        link_name : :obj:`str`
+        link_name
             The name of the end-effector link. Necessary for creating the position constraint.
-        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
-            The tool tip coordinate frame relative to the flange of the robot.
-            If not specified, the target frame is relative to the robot's flange.
-        weight : :obj:`float`, optional
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to
             ``1``.
 
         Returns
         -------
-        :class:`OrientationConstraint`
+        `OrientationConstraint`
 
         Raises
         ------
-        :exc:`ValueError`
+        `ValueError`
             If tolerance axes given are not one or three values.
 
         Notes
@@ -554,20 +549,7 @@ class OrientationConstraint(Constraint):
         z-axis by an angle of 6.3 radians, whereas the z-axis would only rotate
         by 0.01.
 
-
-        Examples
-        --------
-        >>> robot = RobotLibrary.ur5()
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerances_orientation = [math.radians(1)] * 3
-        >>> group = robot.main_group_name
-        >>> end_effector_link_name = robot.get_end_effector_link_name(group)
-        >>> OrientationConstraint.from_frame(frame, tolerances_orientation, end_effector_link_name)
-        OrientationConstraint('tool0', [0.5, 0.5, 0.5, 0.5], [0.017453292519943295, 0.017453292519943295, 0.017453292519943295], 1.0)
         """
-
-        if tool_coordinate_frame:
-            frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
 
         tolerances_orientation = list(tolerances_orientation)
         if len(tolerances_orientation) == 1:
@@ -575,7 +557,7 @@ class OrientationConstraint(Constraint):
         elif len(tolerances_orientation) != 3:
             raise ValueError("`tolerances_orientation` must be a list with either 1 or 3 values")
 
-        return cls(link_name, frame_WCF.quaternion, tolerances_orientation, weight)
+        return cls(link_name, pcf_frame.quaternion, tolerances_orientation, weight)
 
 
 class PositionConstraint(Constraint):
@@ -583,22 +565,22 @@ class PositionConstraint(Constraint):
 
     Parameters
     ----------
-    link_name : :obj:`str`
-        The name of the link this contraint refers to.
-    bounding_volume : :class:`BoundingVolume`
+    link_name
+        The name of the link this constraint refers to.
+    bounding_volume
         The volume this constraint refers to.
-    weight : :obj:`float`, optional
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important. Defaults to
         ``1``.
 
     Attributes
     ----------
-    link_name : :obj:`str`
-        The name of the link this contraint refers to.
-    bounding_volume : :class:`BoundingVolume`
+    link_name
+        The name of the link this constraint refers to.
+    bounding_volume
         The volume this constraint refers to.
-    weight : :obj:`float`
+    weight
         A weighting factor for this constraint. Denotes relative importance to
         other constraints. Closer to zero means less important.
 
@@ -607,11 +589,11 @@ class PositionConstraint(Constraint):
     >>> from compas.geometry import Sphere
     >>> from compas_fab.robots import PositionConstraint
     >>> from compas_fab.robots import BoundingVolume
-    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3,4,5]))
-    >>> pc = PositionConstraint('link_0', bv, weight=1.)
+    >>> bv = BoundingVolume.from_sphere(Sphere(0.5, point=[3, 4, 5]))
+    >>> pc = PositionConstraint("link_0", bv, weight=1.0)
     """
 
-    def __init__(self, link_name, bounding_volume, weight=1.0):
+    def __init__(self, link_name: str, bounding_volume: BoundingVolume, weight: Optional[float] = 1.0) -> None:
         super(PositionConstraint, self).__init__(self.POSITION, weight)
         self.link_name = link_name
         self.bounding_volume = bounding_volume
@@ -625,193 +607,178 @@ class PositionConstraint(Constraint):
         }
 
     @classmethod
-    def from_frame(cls, frame_WCF, tolerance_position, link_name, tool_coordinate_frame=None, weight=1.0):
-        """Create a :class:`PositionConstraint` from a frame on the group's end-effector link.
+    def from_frame(cls, pcf_frame: Frame, tolerance_position: float, link_name: str, weight: Optional[float] = 1.0) -> "PositionConstraint":
+        """Create a `PositionConstraint` from a frame on the group's end-effector link.
         Only the position of the frame is considered for the constraint.
 
         Parameters
         ----------
-        frame_WCF : :class:`compas.geometry.Frame`
-            The frame from which we create position and orientation constraints.
-        tolerance_position : :obj:`float`
+        pcf_frame
+            The Planner Coordinate Frame relative to the WCF.
+        tolerance_position
             The allowed tolerance to the frame's position (defined in the
             robot's units).
-        link_name : :obj:`str`
+        link_name
             The name of the end-effector link. Necessary for creating the position constraint.
-        tool_coordinate_frame : :class:`compas.geometry.Frame`, optional
-            The tool tip coordinate frame relative to the flange of the robot.
-            If not specified, the target frame is relative to the robot's flange.
-        weight : :obj:`float`
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
         Returns
         -------
-        :class:`PositionConstraint`
+        `PositionConstraint`
 
         See Also
         --------
-        :meth:`PositionConstraint.from_box`
-        :meth:`PositionConstraint.from_mesh`
-        :meth:`PositionConstraint.from_sphere`
+        `PositionConstraint.from_box`
+        `PositionConstraint.from_mesh`
+        `PositionConstraint.from_sphere`
 
-        Examples
-        --------
-        >>> robot = RobotLibrary.ur5()
-        >>> frame = Frame([0.4, 0.3, 0.4], [0, 1, 0], [0, 0, 1])
-        >>> tolerance_position = 0.001
-        >>> group = robot.main_group_name
-        >>> end_effector_link_name = robot.get_end_effector_link_name(group)
-        >>> PositionConstraint.from_frame(frame, tolerance_position, end_effector_link_name)                                 # doctest: +SKIP
-        PositionConstraint('tool0', BoundingVolume(2, Sphere(Point(0.400, 0.300, 0.400), 0.001)), 1.0)    # doctest: +SKIP
         """
 
-        if tool_coordinate_frame:
-            frame_WCF = from_tcf_to_t0cf(frame_WCF, tool_coordinate_frame)
-
         radius = float(tolerance_position)
-        sphere = Sphere(radius, point=frame_WCF.point)
+        sphere = Sphere(radius, point=pcf_frame.point)
         return cls.from_sphere(link_name, sphere, weight)
 
     @classmethod
-    def from_box(cls, link_name, box, weight=1.0):
-        """Create a :class:`PositionConstraint` from a :class:`compas.geometry.Box`.
+    def from_box(cls, link_name: str, box: Box, weight: Optional[float] = 1.0) -> "PositionConstraint":
+        """Create a `PositionConstraint` from a [`Box`][compas.geometry.Box].
 
         Parameters
         ----------
-        link_name: :obj:`str`
-            The name of the link this contraint refers to.
-        box : :class:`compas.geometry.Box`
+        link_name
+            The name of the link this constraint refers to.
+        box
             Box defining the bounding volume this constraint refers to.
-        weight : :obj:`float`, optional
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
         Returns
         -------
-        :class:`PositionConstraint`
+        `PositionConstraint`
 
         Examples
         --------
         >>> from compas.geometry import Frame
         >>> from compas.geometry import Box
         >>> box = Box(4, 4, 4, Frame.worldXY())
-        >>> pc = PositionConstraint.from_box('link_0', box)
+        >>> pc = PositionConstraint.from_box("link_0", box)
         """
         bounding_volume = BoundingVolume.from_box(box)
         return cls(link_name, bounding_volume, weight)
 
     @classmethod
-    def from_sphere(cls, link_name, sphere, weight=1.0):
-        """Create a :class:`PositionConstraint` from a :class:`compas.geometry.Sphere`.
+    def from_sphere(cls, link_name: str, sphere: Sphere, weight: Optional[float] = 1.0) -> "PositionConstraint":
+        """Create a `PositionConstraint` from a [`Sphere`][compas.geometry.Sphere].
 
         Parameters
         ----------
-        link_name : :obj:`str`
-            The name of the link this contraint refers to.
-        sphere : :class:`compas.geometry.Sphere`
+        link_name
+            The name of the link this constraint refers to.
+        sphere
             Sphere defining the bounding volume this constraint refers to.
-        weight : :obj:`float`
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
         Returns
         -------
-        :class:`PositionConstraint`
+        `PositionConstraint`
 
         Examples
         --------
         >>> from compas_fab.robots import PositionConstraint
         >>> from compas.geometry import Sphere
-        >>> sphere = Sphere(radius=0.5, point=[3,4,5])
-        >>> pc = PositionConstraint.from_sphere('link_0', sphere, weight=1.)
+        >>> sphere = Sphere(radius=0.5, point=[3, 4, 5])
+        >>> pc = PositionConstraint.from_sphere("link_0", sphere, weight=1.0)
         """
         bounding_volume = BoundingVolume.from_sphere(sphere)
         return cls(link_name, bounding_volume, weight)
 
     @classmethod
-    def from_point(cls, link_name, point, tolerance_position, weight=1.0):
-        """Create a :class:`PositionConstraint` from a point.
+    def from_point(cls, link_name: str, point: Point, tolerance_position: float, weight: Optional[float] = 1.0) -> "PositionConstraint":
+        """Create a `PositionConstraint` from a point.
 
         Parameters
         ----------
-        link_name : :obj:`str`
-            The name of the link this contraint refers to.
-        point : :class:`compas.geometry.Point`
+        link_name
+            The name of the link this constraint refers to.
+        point
             Point defining the bounding volume this constraint refers to.
-        tolerance_position : :obj:`float`
+        tolerance_position
             The allowed tolerance to the point's position (defined in the
             robot's units).
-        weight : :obj:`float`
+        weight
             A weighting factor for this constraint. Denotes relative importance to
             other constraints. Closer to zero means less important. Defaults to ``1``.
 
         Returns
         -------
-        :class:`PositionConstraint`
+        `PositionConstraint`
 
         """
         sphere = Sphere(radius=tolerance_position, point=point)
         return cls.from_sphere(link_name, sphere, weight)
 
     @classmethod
-    def from_mesh(cls, link_name, mesh, weight=1.0):
-        """Create a :class:`PositionConstraint` from a :class:`compas.datastructures.Mesh`.
+    def from_mesh(cls, link_name: str, mesh: Mesh, weight: Optional[float] = 1.0) -> "PositionConstraint":
+        """Create a `PositionConstraint` from a [`Mesh`][compas.datastructures.Mesh].
 
         Parameters
         ----------
-        link_name : :obj:`str`
-            The name of the link this contraint refers to.
-        mesh : :class:`compas.datastructures.Mesh`
+        link_name
+            The name of the link this constraint refers to.
+        mesh
             Mesh defining the bounding volume this constraint refers to.
-        weight : :obj:`float`
+        weight
             A weighting factor for this constraint. Denotes relative importance
             to other constraints. Closer to zero means less important. Defaults
             to ``1``.
 
         Returns
         -------
-        :class:`PositionConstraint`
+        `PositionConstraint`
 
         Examples
         --------
         >>> from compas.datastructures import Mesh
         >>> import compas
-        >>> mesh = Mesh.from_obj(compas.get('faces.obj'))
-        >>> pc = PositionConstraint.from_mesh('link_0', mesh)
+        >>> mesh = Mesh.from_obj(compas.get("faces.obj"))
+        >>> pc = PositionConstraint.from_mesh("link_0", mesh)
         """
         bounding_volume = BoundingVolume.from_mesh(mesh)
         return cls(link_name, bounding_volume, weight)
 
-    def scale(self, scale_factor):
-        """Scale the :attr:`bounding_volume` uniformely.
+    def scale(self, scale_factor: float) -> None:
+        """Scale the `bounding_volume` uniformly.
 
         Parameters
         ----------
-        scale_factor : :obj:`float`
-            Factor to scale constraining :attr:`bounding_volume`.
+        scale_factor
+            Factor to scale constraining `bounding_volume`.
         """
         self.bounding_volume.scale(scale_factor)
 
-    def transform(self, transformation):
-        """Transform the :attr:`bounding_volume` using a :class:`compas.geometry.Transformation`.
+    def transform(self, transformation: Transformation) -> None:
+        """Transform the `bounding_volume` using a [`Transformation`][compas.geometry.Transformation].
 
         Parameters
         ----------
-        transformation : :class:`compas.geometry.Transformation`
+        transformation
         """
         self.bounding_volume.transform(transformation)
 
     def __repr__(self):
-        """Printable representation of :class:`PositionConstraint`."""
+        """Printable representation of `PositionConstraint`."""
         return "PositionConstraint({!r}, {!r}, {!r})".format(self.link_name, self.bounding_volume, self.weight)
 
-    def copy(self):
-        """Create a copy of this :class:`PositionConstraint`.
+    def copy(self) -> "PositionConstraint":
+        """Create a copy of this `PositionConstraint`.
 
         Returns
         -------
-        :class:`PositionConstraint`
+        `PositionConstraint`
         """
         cls = type(self)
         return cls(self.link_name, self.bounding_volume.copy(), self.weight)

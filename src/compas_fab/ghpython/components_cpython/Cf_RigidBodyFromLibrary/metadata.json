@@ -1,0 +1,39 @@
+{
+    "name": "Rigid Body From Library",
+    "nickname": "Body From Library",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a pre-defined RigidBody from RigidBodyLibrary (e.g. 'target_marker'). Also outputs its visual meshes as Rhino geometry for preview.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Name of the RigidBodyLibrary classmethod to call (e.g. 'target_marker').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "rigid_body_id",
+                "description": "Optional id for the body. Used as its key when wired into a Load Robot Cell component's `rigid_bodies` input. Defaults to the library entry name.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "size",
+                "description": "Scaling parameter passed to the library factory. Defaults to 1.0.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "rigid_body",
+                "description": "RigidBody."
+            },
+            {
+                "name": "meshes",
+                "description": "The body's visual meshes as Rhino geometry, drawn in the body's own base frame. For preview only."
+            }
+        ]
+    }
+}

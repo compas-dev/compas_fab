@@ -1,69 +1,10 @@
-"""
-********************************************************************************
-compas_fab.utilities
-********************************************************************************
+"""Utility functions for compas_fab.
 
-.. currentmodule:: compas_fab.utilities
-
-Package containing a set of utility functions.
-
-File system functions
-=====================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    list_files_in_directory
-    read_csv_to_dictionary
-    read_data_from_pickle
-    write_data_to_pickle
-
-Transformation functions
-========================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    from_tcf_to_t0cf
-
-Numerical functions
-===================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    allclose
-    arange
-    clamp
-    diffs
-    map_range
-    range_geometric_row
-    sign
-
-Other functions
-===============
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    argmax
-    argmin
-    argsort
-    LazyLoader
-
+Numerical helpers (`allclose`, `arange`, `clamp`, `diffs`, `map_range`,
+`range_geometric_row`, `sign`, `argmax`, `argmin`, `argsort`) and a
+lazy-import helper (`LazyLoader`).
 """
 
-from .file_io import (
-    read_csv_to_dictionary,
-    read_data_from_json,
-    read_data_from_pickle,
-    write_data_to_json,
-    write_data_to_pickle,
-)
 from .filesystem import (
     list_files_in_directory,
 )
@@ -82,17 +23,8 @@ from .numbers import (
     range_geometric_row,
     sign,
 )
-from .transformation import (
-    from_tcf_to_t0cf,
-)
 
 __all__ = [
-    # file_io
-    "read_csv_to_dictionary",
-    "read_data_from_json",
-    "read_data_from_pickle",
-    "write_data_to_json",
-    "write_data_to_pickle",
     # filesystem
     "list_files_in_directory",
     # lazy_loader
@@ -108,6 +40,4 @@ __all__ = [
     "map_range",
     "range_geometric_row",
     "sign",
-    # transformation
-    "from_tcf_to_t0cf",
 ]

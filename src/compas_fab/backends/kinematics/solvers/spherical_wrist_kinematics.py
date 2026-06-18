@@ -2,31 +2,33 @@
 
 import math
 
+from compas.geometry import Frame
 from compas.geometry import Point
 
+from .analytical_kinematics import AnalyticalKinematics
 from .spherical_wrist import forward_kinematics_spherical_wrist
 from .spherical_wrist import inverse_kinematics_spherical_wrist
 
 
-class SphericalWristKinematics(object):
+class SphericalWristKinematics(AnalyticalKinematics):
     """ """
 
     def __init__(self, points):
         self.points = points
+        super(SphericalWristKinematics, self).__init__()
 
-    def forward(self, joint_values):
+    def forward(self, joint_values: list[float]) -> Frame:
         joint_values = self._pre_process(joint_values)
         return forward_kinematics_spherical_wrist(joint_values, self.points)
 
-    def inverse(self, frame_rcf):
+    def inverse(self, frame_rcf: Frame) -> list[list[float]]:
         solutions = inverse_kinematics_spherical_wrist(frame_rcf, self.points)
         return list(self._post_process(solutions))
-        # return solutions
 
-    def _post_process(self, solutions):
+    def _post_process(self, solutions: list[list[float]]) -> list[list[float]]:
         return solutions
 
-    def _pre_process(self, joint_values):
+    def _pre_process(self, joint_values: list[float]) -> list[float]:
         return joint_values
 
 
@@ -42,7 +44,7 @@ class Staubli_TX260LKinematics(SphericalWristKinematics):
         ]
         super(Staubli_TX260LKinematics, self).__init__(points)
 
-    def _pre_process(self, joint_values):
+    def _pre_process(self, joint_values: list[float]) -> list[float]:
         q1, q2, q3, q4, q5, q6 = joint_values
         q1 = -1 * q1
         q2 = q2 - math.pi / 2
@@ -50,7 +52,7 @@ class Staubli_TX260LKinematics(SphericalWristKinematics):
         q6 = q6 * -1 + math.pi / 2
         return [q1, q2, q3, q4, q5, q6]
 
-    def _post_process(self, solutions):
+    def _post_process(self, solutions: list[list[float]]) -> list[list[float]]:
         for q1, q2, q3, q4, q5, q6 in solutions:
             q1 = -1 * q1
             q2 = q2 + math.pi / 2
@@ -71,7 +73,7 @@ class ABB_IRB4600_40_255Kinematics(SphericalWristKinematics):
         ]
         super(ABB_IRB4600_40_255Kinematics, self).__init__(points)
 
-    def _pre_process(self, joint_values):
+    def _pre_process(self, joint_values: list[float]) -> list[float]:
         q1, q2, q3, q4, q5, q6 = joint_values
         q1 = -1 * q1
         q2 = q2 - math.pi / 2
@@ -80,7 +82,7 @@ class ABB_IRB4600_40_255Kinematics(SphericalWristKinematics):
         q6 = q6 * -1 + math.pi / 2
         return [q1, q2, q3, q4, q5, q6]
 
-    def _post_process(self, solutions):
+    def _post_process(self, solutions: list[list[float]]) -> list[list[float]]:
         for q1, q2, q3, q4, q5, q6 in solutions:
             q1 = -1 * q1
             q2 = q2 + math.pi / 2

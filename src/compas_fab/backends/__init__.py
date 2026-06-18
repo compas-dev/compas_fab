@@ -1,118 +1,41 @@
+"""Backend classes for simulation, planning and execution.
+
+Submodules group classes by backend family:
+
+- ROS + MoveIt: [`RosClient`][compas_fab.backends.RosClient],
+  [`MoveItPlanner`][compas_fab.backends.MoveItPlanner],
+  [`RosFileServerLoader`][compas_fab.backends.RosFileServerLoader],
+  [`HttpFileServerLoader`][compas_fab.backends.HttpFileServerLoader].
+- PyBullet: [`PyBulletClient`][compas_fab.backends.PyBulletClient],
+  [`PyBulletPlanner`][compas_fab.backends.PyBulletPlanner].
+- Analytical: [`AnalyticalKinematicsPlanner`][compas_fab.backends.AnalyticalKinematicsPlanner]
+  with robot-specific solvers
+  (e.g. [`UR10eKinematics`][compas_fab.backends.UR10eKinematics]).
+
+See the [backend architecture guide](../developer/architecture.md) for
+details about integrating new backends.
 """
-********************************************************************************
-compas_fab.backends
-********************************************************************************
-
-.. currentmodule:: compas_fab.backends
-
-This package contains classes backends for simulation, planning and execution.
-
-ROS
-===
-
-Classes to interact with `ROS <https://ros.org/>`_ and the ``MoveIt`` planning
-framework.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    RosClient
-    RosFileServerLoader
-    MoveItPlanner
-    RosError
-    RosValidationError
-
-
-PyBullet
-========
-
-Classes to interact with `PyBullet <http://pybullet.org/>`_.
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    PyBulletClient
-    PyBulletPlanner
-    PyBulletError
-    CollisionError
-
-
-Analytical Kinematics
-=====================
-
-Pure-python implementation of analytic IK solvers.
-
-IK solvers
-----------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    AnalyticalInverseKinematics
-    AnalyticalPlanCartesianMotion
-    OffsetWristKinematics
-    SphericalWristKinematics
-    AnalyticalPyBulletClient
-
-Robot-specific kinematics
--------------------------
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    UR3Kinematics
-    UR3eKinematics
-    UR5Kinematics
-    UR5eKinematics
-    UR10Kinematics
-    UR10eKinematics
-    Staubli_TX260LKinematics
-    ABB_IRB4600_40_255Kinematics
-
-Long-running tasks
-==================
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    FutureResult
-    CancellableFutureResult
-
-Exceptions
-==========
-
-.. autosummary::
-    :toctree: generated/
-    :nosignatures:
-
-    BackendError
-    BackendFeatureNotSupportedError
-    CartesianMotionError
-    InverseKinematicsError
-    KinematicsError
-
-Interfaces
-==========
-
-For details about integrating new backends, check
-the :ref:`architecture` documentation.
-
-"""
-
-import compas
 
 # Base imports
 from .exceptions import (
     BackendError,
     BackendFeatureNotSupportedError,
+    BackendTargetNotSupportedError,
+    TargetModeMismatchError,
+    PlanningGroupNotExistsError,
     InverseKinematicsError,
     KinematicsError,
+    CollisionCheckError,
+    MotionPlanningError,
+    MPStartStateInCollisionError,
+    MPTargetInCollisionError,
+    MPInterpolationInCollisionError,
+    MPSearchTimeOutError,
+    MPNoIKSolutionError,
+    MPNoPlanFoundError,
+    MPMaxJumpError,
 )
+
 from .tasks import (
     FutureResult,
     CancellableFutureResult,
@@ -124,20 +47,23 @@ from .ros import (
     RosError,
     RosValidationError,
     RosFileServerLoader,
+    HttpFileServerLoader,
     MoveItPlanner,
 )
 
-# Analytic IK
+# Kinematics imports
 from .kinematics import (
+    # Kinematics - Analytic IK
+    AnalyticalKinematics,
+    AnalyticalKinematicsClient,
     AnalyticalInverseKinematics,
     AnalyticalPlanCartesianMotion,
+    AnalyticalPyBulletPlanner,
+    AnalyticalKinematicsPlanner,
     OffsetWristKinematics,
     SphericalWristKinematics,
     CartesianMotionError,
-)
-
-# Robot-specific analytic IK
-from .kinematics import (
+    # Kinematics - Robot-specific analytic IK
     UR3Kinematics,
     UR3eKinematics,
     UR5Kinematics,
@@ -148,21 +74,33 @@ from .kinematics import (
     ABB_IRB4600_40_255Kinematics,
 )
 
-if not compas.IPY:
-    from .pybullet import (
-        PyBulletClient,
-        CollisionError,
-        PyBulletError,
-        PyBulletPlanner,
-        AnalyticalPyBulletClient,
-    )
+from .pybullet import (
+    PyBulletClient,
+    PyBulletError,
+    PyBulletPlanner,
+    AnalyticalPyBulletClient,
+    PlanningGroupNotSupported,
+)
 
 __all__ = [
-    # Base
+    # Exceptions
     "BackendError",
     "BackendFeatureNotSupportedError",
+    "BackendTargetNotSupportedError",
+    "TargetModeMismatchError",
+    "PlanningGroupNotExistsError",
     "InverseKinematicsError",
     "KinematicsError",
+    "CollisionCheckError",
+    "MotionPlanningError",
+    "MPStartStateInCollisionError",
+    "MPTargetInCollisionError",
+    "MPInterpolationInCollisionError",
+    "MPSearchTimeOutError",
+    "MPNoIKSolutionError",
+    "MPNoPlanFoundError",
+    "MPMaxJumpError",
+    # Tasks
     "FutureResult",
     "CancellableFutureResult",
     # ROS
@@ -170,14 +108,19 @@ __all__ = [
     "RosError",
     "RosValidationError",
     "RosFileServerLoader",
+    "HttpFileServerLoader",
     "MoveItPlanner",
-    # Analytic IK
+    # Kinematics
+    "AnalyticalKinematics",
+    "AnalyticalKinematicsClient",
     "AnalyticalInverseKinematics",
     "AnalyticalPlanCartesianMotion",
+    "AnalyticalPyBulletPlanner",
+    "AnalyticalKinematicsPlanner",
     "OffsetWristKinematics",
     "SphericalWristKinematics",
     "CartesianMotionError",
-    # Robot-specific analytic IK
+    # Kinematics - Robot-specific analytic IK
     "UR3Kinematics",
     "UR3eKinematics",
     "UR5Kinematics",
@@ -186,13 +129,10 @@ __all__ = [
     "UR10eKinematics",
     "Staubli_TX260LKinematics",
     "ABB_IRB4600_40_255Kinematics",
+    # PyBullet
+    "PyBulletClient",
+    "PyBulletError",
+    "PyBulletPlanner",
+    "AnalyticalPyBulletClient",
+    "PlanningGroupNotSupported",
 ]
-
-if not compas.IPY:
-    __all__ += [
-        "PyBulletClient",
-        "CollisionError",
-        "PyBulletError",
-        "PyBulletPlanner",
-        "AnalyticalPyBulletClient",
-    ]

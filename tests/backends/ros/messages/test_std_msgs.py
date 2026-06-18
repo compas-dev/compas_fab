@@ -1,9 +1,11 @@
+import json
 from compas_fab.backends.ros.messages import Float32MultiArray
 from compas_fab.backends.ros.messages import Header
 from compas_fab.backends.ros.messages import Int8MultiArray
 from compas_fab.backends.ros.messages import Pose
 from compas_fab.backends.ros.messages import PoseArray
 from compas_fab.backends.ros.messages import ROSmsg
+from compas_fab.backends.ros.messages import RosDistro
 from compas_fab.backends.ros.messages import String
 from compas_fab.backends.ros.messages import Time
 
@@ -25,6 +27,42 @@ def test_nested_repr():
     assert repr(h) == "Header(seq=10, stamp=Time(secs=80, nsecs=20), frame_id='/wow')"
 
 
+def test_header_serializes_as_ros1_header_by_default():
+    h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
+    assert h.msg == {"seq": 10, "stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
+
+
+def test_header_serializes_as_ros2_header_for_ros2_distro():
+    h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
+    h.filter_fields_for_distro(RosDistro.JAZZY)
+    assert h.msg == {"stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
+    assert h.seq == 10
+
+
+def test_ros2_header_filter_accepts_ros2_time_keys():
+    h = Header.from_msg({"seq": 10, "stamp": {"sec": 80, "nanosec": 20}, "frame_id": "/wow"})
+    h.filter_fields_for_distro(RosDistro.JAZZY)
+    assert h.msg == {"stamp": {"secs": 80, "nsecs": 20}, "frame_id": "/wow"}
+
+
+def test_header_msg_is_json_serializable():
+    # Regression: roslibpy 2.0 wraps a header's stamp in a UserDict-based
+    # roslibpy.core.Time, which json.dumps rejects. Header.msg must emit plain dicts.
+    h = Header(seq=10, stamp=Time(80, 20), frame_id="/wow")
+    assert type(h.msg["stamp"]) is dict
+    json.dumps(h.msg)  # must not raise
+
+    h.filter_fields_for_distro(RosDistro.JAZZY)
+    assert type(h.msg["stamp"]) is dict
+    json.dumps(h.msg)  # must not raise
+
+
+def test_time_accepts_ros2_time_keys():
+    t = Time.from_msg({"sec": 80, "nanosec": 20})
+    assert t.secs == 80
+    assert t.nsecs == 20
+
+
 def test_subclasses_define_type_name():
     for cls in ROSmsg.__subclasses__():
         assert cls.ROS_MSG_TYPE is not None, "Class {} does not define its msg type".format(cls.__name__)
@@ -32,9 +70,7 @@ def test_subclasses_define_type_name():
 
 def test_consistent_naming():
     for cls in ROSmsg.__subclasses__():
-        assert (
-            cls.ROS_MSG_TYPE.split("/")[1] == cls.__name__
-        ), "Class {} does not match to the ROS msg type name={}".format(cls.__name__, cls.ROS_MSG_TYPE)
+        assert cls.ROS_MSG_TYPE.split("/")[1] == cls.__name__, "Class {} does not match to the ROS msg type name={}".format(cls.__name__, cls.ROS_MSG_TYPE)
 
 
 def test_uniqueness_of_msg_type():

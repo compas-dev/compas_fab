@@ -1,19 +1,55 @@
-from __future__ import absolute_import
-from __future__ import print_function
-
 import json
+from collections.abc import Mapping
 
-import compas
-
-if compas.PY3:
-    from collections.abc import Mapping
-else:
-    from collections import Mapping
+from roslibpy import Header as RoslibpyRos1Header
+from roslibpy.ros2 import Header as RoslibpyRos2Header
 
 _TYPE_MAP = {}
 
 
-class ROSmsg(object):
+def _to_plain(value):
+    """Recursively convert ``Mapping`` values (e.g. roslibpy's ``UserDict``-based
+    ``Header``/``Time``) into plain ``dict``/``list`` so the result is JSON serializable.
+
+    roslibpy 2.0 wraps a header's ``stamp`` in a ``roslibpy.core.Time``, which is a
+    ``UserDict`` and *not* a real ``dict`` — ``json.dumps`` rejects it. Flattening here
+    keeps the per-distro field shaping roslibpy provides while emitting only plain types.
+    """
+    if isinstance(value, Mapping):
+        return {k: _to_plain(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_to_plain(v) for v in value]
+    return value
+
+
+def format_header_for_distro(header, ros_distro):
+    if hasattr(header, "filter_fields_for_distro"):
+        header.filter_fields_for_distro(ros_distro)
+        return header
+
+    stamp = _format_stamp_for_roslibpy(header.get("stamp")) if header else None
+    frame_id = header.get("frame_id") if header else None
+
+    if ros_distro.is_ros2:
+        return _to_plain(RoslibpyRos2Header(stamp=stamp, frame_id=frame_id))
+
+    seq = header.get("seq") if header else None
+    return _to_plain(RoslibpyRos1Header(seq=seq, stamp=stamp, frame_id=frame_id))
+
+
+def _format_stamp_for_roslibpy(stamp):
+    if not stamp:
+        return None
+    if hasattr(stamp, "msg"):
+        stamp = stamp.msg
+    if "secs" in stamp and "nsecs" in stamp:
+        return stamp
+    if "sec" in stamp and "nanosec" in stamp:
+        return {"secs": stamp["sec"], "nsecs": stamp["nanosec"]}
+    return stamp
+
+
+class ROSmsg:
     """The base class for ROS messages.
 
     Attributes
@@ -93,7 +129,9 @@ class ROSmsg(object):
 
 
 class Time(ROSmsg):
-    """https://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Time.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/builtin_interfaces/interfaces/msg/Time.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Time"
 
@@ -101,12 +139,22 @@ class Time(ROSmsg):
         self.secs = secs
         self.nsecs = nsecs
 
+    @classmethod
+    def from_msg(cls, msg):
+        if "secs" in msg and "nsecs" in msg:
+            return cls(msg["secs"], msg["nsecs"])
+        return cls(msg["sec"], msg["nanosec"])
+
     def seconds(self):
         return self.secs + 1e-9 * self.nsecs
 
 
 class Header(ROSmsg):
-    """https://docs.ros.org/melodic/api/std_msgs/html/msg/Header.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Header.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Header.html
+
+    Note: ROS 2's Header drops the `seq` field that ROS 1's has.
+    """
 
     ROS_MSG_TYPE = "std_msgs/Header"
 
@@ -114,10 +162,26 @@ class Header(ROSmsg):
         self.seq = seq
         self.stamp = stamp
         self.frame_id = frame_id
+        self._roslibpy_header_cls = RoslibpyRos1Header
+
+    @property
+    def msg(self):
+        stamp = _format_stamp_for_roslibpy(self.stamp)
+        if self._roslibpy_header_cls is RoslibpyRos2Header:
+            return _to_plain(RoslibpyRos2Header(stamp=stamp, frame_id=self.frame_id))
+        return _to_plain(RoslibpyRos1Header(seq=self.seq, stamp=stamp, frame_id=self.frame_id))
+
+    def filter_fields_for_distro(self, ros_distro):
+        self._roslibpy_header_cls = RoslibpyRos2Header if ros_distro.is_ros2 else RoslibpyRos1Header
+
+    def __repr__(self):
+        return "Header(seq={!r}, stamp={!r}, frame_id={!r})".format(self.seq, self.stamp, self.frame_id)
 
 
 class String(ROSmsg):
-    """https://docs.ros.org/api/std_msgs/html/msg/String.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/String.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/String.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/String"
 
@@ -126,7 +190,9 @@ class String(ROSmsg):
 
 
 class MultiArrayDimension(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayDimension.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/MultiArrayDimension.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/MultiArrayDimension.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/MultiArrayDimension"
 
@@ -141,7 +207,9 @@ class MultiArrayDimension(ROSmsg):
 
 
 class MultiArrayLayout(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/MultiArrayLayout.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/MultiArrayLayout.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/MultiArrayLayout.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/MultiArrayLayout"
 
@@ -156,7 +224,9 @@ class MultiArrayLayout(ROSmsg):
 
 
 class Int8MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Int8MultiArray.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Int8MultiArray.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Int8MultiArray.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Int8MultiArray"
 
@@ -171,7 +241,9 @@ class Int8MultiArray(ROSmsg):
 
 
 class Float32MultiArray(ROSmsg):
-    """http://docs.ros.org/en/api/std_msgs/html/msg/Float32MultiArray.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Float32MultiArray.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Float32MultiArray.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Float32MultiArray"
 
@@ -186,7 +258,9 @@ class Float32MultiArray(ROSmsg):
 
 
 class Int32(ROSmsg):
-    """http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Int32.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/std_msgs/html/msg/Int32.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/std_msgs/interfaces/msg/Int32.html
+    """
 
     ROS_MSG_TYPE = "std_msgs/Int32"
 

@@ -1,7 +1,8 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import TYPE_CHECKING
+from typing import Optional
 
+from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas.utilities import await_callback
 
 from compas_fab.backends.interfaces import ForwardKinematics
@@ -13,6 +14,14 @@ from compas_fab.backends.ros.messages import JointState
 from compas_fab.backends.ros.messages import MultiDOFJointState
 from compas_fab.backends.ros.messages import RobotState
 from compas_fab.backends.ros.service_description import ServiceDescription
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
+
+if TYPE_CHECKING:
+    from compas_fab.backends import MoveItPlanner
+    from compas_fab.backends import RosClient
+
 
 __all__ = [
     "MoveItForwardKinematics",
@@ -22,55 +31,131 @@ __all__ = [
 class MoveItForwardKinematics(ForwardKinematics):
     """Callable to calculate the robot's forward kinematic."""
 
-    GET_POSITION_FK = ServiceDescription(
-        "/compute_fk", "GetPositionFK", GetPositionFKRequest, GetPositionFKResponse, validate_response
-    )
+    GET_POSITION_FK = ServiceDescription("/compute_fk", "GetPositionFK", GetPositionFKRequest, GetPositionFKResponse, validate_response)
 
-    def forward_kinematics(self, robot, configuration, group=None, options=None):
-        """Calculate the robot's forward kinematic.
+    def forward_kinematics(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: TargetMode,
+        group: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ):
+        """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
+
+        The returned coordinate frame is dependent on the chosen ``target_mode``:
+
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
+        - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
+          if a workpiece is attached (via an attached tool).
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
-        configuration : :class:`compas_fab.robots.Configuration`
-            The full configuration to calculate the forward kinematic for. If no
-            full configuration is passed, the zero-joint state for the other
-            configurable joints is assumed.
-        group : str, optional
-            Unused parameter.
-        options : dict, optional
+        robot_cell_state
+            The robot cell state describing the robot cell.
+            The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
+            The robot cell state should also reflect the attachment of tools, if any.
+        target_mode
+            The target mode to select which frame to return.
+        group
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        native_scale
+            The scaling factor to apply to the resulting frame.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Defaults to None, which means no scaling is applied.
+        options
             Dictionary containing the following key-value pairs:
 
             - ``"base_link"``: (:obj:`str`) Name of the base link.
               Defaults to the model's root link.
-            - ``"link"``: (:obj:`str`, optional) The name of the link to
-              calculate the forward kinematics for. Defaults to the group's end
-              effector link.
-              Backwards compatibility note: if there's no ``link`` option, the
-              planner will try also ``tool0`` as fallback before defaulting
-              to the end effector's link.
 
         Returns
         -------
         :class:`Frame`
             The frame in the world's coordinate system (WCF).
         """
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
         options = options or {}
+
+        group = group or robot_cell.main_group_name
+
+        link_name = robot_cell.get_end_effector_link_name(group)
+        pcf_frame = self.forward_kinematics_to_link(robot_cell_state, link_name, native_scale, options)
+
+        # Convert PCF to the target frame
+        target_frame = client.robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, group)
+        t_rcf_target = Transformation.from_frame(target_frame)
+
+        # Convert target frame to WCF
+        t_wcf_rcf = Transformation.from_frame(robot_cell_state.robot_base_frame)
+        t_wcf_target = t_wcf_rcf * t_rcf_target
+        wcf_target_frame = Frame.from_transformation(t_wcf_target)
+
+        # Scale resulting frame to user units
+        if native_scale:
+            wcf_target_frame.scale(1 / native_scale)
+
+        return wcf_target_frame
+
+    def forward_kinematics_to_link(
+        self,
+        robot_cell_state: RobotCellState,
+        link_name: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ):
+        """Calculate the frame of the specified robot link from the provided RobotCellState.
+
+        This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
+        but allows the user to specify which link to return. The function will return the frame of the specified
+        link relative to the world coordinate frame (WCF).
+
+        This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
+        robot's links and the user needs to know the position of the object relative to the world coordinate frame.
+
+        Parameters
+        ----------
+        robot_cell_state
+            The robot cell state describing the robot cell.
+        link_name
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the last link of the provided planning group.
+        native_scale
+            The scaling factor to apply to the resulting frame.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Defaults to None, which means no scaling is applied.
+        options
+            Dictionary containing the following key-value pairs:
+
+            - ``"base_link"``: (:obj:`str`) Name of the base link.
+              Defaults to the model's root link.
+        """
+        planner: MoveItPlanner = self
+        client: RosClient = planner.client
+        robot_cell: RobotCell = client.robot_cell
+        options = options or {}
+
+        if robot_cell.robot_model.get_link_by_name(link_name) is None:
+            raise ValueError("Link name {} does not exist in robot model".format(link_name))
+
+        planner.set_robot_cell_state(robot_cell_state)
+
+        # Compose the kwargs for the forward kinematics
         kwargs = {}
-        kwargs["configuration"] = configuration
+        kwargs["configuration"] = robot_cell_state.robot_configuration
         kwargs["options"] = options
         kwargs["errback_name"] = "errback"
+        options["base_link"] = options.get("base_link", robot_cell.root_name)
+        options["link"] = link_name
 
-        # Use base_link or fallback to model's root link
-        options["base_link"] = options.get("base_link", robot.model.root.name)
-
-        # Use selected link or default to group's end effector
-        options["link"] = options.get("link", options.get("tool0")) or robot.get_end_effector_link_name(group)
-        if options["link"] not in robot.get_link_names(group):
-            raise ValueError("Link name {} does not exist in planning group".format(options["link"]))
-
-        return await_callback(self.forward_kinematics_async, **kwargs)
+        lcf_frame = await_callback(self.forward_kinematics_async, **kwargs)
+        return lcf_frame
 
     def forward_kinematics_async(self, callback, errback, configuration, options):
         """Asynchronous handler of MoveIt FK service."""

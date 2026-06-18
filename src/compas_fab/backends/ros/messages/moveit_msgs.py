@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from compas_fab.backends.ros.messages.geometry_msgs import Point
 from compas_fab.backends.ros.messages.geometry_msgs import Pose
 from compas_fab.backends.ros.messages.geometry_msgs import PoseStamped
@@ -11,19 +9,19 @@ from compas_fab.backends.ros.messages.ros_releases import RosDistro
 from compas_fab.backends.ros.messages.sensor_msgs import JointState
 from compas_fab.backends.ros.messages.sensor_msgs import MultiDOFJointState
 from compas_fab.backends.ros.messages.shape_msgs import Mesh
-from compas_fab.backends.ros.messages.shape_msgs import MeshTriangle
 from compas_fab.backends.ros.messages.shape_msgs import Plane
 from compas_fab.backends.ros.messages.shape_msgs import SolidPrimitive
 from compas_fab.backends.ros.messages.std_msgs import Header
 from compas_fab.backends.ros.messages.std_msgs import ROSmsg
+from compas_fab.backends.ros.messages.std_msgs import format_header_for_distro
 from compas_fab.backends.ros.messages.trajectory_msgs import JointTrajectory
 from compas_fab.backends.ros.messages.trajectory_msgs import MultiDOFJointTrajectory
-from compas_fab.robots import AttachedCollisionMesh
-from compas_fab.robots import CollisionMesh
 
 
 class CollisionObject(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/CollisionObject.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/CollisionObject.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/CollisionObject.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/CollisionObject"
 
@@ -51,9 +49,7 @@ class CollisionObject(ROSmsg):
         self.header = header or Header()  # a header, used for interpreting the poses
         self.id = id  # the id of the object (name used in MoveIt)
         self.type = type or ObjectType()  # The object type in a database of known objects
-        self.pose = (
-            pose or Pose()
-        )  # currently not actively used in FAB, but needed to be present otherwise ROS Noetic complains about empty quaternion
+        self.pose = pose or Pose()  # currently not actively used in FAB, but needed to be present otherwise ROS Noetic complains about empty quaternion
 
         # solid geometric primitives
         self.primitives = primitives or []
@@ -66,18 +62,6 @@ class CollisionObject(ROSmsg):
         self.plane_poses = plane_poses or []
 
         self.operation = operation  # ADD or REMOVE or APPEND or MOVE
-
-    @classmethod
-    def from_collision_mesh(cls, collision_mesh):
-        """Creates a collision object from a :class:`compas_fab.robots.CollisionMesh`"""
-        kwargs = {}
-        kwargs["header"] = Header(frame_id=collision_mesh.root_name)
-        kwargs["id"] = collision_mesh.id
-        kwargs["meshes"] = [Mesh.from_mesh(collision_mesh.mesh)]
-        kwargs["mesh_poses"] = [Pose.from_frame(collision_mesh.frame)]
-        kwargs["pose"] = Pose()
-
-        return cls(**kwargs)
 
     @classmethod
     def from_msg(cls, msg):
@@ -99,39 +83,16 @@ class CollisionObject(ROSmsg):
 
         return cls(**kwargs)
 
-    def to_collision_meshes(self):
-        """Creates a list of collision meshes from a :class:`compas_fab.backends.CollisionObject`"""
-        collision_meshes = []
-        for mesh, pose in zip(self.meshes, self.mesh_poses):
-            pose = pose if isinstance(pose, Pose) else Pose(**pose)
-            pose.position = pose.position if isinstance(pose.position, Point) else Point(**pose.position)
-            pose.position.x = float(pose.position.x)
-            pose.position.y = float(pose.position.y)
-            pose.position.z = float(pose.position.z)
-            pose.orientation = (
-                pose.orientation if isinstance(pose.orientation, Quaternion) else Quaternion(**pose.orientation)
-            )
-            pose.orientation.x = float(pose.orientation.x)
-            pose.orientation.y = float(pose.orientation.y)
-            pose.orientation.z = float(pose.orientation.z)
-            pose.orientation.w = float(pose.orientation.w)
-            mesh = mesh if isinstance(mesh, Mesh) else Mesh(**mesh)
-            mesh.triangles = [t if isinstance(t, MeshTriangle) else MeshTriangle(**t) for t in mesh.triangles]
-            for triangle in mesh.triangles:
-                triangle.vertex_indices = [int(x) for x in triangle.vertex_indices]
-            mesh.vertices = [v if isinstance(v, Point) else Point(**v) for v in mesh.vertices]
-            for vertex in mesh.vertices:
-                vertex.x = float(vertex.x)
-                vertex.y = float(vertex.y)
-                vertex.z = float(vertex.z)
-            root_name = getattr(self.header, "frame_id", None) or self.header["frame_id"]
-            cm = CollisionMesh(mesh.mesh, self.id, pose.frame, root_name)
-            collision_meshes.append(cm)
-        return collision_meshes
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC) and hasattr(self, "pose"):
+            del self.pose
 
 
 class AttachedCollisionObject(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/AttachedCollisionObject.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/AttachedCollisionObject.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/AttachedCollisionObject"
 
@@ -142,31 +103,26 @@ class AttachedCollisionObject(ROSmsg):
         self.detach_posture = detach_posture or JointTrajectory()
         self.weight = weight
 
-    @classmethod
-    def from_attached_collision_mesh(cls, attached_collision_mesh):
-        """Creates an attached collision object from a :class:`compas_fab.robots.AttachedCollisionMesh`"""
-
-        kwargs = {}
-        kwargs["link_name"] = attached_collision_mesh.link_name
-        kwargs["object"] = CollisionObject.from_collision_mesh(attached_collision_mesh.collision_mesh)
-        kwargs["touch_links"] = [str(s) for s in attached_collision_mesh.touch_links]
-        kwargs["weight"] = attached_collision_mesh.weight
-
-        return cls(**kwargs)
-
-    def to_attached_collision_meshes(self):
-        """Creates a list of attached collision meshes from a :class:`compas_fab.backends.AttachedCollisionObject`"""
-        attached_collision_meshes = []
-        obj = self.object if isinstance(self.object, CollisionObject) else CollisionObject(**self.object)
-        collision_meshes = obj.to_collision_meshes()
-        for cm in collision_meshes:
-            acm = AttachedCollisionMesh(cm, self.link_name, self.touch_links, self.weight)
-            attached_collision_meshes.append(acm)
-        return attached_collision_meshes
+    def filter_fields_for_distro(self, ros_distro):
+        # `self.object` and `self.detach_posture` may be dicts after a round-trip
+        # through `get_planning_scene` because `from_msg` does not recursively
+        # rehydrate nested messages. Handle both shapes (rosbridge accepts both).
+        if hasattr(self.object, "filter_fields_for_distro"):
+            self.object.filter_fields_for_distro(ros_distro)
+        elif isinstance(self.object, dict):
+            self.object["header"] = format_header_for_distro(self.object.get("header"), ros_distro)
+            if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
+                self.object.pop("pose", None)
+        if hasattr(self.detach_posture, "filter_fields_for_distro"):
+            self.detach_posture.filter_fields_for_distro(ros_distro)
+        elif isinstance(self.detach_posture, dict):
+            self.detach_posture["header"] = format_header_for_distro(self.detach_posture.get("header"), ros_distro)
 
 
 class Constraints(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/Constraints.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/Constraints.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/Constraints.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/Constraints"
 
@@ -184,9 +140,17 @@ class Constraints(ROSmsg):
         self.orientation_constraints = orientation_constraints if orientation_constraints else []
         self.visibility_constraints = visibility_constraints if visibility_constraints else []
 
+    def filter_fields_for_distro(self, ros_distro):
+        for constraint in self.position_constraints:
+            constraint.filter_fields_for_distro(ros_distro)
+        for constraint in self.orientation_constraints:
+            constraint.filter_fields_for_distro(ros_distro)
+
 
 class RobotState(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotState.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/RobotState.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/RobotState.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/RobotState"
 
@@ -200,22 +164,22 @@ class RobotState(ROSmsg):
     def from_msg(cls, msg):
         joint_state = JointState.from_msg(msg["joint_state"])
         multi_dof_joint_state = MultiDOFJointState.from_msg(msg["multi_dof_joint_state"])
-        attached_collision_objects = [
-            AttachedCollisionObject.from_msg(item) for item in msg["attached_collision_objects"]
-        ]
+        attached_collision_objects = [AttachedCollisionObject.from_msg(item) for item in msg["attached_collision_objects"]]
         return cls(joint_state, multi_dof_joint_state, attached_collision_objects, msg["is_diff"])
 
     def filter_fields_for_distro(self, ros_distro):
         """To maintain backwards compatibility with older ROS distros,
         we need to make sure newly added fields are removed from the request."""
-        # Remove the field `pose` for distros older than NOETIC
-        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
-            for aco in self.attached_collision_objects:
-                del aco.object.pose
+        self.joint_state.filter_fields_for_distro(ros_distro)
+        self.multi_dof_joint_state.filter_fields_for_distro(ros_distro)
+        for aco in self.attached_collision_objects:
+            aco.filter_fields_for_distro(ros_distro)
 
 
 class PositionIKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionIKRequest.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PositionIKRequest.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PositionIKRequest.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PositionIKRequest"
 
@@ -239,7 +203,9 @@ class PositionIKRequest(ROSmsg):
 
 
 class RobotTrajectory(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/RobotTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/RobotTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/RobotTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/RobotTrajectory"
 
@@ -255,7 +221,9 @@ class RobotTrajectory(ROSmsg):
 
 
 class MoveItErrorCodes(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MoveItErrorCodes.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/MoveItErrorCodes.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/MoveItErrorCodes.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/MoveItErrorCodes"
 
@@ -294,8 +262,19 @@ class MoveItErrorCodes(ROSmsg):
     # kinematics errors
     NO_IK_SOLUTION = -31
 
-    def __init__(self, val=-31):
+    def __init__(self, val=-31, message="", source=""):
         self.val = val
+        self.message = message
+        self.source = source
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(msg["val"], msg.get("message", ""), msg.get("source", ""))
+
+    def filter_fields_for_distro(self, ros_distro):
+        if not ros_distro.is_ros2:
+            del self.message
+            del self.source
 
     def __int__(self):
         return self.val
@@ -316,7 +295,9 @@ class MoveItErrorCodes(ROSmsg):
 
 
 class PlannerParams(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlannerParams.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlannerParams.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlannerParams.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlannerParams"
 
@@ -327,7 +308,9 @@ class PlannerParams(ROSmsg):
 
 
 class WorkspaceParameters(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/WorkspaceParameters.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/WorkspaceParameters.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/WorkspaceParameters.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/WorkspaceParameters"
 
@@ -336,18 +319,29 @@ class WorkspaceParameters(ROSmsg):
         self.min_corner = min_corner or Vector3(-1000, -1000, -1000)
         self.max_corner = max_corner or Vector3(1000, 1000, 1000)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class TrajectoryConstraints(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/TrajectoryConstraints.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/TrajectoryConstraints.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/TrajectoryConstraints"
 
     def __init__(self, constraints=None):
         self.constraints = constraints or []  # Constraints[]
 
+    def filter_fields_for_distro(self, ros_distro):
+        for constraint in self.constraints:
+            constraint.filter_fields_for_distro(ros_distro)
+
 
 class JointConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/JointConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/JointConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/JointConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/JointConstraint"
 
@@ -366,7 +360,9 @@ class JointConstraint(ROSmsg):
 
 
 class VisibilityConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/VisibilityConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/VisibilityConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/VisibilityConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/VisibilityConstraint"
 
@@ -375,7 +371,9 @@ class VisibilityConstraint(ROSmsg):
 
 
 class BoundingVolume(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/BoundingVolume.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/BoundingVolume.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/BoundingVolume.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/BoundingVolume"
 
@@ -440,7 +438,9 @@ class BoundingVolume(ROSmsg):
 
 
 class PositionConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PositionConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PositionConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PositionConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PositionConstraint"
 
@@ -457,9 +457,14 @@ class PositionConstraint(ROSmsg):
         constraint_region = BoundingVolume.from_bounding_volume(position_constraint.bounding_volume)
         return cls(header, position_constraint.link_name, None, constraint_region, position_constraint.weight)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class OrientationConstraint(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/OrientationConstraint.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/OrientationConstraint.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/OrientationConstraint.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/OrientationConstraint"
 
@@ -507,9 +512,14 @@ class OrientationConstraint(ROSmsg):
 
         return cls(**kwargs)
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+
 
 class PlanningSceneComponents(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlanningSceneComponents.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlanningSceneComponents.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlanningSceneComponents"
 
@@ -543,7 +553,9 @@ class PlanningSceneComponents(ROSmsg):
 
 
 class AllowedCollisionMatrix(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/AllowedCollisionMatrix.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/AllowedCollisionMatrix.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/AllowedCollisionMatrix"
 
@@ -555,7 +567,9 @@ class AllowedCollisionMatrix(ROSmsg):
 
 
 class PlanningSceneWorld(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningSceneWorld.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlanningSceneWorld.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlanningSceneWorld.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlanningSceneWorld"
 
@@ -573,14 +587,21 @@ class PlanningSceneWorld(ROSmsg):
     def filter_fields_for_distro(self, ros_distro):
         """To maintain backwards compatibility with older ROS distros,
         we need to make sure newly added fields are removed from the request."""
-        # Remove the field `pose` for distros older than NOETIC
-        if ros_distro in (RosDistro.KINETIC, RosDistro.MELODIC):
-            for co in self.collision_objects:
-                del co.pose
+        for co in self.collision_objects:
+            co.filter_fields_for_distro(ros_distro)
+        if hasattr(self.octomap, "filter_fields_for_distro"):
+            self.octomap.filter_fields_for_distro(ros_distro)
+        elif isinstance(self.octomap, dict):
+            self.octomap["header"] = format_header_for_distro(self.octomap.get("header"), ros_distro)
+            octomap = self.octomap.get("octomap")
+            if isinstance(octomap, dict):
+                octomap["header"] = format_header_for_distro(octomap.get("header"), ros_distro)
 
 
 class PlanningScene(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/msg/PlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/PlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/PlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/PlanningScene"
 
@@ -640,7 +661,9 @@ class PlanningScene(ROSmsg):
 
 
 class ExecuteTrajectoryGoal(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/action/ExecuteTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryGoal"
 
@@ -649,7 +672,9 @@ class ExecuteTrajectoryGoal(ROSmsg):
 
 
 class ExecuteTrajectoryFeedback(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/action/ExecuteTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryFeedback"
 
@@ -662,7 +687,9 @@ class ExecuteTrajectoryFeedback(ROSmsg):
 
 
 class ExecuteTrajectoryResult(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/action/ExecuteTrajectory.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/action/ExecuteTrajectory.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/action/ExecuteTrajectory.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ExecuteTrajectoryResult"
 

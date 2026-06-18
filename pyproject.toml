@@ -1,26 +1,153 @@
-[tool.black]
-line-length = 120
+[build-system]
+requires = ["setuptools>=66.0"]
+build-backend = "setuptools.build_meta"
+
+# ============================================================================
+# Project info
+# ============================================================================
+
+[project]
+name = "compas_fab"
+description = "Robotic fabrication package for the COMPAS Framework"
+keywords = ["robotic fabrication", "digital fabrication", "architecture", "robotics", "ros"]
+authors = [
+    { name = "Gramazio Kohler Research", email = "gramaziokohler@arch.ethz.ch" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+dynamic = ['dependencies', 'optional-dependencies', 'version']
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Unix",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "compas_fab.__version__.__version__" }
+dependencies = { file = "requirements.txt" }
+optional-dependencies = { dev = { file = "requirements-dev.txt" } }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yaml", "*.yml", "*.urdf", "*.srdf", "*.stl", "*.dae", "*.obj", "*.ghuser"]
+
+[project.urls]
+Homepage = "https://github.com/compas-dev/compas_fab"
+Documentation = "https://compas.dev/compas_fab"
+Repository = "https://github.com/compas-dev/compas_fab"
+Changelog = "https://github.com/compas-dev/compas_fab/blob/main/CHANGELOG.md"
+Issues = "https://github.com/compas-dev/compas_fab/issues"
+Forum = "https://forum.compas-framework.org/"
+
+# ============================================================================
+# Testing
+# ============================================================================
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-testpaths = ["src", "tests"]
+testpaths = ["tests", "src/compas_fab"]
 python_files = [
     "test_*.py",
-    "*_test.py",
-    "tests.py"
+    "tests.py",
 ]
-addopts = "-ra --strict --doctest-glob=*.rst --tb=short"
-doctest_optionflags= "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL ALLOW_UNICODE ALLOW_BYTES"
+addopts = "-ra --strict-markers --doctest-glob=*.md --tb=short --import-mode=importlib"
+doctest_optionflags = "NORMALIZE_WHITESPACE IGNORE_EXCEPTION_DETAIL ALLOW_UNICODE ALLOW_BYTES NUMBER"
 filterwarnings = "ignore::DeprecationWarning"
 
-[tool.pydocstyle]
-convention = "numpy"
-add-ignore = ["D100"]
+# ============================================================================
+# Linting and formatting
+# ============================================================================
 
-[tool.isort]
-force_single_line = true
-line_length = 120
-known_first_party = "compas_fab"
-default_section = "THIRDPARTY"
-forced_separate = "test_compas_fab"
-skip = ["__init__.py"]
+[tool.ruff]
+line-length = 179
+indent-width = 4
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["I001"]
+"tests/*" = ["I001", "E501"]
+"tasks.py" = ["I001"]
+"src/compas_fab/ghpython/components_cpython/*/code.py" = ["F821", "F401"]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = ["compas_fab"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 179
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+# ============================================================================
+# Release automation
+# ============================================================================
+
+[tool.bumpversion]
+current_version = "1.1.0"
+message = "Bump version to {new_version}"
+commit = true
+tag = true
+parse = """(?x)
+    (?P<major>0|[1-9]\\d*)\\.
+    (?P<minor>0|[1-9]\\d*)\\.
+    (?P<patch>0|[1-9]\\d*)
+    (?:
+        -                             # dash separator for pre-release section
+        (?P<pre_l>[a-zA-Z-]+)         # pre-release label
+        (?P<pre_n>0|[1-9]\\d*)        # pre-release version number
+    )?                                # pre-release section is optional
+"""
+serialize = [
+    "{major}.{minor}.{patch}-{pre_l}{pre_n}",
+    "{major}.{minor}.{patch}",
+]
+
+[tool.bumpversion.parts.pre_l]
+values = ["rc", "final"]
+optional_value = "final"
+
+[[tool.bumpversion.files]]
+filename = "src/compas_fab/__version__.py"
+search = "{current_version}"
+replace = "{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "CITATION.cff"
+search = 'version: "{current_version}"'
+replace = 'version: "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "CHANGELOG.md"
+search = "Unreleased"
+replace = "[{new_version}] {now:%Y-%m-%d}"
+
+[[tool.bumpversion.files]]
+glob = "src/compas_fab/ghpython/components_cpython/**/code.py"
+search = "# r: compas_fab>={current_version}"
+replace = "# r: compas_fab>={new_version}"
+
+[[tool.bumpversion.files]]
+glob = "src/compas_fab/ghpython/components_cpython/**/code.py"
+search = "COMPAS FAB v{current_version}"
+replace = "COMPAS FAB v{new_version}"

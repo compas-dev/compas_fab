@@ -1,0 +1,38 @@
+{
+    "name": "Rigid Body From Mesh",
+    "nickname": "Body From Mesh",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Construct a RigidBody from a Rhino mesh. The same mesh is used for collision checking unless a separate `collision_mesh` is provided.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Identifier for the body. Used as its key when wired into a Load Robot Cell component's `rigid_bodies` input. Required for that use.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "visual_mesh",
+                "description": "Rhino mesh for visualization (and collision checking if no separate collision mesh is provided)."
+            },
+            {
+                "name": "collision_mesh",
+                "description": "Optional Rhino mesh used only for collision checking. Defaults to `visual_mesh`."
+            },
+            {
+                "name": "native_scale",
+                "description": "Scale factor: user_value * native_scale = meters. Use 0.001 for millimeter documents. Defaults to 1.0.",
+                "typeHintID": "float"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "rigid_body",
+                "description": "RigidBody."
+            }
+        ]
+    }
+}

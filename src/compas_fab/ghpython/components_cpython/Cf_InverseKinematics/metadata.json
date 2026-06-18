@@ -1,0 +1,50 @@
+{
+    "name": "Inverse Kinematics",
+    "nickname": "IK",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Solve inverse kinematics for a target using the given planner and starting RobotCellState.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "planner",
+                "description": "A planner instance (AnalyticalKinematicsPlanner, MoveItPlanner, PyBulletPlanner, AnalyticalPyBulletPlanner)."
+            },
+            {
+                "name": "target",
+                "description": "Target to reach (FrameTarget, PointAxisTarget, etc.)."
+            },
+            {
+                "name": "start_state",
+                "description": "Starting RobotCellState. The robot's configuration in this state is used as the IK seed."
+            },
+            {
+                "name": "group",
+                "description": "Optional planning group name. Defaults to the cell's main planning group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "check_collision",
+                "description": "When True, only collision-free IK solutions are returned; when False, in-collision solutions are accepted. Unwired keeps the backend default (True: collision-free).",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "configuration",
+                "description": "Resulting Configuration, or None if no solution was found."
+            },
+            {
+                "name": "cell_state",
+                "description": "A copy of the start_state with `robot_configuration` set to the IK result. Wire straight into VisualizeRobotCell / ForwardKinematics / next planner step- no SetRobotConfiguration needed."
+            },
+            {
+                "name": "debug_info",
+                "description": "The warnings / errors raised by this run (including a collision diagnostic on failure), as a single string. Wire a panel to read them; empty on a clean solve."
+            }
+        ]
+    }
+}

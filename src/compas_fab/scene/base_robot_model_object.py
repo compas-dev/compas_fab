@@ -1,0 +1,252 @@
+from typing import Optional
+
+from compas.colors import Color
+from compas.datastructures import Mesh
+from compas.geometry import Frame
+from compas.geometry import Scale
+from compas.geometry import Transformation
+from compas.scene import SceneObject
+from compas_robots import Configuration
+from compas_robots import RobotModel
+from compas_robots.model import LinkGeometry
+
+
+class BaseRobotModelObject(SceneObject):
+    """Base class for compas_fab-special RobotModelObjects
+
+    This class is a SceneObject that represents a robot model.
+    It is used to draw the robot model in the respective CAD environment.
+
+    Parameters
+    ----------
+    draw_visual
+        Draw the visual meshes of the robot model. Default is `True`.
+    draw_collision
+        Draw the collision meshes of the robot model. Default is `False`.
+        It is possible to turn on both `draw_visual` and `draw_collision`, however both set of meshes
+        will be returned as a combined list in the `draw()` method. Consider creating two separate
+        RobotModelObjects if you want to draw the visual and collision meshes separately
+    native_scale
+        The native scale factor to visualize the robot model, in case the native CAD environment
+        uses a different unit system other than meters. The native scale value should be set such
+        that a `meter_mesh.scale(1/native_scale)` will create the mesh in the native unit system.
+        For example, if the unit system of the visualization environment  is millimeters, `native_scale` should be set to ``'0.001'``.
+        Default is `1.0`.
+
+    Notes
+    -----
+        The initial parameters `draw_visual`, `draw_collision`, and `scale` cannot be changed after initialization.
+    """
+
+    MESH_JOIN_PRECISION = 12
+
+    def __init__(self, draw_visual: bool = True, draw_collision: bool = False, native_scale: float = 1.0, *args, **kwargs):
+        super(BaseRobotModelObject, self).__init__(*args, **kwargs)
+        self._draw_visual = draw_visual
+        self._draw_collision = draw_collision
+        self._native_scale = native_scale
+
+        # It will be filled when the `draw()` method is called for the first time.
+        self._links_visual_mesh_native_geometry = {}
+        self._links_collision_mesh_native_geometry = {}
+        # Dictionary to hold the current transformation of the robot links
+        self._links_visual_mesh_transformation = {}
+        self._links_collision_mesh_transformation = {}
+
+    @property
+    def robot_model(self) -> RobotModel:
+        """The robot model this object is associated with."""
+        return self.item
+
+    def draw(self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None) -> list[object]:
+        """Draw the robot model object in the respective CAD environment.
+
+        This function conforms to `SceneObject.draw()` Interface and will return
+        the native geometry objects that were created.
+
+        - In the Rhino context where the geometry had been placed in the Rhino document,
+          the native geometry handles are still returned.
+        - In the GHPython context, the native geometry is returned as a list of
+          `Rhino.Geometry.Mesh` objects, which can be used as a GHComponent output.
+
+        """
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
+        if (not self._links_visual_mesh_native_geometry) and (not self._links_collision_mesh_native_geometry):
+            self._initial_draw()
+
+        # Update the robot model if a configuration is provided
+        if robot_configuration or base_frame:
+            self.update(robot_configuration, base_frame)
+
+        # Return the native geometry
+        native_geometry = []
+        if self._draw_visual:
+            for meshes in self._links_visual_mesh_native_geometry.values():
+                native_geometry.extend(meshes)
+        if self._draw_collision:
+            for meshes in self._links_collision_mesh_native_geometry.values():
+                native_geometry.extend(meshes)
+        return native_geometry
+
+    def _initial_draw(self):
+        """Creating the native geometry when `draw()` or `update()` method is called for the first time.
+
+        This private function is isolated out such that the initial draw does not happen in the __init__
+        method and can be deferred until  `draw()` or `update()` is called for the first time.
+        """
+        # Reset the dictionaries
+        self.base_native_geometry = None
+        self.base_transformation = None
+        self._links_visual_mesh_native_geometry: dict[str, Mesh] = {}
+        self._links_collision_mesh_native_geometry: dict[str, Mesh] = {}
+        self._links_visual_mesh_transformation: dict[str, Transformation] = {}
+        self._links_collision_mesh_transformation: dict[str, Transformation] = {}
+
+        # Helper function to get the meshes from the visual or collision elements
+        # NOTE: The meshes are transformed to the base frame of the link using the `self._transform()` method
+        #       instead of using `Mesh.transform()` to have better performance.
+        def create_and_transform_meshes(elements, name):
+            native_geometries = []
+            for element in elements:
+                for mesh in LinkGeometry._get_item_meshes(element):
+                    native_geometry = self._create_geometry(mesh, name)
+                    if element.origin:
+                        native_geometry = self._transform(native_geometry, Transformation.from_frame(element.origin))
+                    native_geometries.append(native_geometry)
+            return native_geometries
+
+        # Iterate over the links and create the visual and collision meshes.
+        # Only create the geometry if it exists.
+        for link in self.robot_model.iter_links():
+            link_name = link.name
+            if self._draw_visual:
+                native_geometries = create_and_transform_meshes(link.visual, name=link_name + "_visual")
+                if native_geometries:
+                    self._links_visual_mesh_native_geometry[link_name] = native_geometries
+                    self._links_visual_mesh_transformation[link_name] = Transformation()
+
+            if self._draw_collision:
+                native_geometries = create_and_transform_meshes(link.collision, name=link_name + "_collision")
+                if native_geometries:
+                    self._links_collision_mesh_native_geometry[link_name] = native_geometries
+                    self._links_collision_mesh_transformation[link_name] = Transformation()
+
+    def update(self, robot_configuration: Optional[Configuration] = None, base_frame: Optional[Frame] = None):
+        """Updates the native geometry of the robot model according to the given robot
+        configuration and base frame.
+
+        Parameters
+        ----------
+        robot_configuration
+            The robot configuration to update the robot model.
+            This is only optional for robot models that do not have any configurable joints.
+        base_frame
+            The frame of the RobotCoordinateFrame relative to the WorldCoordinateFrame.
+            Default is World XY frame at origin.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        It is possible to call this method before the [`draw`][] method.
+        """
+
+        # Create the native geometry when the `draw()` or `update()` method is called for the first time
+        if (not self._links_visual_mesh_native_geometry) and (not self._links_collision_mesh_native_geometry):
+            self._initial_draw()
+
+        # NOTE: This function should still update the base_frame even if there are no configurable joints
+
+        def _update_link_meshes(link_name, new_transformation):
+            if link_name in self._links_visual_mesh_native_geometry:
+                # Compute the delta transformation
+                previous_transformation = self._links_visual_mesh_transformation[link_name]
+                delta_transformation: Transformation = new_transformation * previous_transformation.inverse()
+                # Transform the native geometry
+                new_native_geometries = []
+                for native_geometry in self._links_visual_mesh_native_geometry[link_name]:
+                    new_native_geometries.append(self._transform(native_geometry, delta_transformation))
+                # Update the dictionaries
+                self._links_visual_mesh_native_geometry[link_name] = new_native_geometries
+                self._links_visual_mesh_transformation[link_name] = new_transformation
+            if link_name in self._links_collision_mesh_native_geometry:
+                # Compute the delta transformation
+                previous_transformation = self._links_collision_mesh_transformation[link_name]
+                delta_transformation = new_transformation * previous_transformation.inverse()
+                # Transform the native geometry
+                new_native_geometries = []
+                for native_geometry in self._links_collision_mesh_native_geometry[link_name]:
+                    new_native_geometries.append(self._transform(native_geometry, delta_transformation))
+                # Update the dictionaries
+                self._links_collision_mesh_native_geometry[link_name] = new_native_geometries
+                self._links_collision_mesh_transformation[link_name] = new_transformation
+
+        # The World Coordinate Frame (WCF) relative to the Visualization Coordinate Frame (VCF)
+        t_vcf_wcf = Scale.from_factors([1 / self._native_scale] * 3)
+        # The robot base frame relative to the world frame
+        t_wcf_rcf = Transformation.from_frame(base_frame) if base_frame else Transformation()
+
+        # Update the base link
+        _update_link_meshes(self.robot_model.root.name, t_vcf_wcf * t_wcf_rcf)
+
+        # Iterate over the joints (equivalent to all the child links) and update their pose
+        # This iteration order is the same as the result from transform_frames()
+        transformed_joint_frames = self.robot_model.transformed_frames(robot_configuration)
+        for joint_frame, joint in zip(transformed_joint_frames, list(self.robot_model.iter_joints())):
+            # From Robot Coordinate Frame to Link Coordinate Frame (Link Frame == Joint Frame)
+            t_rcf_lcf = Transformation.from_frame(joint_frame)
+            # From World Coordinate Frame to Link Coordinate Frame
+            t_wcf_lcf = t_vcf_wcf * t_wcf_rcf * t_rcf_lcf
+            _update_link_meshes(joint.child_link.name, t_wcf_lcf)
+
+    # --------------------------------------------------------------------------
+    # Private methods that need to be implemented by CAD specific classes
+    # --------------------------------------------------------------------------
+
+    def _transform(self, geometry: object, transformation: Transformation) -> object:
+        """Transforms the given native CAD-specific geometry.
+
+        Here we do not assume whether that the CAD-specific `._transform` method will operate on the native geometry
+        in place, or creating a new object. This is up to the CAD-specific implementation.
+        The `._transform` method should return the transformed geometry object, whether it is a new object or the same object.
+
+        Parameters
+        ----------
+        geometry
+            A CAD-specific (i.e. native) geometry object as returned by :meth:`_create_geometry`.
+        transformation
+            Transformation to update the geometry object.
+
+        Returns
+        -------
+        object
+            The transformed geometry object.
+
+        """
+        raise NotImplementedError
+
+    def _create_geometry(self, geometry: Mesh, name: Optional[str] = None, color: Optional[Color] = None):
+        """Create new native geometry in the respective CAD environment.
+
+        Parameters
+        ----------
+        geometry
+            Instance of a mesh data structure
+        name
+            The name of the mesh to draw.
+        color
+            The color of the object.`
+
+        Returns
+        -------
+        object
+            CAD-specific geometry
+
+        Notes
+        -----
+        This is an abstract method that needs to be implemented by derived classes.
+
+        """
+        raise NotImplementedError

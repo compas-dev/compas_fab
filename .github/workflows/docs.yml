@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - LTS-main-1.x
     tags:
       - 'v*'
   pull_request_review:
@@ -14,7 +15,11 @@ jobs:
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'pull_request_review' && github.event.review.state == 'approved')
     runs-on: ubuntu-latest
     steps:
-      - uses: compas-dev/compas-actions.docs@v3
+      - uses: compas-dev/compas-actions.docs@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           doc_url: https://compas.dev/compas_fab
+          # Site is built with MkDocs (via `invoke docs`); `v5` of the action
+          # added the `generator` switch so it can deploy MkDocs sites in
+          # addition to the original Sphinx flow.
+          generator: mkdocs

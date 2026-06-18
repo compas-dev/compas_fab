@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
 import os
 import sys
@@ -25,10 +21,10 @@ def redirect_stdout(to=os.devnull, enabled=True):
 
     Examples
     --------
-    >>> import os                                                        # doctest: +SKIP
-    >>> with redirect_stdout(to='filename'):                             # doctest: +SKIP
-    ...     print("from Python")                                         # doctest: +SKIP
-    ...     os.system("echo non-Python applications are also supported") # doctest: +SKIP
+    >>> import os  # doctest: +SKIP
+    >>> with redirect_stdout(to="filename"):  # doctest: +SKIP
+    ...     print("from Python")  # doctest: +SKIP
+    ...     os.system("echo non-Python applications are also supported")  # doctest: +SKIP
     """
 
     def _redirect_stdout(to_):
@@ -42,6 +38,15 @@ def redirect_stdout(to=os.devnull, enabled=True):
     called_from_ipykernel = "ipykernel" in sys.modules
 
     enabled = False if called_from_test or called_from_ipykernel else enabled
+
+    # Embedded interpreters (e.g. Rhino's CPython) replace ``sys.stdout`` with a
+    # stream that has no OS-level file descriptor, so ``fileno()`` raises and
+    # fd-level redirection is impossible. Fall back to running without it.
+    if enabled:
+        try:
+            sys.stdout.fileno()
+        except (AttributeError, OSError, ValueError):
+            enabled = False
 
     if not enabled:
         yield

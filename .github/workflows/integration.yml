@@ -4,34 +4,55 @@ on:
   push:
     branches:
       - main
-      - wip
   pull_request:
+    branches:
+      - main
+      - LTS-main-1.x
 
 jobs:
   build:
-    name: ubuntu-py38-integration
+    name: ubuntu-py39-integration
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v6
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
-      - name: Set up docker containers
+          python-version: '3.9'
+
+      - name: Bring up both ROS stacks
+        # Defaults: ROS 1 rosbridge on 9090, ROS 2 rosbridge on 9091, ROS 2
+        # HTTP assets on 9092. See `tests/integration_setup/README.md`.
         run: |
-          docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build
+          docker compose -f tests/integration_setup/docker-compose.yml      up -d --build
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml up -d --build
           docker ps -a
+
       - name: Install dependencies
+        # `pip install -r requirements-dev.txt` alone installs the dev tools
+        # but NOT the package itself nor its runtime deps. The top-level
+        # `conftest.py` then crashes on `from twisted.internet import ...`
+        # because twisted only arrives transitively via `roslibpy` (a runtime
+        # dep). Installing the package with the `[dev]` extra pulls both.
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install wheel
-      - name: Install
-        run: |
-          python -m pip install --no-cache-dir -r requirements-dev.txt
-      - name: Run integration tests
+          python -m pip install --upgrade pip wheel
+          python -m pip install --no-cache-dir -e ".[dev]"
+
+      - name: Run tests + doctests
+        # `COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS=1` opts the `ros1_client` /
+        # `ros2_client` fixtures into actually connecting (otherwise every
+        # integration test is skipped). `--doctest-modules` picks up
+        # doctests embedded in `src/compas_fab/` modules.
+        env:
+          COMPAS_FAB_RUN_ROS_INTEGRATION_TESTS: "1"
+          # Opt the whole suite into roslibpy's new asyncio transport
+          # (websockets-based) instead of the historical twisted reactor.
+          ROSLIBPY_TRANSPORT: asyncio
         run: |
           pytest --doctest-modules
-          pytest docs
+
       - name: Tear down docker containers
+        if: always()
         run: |
-          docker-compose -f "tests/integration_setup/docker-compose.yml" down
+          docker compose -f tests/integration_setup/docker-compose.yml      down
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml down

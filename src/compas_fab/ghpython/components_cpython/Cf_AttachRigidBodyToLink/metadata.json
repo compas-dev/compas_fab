@@ -1,0 +1,44 @@
+{
+    "name": "Attach Rigid Body To Link",
+    "nickname": "Attach Body to Link",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Attach a RigidBody to a robot link inside a RobotCellState. Use for items rigidly mounted on the robot (cable dress-packs, wrist-mounted cameras, etc.).",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "cell_state",
+                "description": "The RobotCellState to modify."
+            },
+            {
+                "name": "rigid_body_id",
+                "description": "Id of the rigid body inside the RobotCell.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "link_name",
+                "description": "Name of the robot link the body is attached to.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "attachment_plane",
+                "description": "Optional pose of the body relative to the link. Defaults to World XY (body at the link's base)."
+            },
+            {
+                "name": "touch_links",
+                "description": "Optional list of robot link names allowed to collide with the body.",
+                "typeHintID": "str",
+                "scriptParamAccess": 1
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "cell_state",
+                "description": "New RobotCellState with the body attached to the link."
+            }
+        ]
+    }
+}

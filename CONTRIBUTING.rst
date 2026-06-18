@@ -22,7 +22,7 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 ::
 
-    docker-compose -f "tests/integration_setup/docker-compose.yml" up -d --build
+    docker compose -f "tests/integration_setup/docker-compose.yml" up -d --build
 
 5. Make sure all tests pass:
 
@@ -41,7 +41,7 @@ We love pull requests from everyone! Here's a quick guide to improve the code:
 
 ::
 
-    docker-compose -f "tests/integration_setup/docker-compose.yml"" down
+    docker compose -f "tests/integration_setup/docker-compose.yml" down
 
 9. Check there are no linter errors:
 

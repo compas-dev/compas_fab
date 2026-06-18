@@ -1,0 +1,34 @@
+{
+    "name": "Analytical PyBullet Planner",
+    "nickname": "Analytical PyBullet",
+    "category": "COMPAS FAB",
+    "subcategory": "Backends",
+    "description": "Create an AnalyticalPyBulletPlanner that manages its own in-process PyBullet physics server: closed-form analytical IK paired with PyBullet collision checking, so IK solutions in collision are rejected. Pass a RobotCell and pick a solver.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "RobotCell to plan against. Applied to the planner via set_robot_cell on every run."
+            },
+            {
+                "name": "solver",
+                "description": "Name of the analytical solver: 'ur3', 'ur3e', 'ur5', 'ur5e', 'ur10', 'ur10e', 'staubli_tx260l', or 'abb_irb4600_40_255'. A dropdown is auto-created.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "connection_type",
+                "description": "'direct' (headless, recommended on the canvas) or 'gui' (opens a separate PyBullet window for visualization, where a display is available). A dropdown is auto-created. Defaults to 'direct'.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "planner",
+                "description": "AnalyticalPyBulletPlanner with its robot cell loaded."
+            }
+        ]
+    }
+}

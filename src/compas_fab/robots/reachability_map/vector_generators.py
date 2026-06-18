@@ -8,19 +8,19 @@ from compas.geometry import Vector
 from compas_fab.utilities import arange
 
 
-class OrthonormalVectorsFromAxisGenerator(object):
+class OrthonormalVectorsFromAxisGenerator:
     """Generate vectors that are orthonormal to an axis.
 
     Parameters
     ----------
-    axis : :class:`compas.geometry.Vector`
+    axis : [`Vector`][compas.geometry.Vector]
         The axis to which the vectors should be orthonormal to.
     angle_step : float
         The angle in radians as the spacing between generated vectors.
 
     Yields
     ------
-    :class:`compas.geometry.Vector`
+    [`Vector`][compas.geometry.Vector]
         The orthonormal vector.
 
     Examples
@@ -69,12 +69,12 @@ class OrthonormalVectorsFromAxisGenerator(object):
                 yield f.to_world_coordinates(Vector(x, y, 0))
 
 
-class DeviationVectorsGenerator(object):
+class DeviationVectorsGenerator:
     """Calculates equally distributed vectors that deviate from the specified one by a maximal angle of `max_alpha`.
 
     Parameters
     ----------
-    axis : :class:`compas.geometry.Vector`
+    axis : [`Vector`][compas.geometry.Vector]
         The axis about which to calculate vectors.
     max_alpha : float
         The maximum angle in radians that a vector should deviate from the axis.
@@ -83,7 +83,7 @@ class DeviationVectorsGenerator(object):
 
     Yields
     ------
-    list of :class:`compas.geometry.Vector`
+    list of [`Vector`][compas.geometry.Vector]
 
     Examples
     --------
@@ -111,9 +111,7 @@ class DeviationVectorsGenerator(object):
 
     def __iter__(self):
         yield self.axis
-        alphas = arange(
-            self.max_alpha / self.step, self.max_alpha + self.max_alpha / self.step, self.max_alpha / self.step
-        )
+        alphas = arange(self.max_alpha / self.step, self.max_alpha + self.max_alpha / self.step, self.max_alpha / self.step)
         radii = [math.sin(alpha) for alpha in alphas]
         x, y = math.cos(alphas[0]), math.sin(alphas[0])
         d = math.sqrt((1 - x) ** 2 + y**2)

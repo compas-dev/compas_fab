@@ -1,19 +1,13 @@
-attrs >=19.3.0
-autopep8
-black
-bump2version >=1.0.1
-check-manifest >=0.36
-compas_invocations
-doc8
-flake8
-importlib_metadata <5.0
-invoke>=0.14
-isort
-pylint
+attrs >= 19.3.0
+bump-my-version
+compas_invocations2[mkdocs]
+invoke >= 0.14
+mkdocs-print-site-plugin
 pytest
-pytest_mock
 pytest-cov
-sphinx_compas2_theme
-sybil
+pytest-mock
+pybullet
+pythonnet
+ruff
+tomlkit
 twine
--e .

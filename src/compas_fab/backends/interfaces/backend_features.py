@@ -1,119 +1,419 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from typing import Optional
 
-import compas
+from compas.geometry import Frame
+from compas_robots import Configuration
 
-if not compas.IPY:
-    from typing import TYPE_CHECKING
+from compas_fab.backends.exceptions import PlanningGroupNotExistsError
+from compas_fab.robots import JointTrajectory
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
+from compas_fab.robots import Target
+from compas_fab.robots import TargetMode
+from compas_fab.robots import Waypoints
 
-    if TYPE_CHECKING:
-        from compas_fab.backends.interfaces import ClientInterface  # noqa: F401
 
-
-class BackendFeature(object):
+class BackendFeature:
     """Base class for all backend features that are implemented by a backend client.
+
+    Classes that inherit from this class are mixed-in when creating the planner backend interface.
+    Hence the the mixed-in class can access the attributes and other mix-ins functions of planner.
+
+    The implemented feature classes can assume that `self` is an instance of the planner backend interface.
+    IDE code completion and type hints can be activated by adding a line such as
+    `planner : MoveItPlanner = self`.
 
     Attributes
     ----------
     client : :class:`compas_fab.backends.interfaces.ClientInterface`
         The backend client that supports this feature.
 
+
     """
 
-    def __init__(self, client):
-        # All backend features are assumed to be associated with a backend client.
-        self.client = client  # type: ClientInterface
+    def __init__(self, client=None):
+        super(BackendFeature, self).__init__()
+
+    def _build_configuration(
+        self,
+        joint_positions: list[float],
+        joint_names: list[str],
+        group: str,
+        return_full_configuration: bool,
+        start_configuration: Optional[Configuration] = None,
+    ) -> Configuration:
+        """This function helps the planner build a standard configuration that can be returned to the user.
+
+        It supports two modes for different use cases:
+
+        - If return_full_configuration is True, it returns a full configuration including all configurable
+          joints in the robot, even if the joint is not in the planning group.
+          See :meth:`compas_robots.model.Joint.is_configurable` for more details.
+        - If return_full_configuration is False, it returns only the joint values for the planning group.
+          The joint values are sorted according to the group's joint order.
+
+
+        Parameters
+        ----------
+        joint_positions
+            All joint values for the full configuration.
+        joint_names
+            The joint names corresponding to the joint values.
+        group
+            The name of the planning group.
+        return_full_configuration
+            If True, the full configuration is returned, otherwise only the group configuration is returned.
+        start_configuration
+            If return_full_configuration is True, this configuration is used to fill in the missing values.
+
+        Notes
+        -----
+        Do not pass None to group when return_full_configuration is False, the behavior is undefined.
+
+        """
+        robot_cell: RobotCell = self.client.robot_cell
+        if return_full_configuration:
+            # build configuration including passive joints, but no sorting
+            configuration = robot_cell.zero_full_configuration()
+            value_dict = dict(zip(joint_names, joint_positions))
+            for name in configuration.joint_names:
+                if name in value_dict:
+                    configuration[name] = value_dict[name]
+                elif start_configuration:
+                    configuration[name] = start_configuration[name]
+        else:
+            # sort values for group configuration
+            joint_state = dict(zip(joint_names, joint_positions))
+            group_joint_names = robot_cell.get_configurable_joint_names(group)
+            values = [joint_state[name] for name in group_joint_names]
+            configuration = Configuration(values, robot_cell.get_configurable_joint_types(group), group_joint_names)
+
+        return configuration
 
 
 #   The code that contains the actual feature implementation is located in the backend's module.
 #   For example, the features for moveit planner and ros client are located in :
 #   "src/compas_fab/backends/ros/backend_features/"
-#   If you cannot a specific feature in the 'backend_features', it means that the planner
+#   Only in the case of `inverse_kinematics` feature, the implementation for managing repeated calls is provided in this file.
+#   If you cannot find a specific feature in the 'backend_features', it means that the planner
 #   does not support that feature.
 
 
-class ForwardKinematics(BackendFeature):
-    """Mix-in interface for implementing a planner's forward kinematics feature."""
+class SetRobotCell(BackendFeature):
+    """Mix-in interface for implementing a planner's set robot cell feature."""
 
-    def forward_kinematics(self, robot, configuration, group=None, options=None):
-        """Calculate the robot's forward kinematic.
+    def set_robot_cell(self, robot_cell: RobotCell, robot_cell_state: Optional[RobotCellState] = None, options: Optional[dict] = None):
+        """Pass the models in the robot cell to the planning client.
+
+        The client keeps the robot cell models in memory and uses them for planning.
+        Calling this method will override the previous robot cell in the client.
+        It should be called only if the robot cell models have changed.
+
+        """
+        pass
+
+
+class SetRobotCellState(BackendFeature):
+    """Mix-in interface for implementing a planner's set robot cell state feature."""
+
+    def set_robot_cell_state(self, robot_cell_state: RobotCellState, options: Optional[dict] = None):
+        """Set the robot cell state to the client.
+
+        The client requires a robot cell state at the beginning of each planning request.
+        This cell state must correspond to the robot cell set earlier by :meth:`set_robot_cell`.
+
+        This function is called automatically by planning functions that takes a RobotCellState as input.
+        Therefore it is typically not necessary for the user to call this function,
+        except when used to trigger visualization using native backend canvas.
+
+        """
+        pass
+
+
+class CheckCollision(BackendFeature):
+    """Mix-in interface for implementing a planner's collision check feature."""
+
+    def check_collision(self, robot_cell_state: RobotCellState, options: Optional[dict] = None):
+        """Check if the robot cell is in collision at the specified state.
+
+        Different planners may have different criteria for collision checking, check the planner's documentation for details.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which forward kinematics is being calculated.
-        configuration : :class:`compas_robots.Configuration`
-            The full configuration to calculate the forward kinematic for. If no
-            full configuration is passed, the zero-joint state for the other
-            configurable joints is assumed.
-        group : str, optional
-            The name of the group to be used in the calculation.
-        options : dict, optional
+        robot_cell_state
+            The robot cell state to check for collision.
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
         Returns
         -------
-        :class:`Frame`
-            The frame in the world's coordinate system (WCF).
+        None
+            If there is collision, the function will raise exception, otherwise it will return None.
+
+        Raises
+        ------
+        :class:`compas_fab.backends.exceptions.CollisionCheckError`
+            If collision is detected.
+
         """
         pass
 
+
+class ForwardKinematics(BackendFeature):
+    """Mix-in interface for implementing a planner's forward kinematics feature."""
+
+    def forward_kinematics(
+        self,
+        robot_cell_state: RobotCellState,
+        target_mode: TargetMode,
+        group: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ) -> Frame:
+        """Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.
+
+        The returned coordinate frame is dependent on the chosen ``target_mode``:
+
+        - ``"Target.ROBOT"`` will return the planner coordinate frame (PCF).
+        - ``"Target.TOOL"`` will return the tool coordinate frame (TCF) if a tool is attached.
+        - ``"Target.WORKPIECE"`` will return the workpiece's object coordinate frame (OCF)
+          if a workpiece is attached (via an attached tool).
+
+        Parameters
+        ----------
+        robot_cell_state
+            The robot cell state describing the robot cell.
+            The attribute `robot_configuration`, must contain the full configuration of the robot corresponding to the planning group.
+            The robot cell state should also reflect the attachment of tools, if any.
+        target_mode
+            The target mode to select which frame to return.
+        group
+            The planning group of the robot.
+            Defaults to the robot's main planning group.
+        native_scale
+            The scaling factor to apply to the resulting frame.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Defaults to None, which means no scaling is applied.
+        options
+            Dictionary containing planner-specific options.
+            See the planner's `ForwardKinematics` documentation for supported options.
+
+        Returns
+        -------
+        :class:`Frame`
+            The frame in the world's coordinate system (WCF).
+
+        """
+        raise NotImplementedError("This feature is not supported by the planner.")
+
         # The implementation code is located in the backend's module:
         # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_forward_kinematics.py"
+
+    def forward_kinematics_to_link(
+        self,
+        robot_cell_state: RobotCellState,
+        link_name: Optional[str] = None,
+        native_scale: Optional[float] = None,
+        options: Optional[dict] = None,
+    ) -> Frame:
+        """Calculate the frame of the specified robot link from the provided RobotCellState.
+
+        This function operates similar to :meth:`compas_fab.backends.PyBulletForwardKinematics.forward_kinematics`,
+        but allows the user to specify which link to return. The function will return the frame of the specified
+        link relative to the world coordinate frame (WCF).
+
+        This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
+        robot's links and the user needs to know the position of the object relative to the world coordinate frame.
+
+        Parameters
+        ----------
+        robot_cell_state
+            The robot cell state describing the robot cell.
+        link_name
+            The name of the link to calculate the forward kinematics for.
+            Defaults to the last link of the provided planning group.
+        native_scale
+            The scaling factor to apply to the resulting frame.
+            It is defined as `user_object_value * native_scale = meter_object_value`.
+            For example, if the resulting frame is to be used in a millimeters environment, `native_scale` should be set to ``'0.001'``.
+            Defaults to None, which means no scaling is applied.
+        options
+            Dictionary containing planner-specific options.
+            See the planner's `ForwardKinematics` documentation for supported options.
+        """
+
+        raise NotImplementedError("This feature is not supported by the planner.")
 
 
 class InverseKinematics(BackendFeature):
     """Mix-in interface for implementing a planner's inverse kinematics feature."""
 
-    def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
+    def __init__(self):
+        # The following fields are used to store the last ik request for iterative calls
+        self._last_ik_request = {"request_hash": None, "solutions": None}
+
+        # Initialize the super class
+        super(InverseKinematics, self).__init__()
+
+    def inverse_kinematics(
+        self,
+        target: Target,
+        robot_cell_state: Optional[RobotCellState] = None,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> Configuration:
         """Calculate the robot's inverse kinematic for a given frame.
 
-        Note that unlike other backend features, `inverse_kinematics` produces a generator.
+        The default implementation is based on the iter_inverse_kinematics method.
+        Calling this method will return the first solution found by the iterator,
+        subsequent calls will return the next solution from the iterator. Once
+        all solutions have been exhausted, the iterator will be re-initialized.
+
+        The starting state describes the robot cell's state at the moment of the calculation.
+        The robot's configuration is taken as the starting configuration.
+        If a tool is attached to the planning group, the tool's coordinate frame is used.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which inverse kinematics is being calculated.
-        frame_WCF : :class:`compas.geometry.Frame`
-            The frame to calculate the inverse for.
-        start_configuration : :class:`compas_robots.Configuration`, optional
-        group : str, optional
+        target
+            The target to calculate the inverse kinematics for.
+        robot_cell_state
+            The starting state to calculate the inverse kinematics for.
+            The robot's configuration in the scene is taken as the starting configuration.
+        group
             The planning group used for calculation.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
+
+        Raises
+        ------
+        :class:`compas_fab.backends.exceptions.InverseKinematicsError`
+            If no configuration can be found.
+
+        Returns
+        -------
+        :obj:`compas_robots.Configuration`
+            The calculated configuration.
+
+        """
+        # This is the default implementation for the inverse kinematics feature to be based on the
+        # iter_inverse_kinematics method. If the planner does not support this feature, it should
+        # override this method and raise a BackendFeatureNotSupportedError.
+
+        # The planner-specific implementation code is located in the backend's module:
+        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_inverse_kinematics"
+
+        # Pseudo-memoized sequential calls will re-use iterator if not exhausted
+        request_hash = (target.sha256(), robot_cell_state.sha256(), str(group), str(options))
+
+        if self._last_ik_request["request_hash"] == request_hash and self._last_ik_request["solutions"] is not None:
+            if options and options.get("verbose", False):
+                print("Inverse Kinematics Hash: Last IK Generator reused")
+            solution = next(self._last_ik_request["solutions"], None)
+            # NOTE: If the iterator is exhausted, solution will be None, subsequent code outside will reset the generator
+            if solution is not None:
+                return solution
+            if options and options.get("verbose", False):
+                print("- Unfortunately, the last IK generator is exhausted, re-initializing the generator...")
+
+        if options and options.get("verbose", False):
+            print("Inverse Kinematics Hash: New IK Generator created")
+        solutions = self.iter_inverse_kinematics(target, robot_cell_state, group, options)
+        self._last_ik_request["request_hash"] = request_hash
+        self._last_ik_request["solutions"] = solutions
+
+        # NOTE: If the 'solutions' generator cannot yield even one solution, it will raise an exception here:
+        return next(solutions)
+
+    def iter_inverse_kinematics(
+        self,
+        target: Target,
+        robot_cell_state: Optional[RobotCellState] = None,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> Configuration:
+        """Calculate the robot's inverse kinematic for a given frame.
+
+        This function returns a generator that yields possible solutions for the
+        inverse kinematics problem. The generator will be exhausted after all
+        possible solutions have been returned or when the maximum number of
+        results has been reached.
+
+        Parameters
+        ----------
+        target
+            The target to calculate the inverse kinematics for.
+        robot_cell_state
+            The starting state to calculate the inverse kinematics for.
+            The robot's configuration in the scene is taken as the starting configuration.
+        group
+            The planning group used for calculation. Defaults to the robot's
+            main planning group.
+        options
+            Dictionary containing planner-specific arguments.
+            See the planner's documentation for supported options.
+            One of the supported options related to the iterator is:
+
+            - ``"max_results"``: (:obj:`int`) Maximum number of results to return.
+              Defaults to ``100``.
+            - ``"verbose"``: (:obj:`bool`, optional)
+                Whether or not to print verbose output. Defaults to ``False``.
+
+        Raises
+        ------
+        compas_fab.backends.exceptions.InverseKinematicsError
+            If no configuration can be found.
+
         Yields
         ------
-        :obj:`tuple` of :obj:`list`
-            A tuple of 2 elements containing a list of joint positions and a list of matching joint names.
-        """
-        pass
+        :class:`compas_robots.Configuration`
+            The calculated configuration.
 
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_inverse_kinematics"
+        """
+        # =====================================================================================
+        # The following lines should be typical in all planners' iter_inverse_kinematics method
+        # =====================================================================================
+
+        planner = self
+        client = planner.client
+        robot_cell = client.robot_cell  # type: RobotCell
+        group = group or robot_cell.main_group_name
+
+        # Unit conversion from user scale to meter scale can be done here because they are shared.
+        # This will be triggered too, when entering from the inverse_kinematics method.
+        target = target.normalized_to_meters()
+
+        # Check if the robot cell state supports the target mode
+        robot_cell.assert_cell_state_match(robot_cell_state)
+        robot_cell_state.assert_target_mode_match(target.target_mode, group)
+
+        # Check if the planning group exist
+        if group not in robot_cell.group_names:
+            raise PlanningGroupNotExistsError("Planning group '{}' is not supported by PyBullet planner.".format(group))
 
 
 class PlanMotion(BackendFeature):
     """Mix-in interface for implementing a planner's plan motion feature."""
 
-    def plan_motion(self, robot, target, start_configuration=None, group=None, options=None):
+    def plan_motion(self, target: Target, start_state: RobotCellState, group: Optional[str] = None, options: Optional[dict] = None) -> JointTrajectory:
         """Calculates a motion path.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the motion path is being calculated.
-        target : :class:`compas_fab.robots.Target`
+        target
             The goal for the robot to achieve.
-        start_configuration : :class:`compas_robots.Configuration`, optional
-            The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position.
-        group : str, optional
-            The name of the group to plan for.
-        options : dict, optional
+        start_state
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
+        group
+            The name of the group to plan for. Defaults to the robot's main
+            planning group.
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
@@ -131,21 +431,25 @@ class PlanMotion(BackendFeature):
 class PlanCartesianMotion(BackendFeature):
     """Mix-in interface for implementing a planner's plan cartesian motion feature."""
 
-    def plan_cartesian_motion(self, robot, waypoints, start_configuration=None, group=None, options=None):
+    def plan_cartesian_motion(
+        self,
+        waypoints: Waypoints,
+        start_state: RobotCellState,
+        group: Optional[str] = None,
+        options: Optional[dict] = None,
+    ) -> JointTrajectory:
         """Calculates a cartesian motion path (linear in tool space).
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot instance for which the cartesian motion path is being calculated.
-        waypoints : :class:`compas_fab.robots.Waypoints`
+        waypoints
             The waypoints for the robot to follow.
-        start_configuration : :class:`compas_robots.Configuration`, optional
-            The robot's full configuration, i.e. values for all configurable
-            joints of the entire robot, at the starting position.
-        group : str, optional
+        start_state
+            The starting state of the robot cell at the beginning of the motion.
+            The attribute `robot_configuration`, must be provided.
+        group
             The planning group used for calculation.
-        options : dict, optional
+        options
             Dictionary containing kwargs for arguments specific to
             the client being queried.
 
@@ -158,164 +462,3 @@ class PlanCartesianMotion(BackendFeature):
 
         # The implementation code is located in the backend's module:
         # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_plan_cartesian_motion.py"
-
-
-class GetPlanningScene(BackendFeature):
-    """Mix-in interface for implementing a planner's get planning scene feature."""
-
-    def get_planning_scene(self, options=None):
-        """Retrieve the planning scene.
-
-        Parameters
-        ----------
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.planning_scene.PlanningScene`
-        """
-        pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_get_planning_scene.py"
-
-
-class ResetPlanningScene(BackendFeature):
-    """Mix-in interface for implementing a planner's reset planning scene feature."""
-
-    def reset_planning_scene(self, options=None):
-        """Resets the planning scene, removing all added collision meshes.
-
-        Parameters
-        ----------
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        ``None``
-        """
-        pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_reset_planning_scene.py"
-
-
-class AddCollisionMesh(BackendFeature):
-    """Mix-in interface for implementing a planner's add collision mesh feature."""
-
-    def add_collision_mesh(self, collision_mesh, options=None):
-        """Add a collision mesh to the planning scene.
-
-        Parameters
-        ----------
-        collision_mesh : :class:`compas_fab.robots.CollisionMesh`
-            Object containing the collision mesh to be added.
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        ``None``
-        """
-        pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_add_collision_mesh.py"
-
-
-class RemoveCollisionMesh(BackendFeature):
-    """Mix-in interface for implementing a planner's remove collision mesh feature."""
-
-    def remove_collision_mesh(self, id, options=None):
-        """Remove a collision mesh from the planning scene.
-
-        Parameters
-        ----------
-        id : str
-            Name of collision mesh to be removed.
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        ``None``
-        """
-        pass
-
-
-class AppendCollisionMesh(BackendFeature):
-    """Mix-in interface for implementing a planner's append collision mesh feature."""
-
-    def append_collision_mesh(self, collision_mesh, options=None):
-        """Append a collision mesh to the planning scene.
-
-        Parameters
-        ----------
-        collision_mesh : :class:`compas_fab.robots.CollisionMesh`
-            Object containing the collision mesh to be appended.
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        ``None``
-        """
-        pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_append_collision_mesh.py"
-
-
-class AddAttachedCollisionMesh(BackendFeature):
-    """Mix-in interface for implementing a planner's add attached collision mesh feature."""
-
-    def add_attached_collision_mesh(self, attached_collision_mesh, options=None):
-        """Add a collision mesh and attach it to the robot.
-
-        Parameters
-        ----------
-        attached_collision_mesh : :class:`compas_fab.robots.AttachedCollisionMesh`
-            Object containing the collision mesh to be attached.
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        ``None``
-        """
-        pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_add_attached_collision_mesh.py"
-
-
-class RemoveAttachedCollisionMesh(BackendFeature):
-    """Mix-in interface for implementing a planner's remove attached collision mesh feature."""
-
-    def remove_attached_collision_mesh(self, id, options=None):
-        """Remove an attached collision mesh from the robot.
-
-        Parameters
-        ----------
-        id : str
-            Name of collision mesh to be removed.
-        options : dict, optional
-            Dictionary containing kwargs for arguments specific to
-            the client being queried.
-
-        Returns
-        -------
-        ``None``
-        """
-        pass
-
-        # The implementation code is located in the backend's module:
-        # "src/compas_fab/backends/<backend_name>/backend_features/<planner_name>_remove_attached_collision_mesh.py"

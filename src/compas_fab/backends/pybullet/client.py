@@ -1,42 +1,60 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import itertools
 import os
+import sys
 import tempfile
-from itertools import combinations
+from typing import TYPE_CHECKING
+from typing import Optional
 
-import compas
+from compas import OSX
+from compas import WINDOWS
+from compas.colors import Color
+from compas.datastructures import Mesh
 from compas.geometry import Frame
+from compas_robots import Configuration
 from compas_robots import RobotModel
+from compas_robots import ToolModel
 from compas_robots.files import URDF
+from compas_robots.model import Inertia
+from compas_robots.model import Inertial
+from compas_robots.model import Mass
+from compas_robots.model import Material
 from compas_robots.model import MeshDescriptor
+from compas_robots.model import Mimic
 
-import compas_fab
+from compas_fab.backends import CollisionCheckError
 from compas_fab.backends.interfaces.client import ClientInterface
-from compas_fab.backends.kinematics import AnalyticalInverseKinematics
-from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
-from compas_fab.robots import Robot
-from compas_fab.robots import RobotLibrary
+from compas_fab.robots import RigidBody
+from compas_fab.robots import RobotCell
+from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotSemantics
 from compas_fab.utilities import LazyLoader
 
 from . import const
 from .conversions import frame_from_pose
 from .conversions import pose_from_frame
-from .exceptions import CollisionError
-from .planner import PyBulletPlanner
-from .utils import LOG
 from .utils import redirect_stdout
 
-pybullet = LazyLoader("pybullet", globals(), "pybullet")
+if TYPE_CHECKING:
+    import pybullet
 
-if not compas.IPY:
-    from typing import TYPE_CHECKING
+    from compas_fab.backends.kinematics import AnalyticalInverseKinematics
+    from compas_fab.backends.kinematics import AnalyticalPlanCartesianMotion
 
-    if TYPE_CHECKING:
-        from typing import list
+
+# `pybullet`'s native extension is heavy to import (several seconds on
+# macOS) and is unrelated to ROS / analytical backends. Install a
+# `LazyLoader` proxy unless someone has already imported the real module
+# in this process. Either way, code inside this file can refer to
+# `pybullet` as if it were a normal module — the proxy forwards attribute
+# access to the real module on first touch.
+if "pybullet" in sys.modules:
+    # Already imported elsewhere in this process (e.g. the user imported it in
+    # their Grasshopper script). Bind the real module into this namespace; the
+    # import is cached so this is cheap. Without this, being in `sys.modules`
+    # alone never binds the `pybullet` name here -> NameError on first use.
+    import pybullet  # noqa: F401, F811
+else:
+    pybullet = LazyLoader("pybullet", globals(), "pybullet")  # noqa: F811
 
 __all__ = [
     "PyBulletClient",
@@ -44,24 +62,41 @@ __all__ = [
 ]
 
 
-class PyBulletBase(object):
-    def __init__(self, connection_type):
+class PyBulletBase:
+    def __init__(self, connection_type: str):
         self.client_id = None
         self.connection_type = connection_type
+        super(PyBulletBase, self).__init__()
 
-    def connect(self, shadows=True, color=None, width=None, height=None):
+    # -------------------------------------------------------------------
+    # Functions for connecting and disconnecting from the PyBullet server
+    # -------------------------------------------------------------------
+
+    def connect(
+        self,
+        shadows: bool = True,
+        color: Optional[tuple[float, float, float]] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        verbose: bool = False,
+        enable_debug_gui: bool = False,
+    ):
         """Connect from the PyBullet server.
 
         Parameters
         ----------
-        shadows : :obj:`bool`
+        shadows
             Display shadows in the GUI. Defaults to ``True``.
-        color : :obj:`tuple` of :obj:`float`
+        color
             Set the background color of the GUI. Defaults to ``None``.
-        width : :obj:`int`
+        width
             Set the width in pixels of the GUI. Defaults to ``None``.
-        height : :obj:`int`
+        height
             Set the height in pixels of GUI. Defaults to ``None``.
+        verbose
+            Enable verbose output. Defaults to ``False``.
+        enable_debug_gui
+            Enable the GUI sidebar and parameter views. Defaults to ``False``.
 
         Returns
         -------
@@ -69,22 +104,25 @@ class PyBulletBase(object):
         """
         # Shared Memory: execute the physics simulation and rendering in a separate process
         # https://github.com/bulletphysics/bullet3/blob/master/examples/pybullet/examples/vrminitaur.py#L7
-        self._detect_display()
-        options = self._compose_options(color, width, height)
-        with redirect_stdout():
-            self.client_id = pybullet.connect(const.CONNECTION_TYPE[self.connection_type], options=options)
-        if self.client_id < 0:
-            raise Exception("Error in establishing connection with PyBullet.")
-        if self.connection_type == "gui":
-            self._configure_debug_visualizer(shadows)
 
-    def _detect_display(self):
-        if self.connection_type == "gui" and not compas.OSX and not compas.WINDOWS and ("DISPLAY" not in os.environ):
+        # If connection_type is 'gui' but there is no display detected, switch to 'direct'
+        if self.connection_type == "gui" and not OSX and not WINDOWS and ("DISPLAY" not in os.environ):
             self.connection_type = "direct"
             print("No display detected! Continuing without GUI.")
 
+        # Format GUI parameters for launching PyBullet
+        options = self._compose_options(color, width, height)
+
+        with redirect_stdout(enabled=not verbose):
+            self.client_id = pybullet.connect(const.CONNECTION_TYPE[self.connection_type], options=options)
+
+        if self.client_id < 0:
+            raise Exception("Error in establishing connection with PyBullet.")
+        if self.connection_type == "gui":
+            self._configure_debug_visualizer(shadows, enable_debug_gui)
+
     @staticmethod
-    def _compose_options(color, width, height):
+    def _compose_options(color: Optional[tuple[float, float, float]] = None, width: Optional[int] = None, height: Optional[int] = None) -> str:
         options = ""
         if color is not None:
             options += "--background_color_red={} --background_color_green={} --background_color_blue={}".format(*color)
@@ -94,21 +132,18 @@ class PyBulletBase(object):
             options += "--height={}".format(height)
         return options
 
-    def _configure_debug_visualizer(self, shadows):
-        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, False, physicsClientId=self.client_id)
+    def _configure_debug_visualizer(self, shadows: bool = True, enable_debug_gui: bool = False):
+        # COV_ENABLE_GUI controls the sidebar and parameter views in the GUI
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_GUI, enable_debug_gui, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_TINY_RENDERER, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_RGB_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
-        pybullet.configureDebugVisualizer(
-            pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id
-        )
-        pybullet.configureDebugVisualizer(
-            pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id
-        )
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_DEPTH_BUFFER_PREVIEW, False, physicsClientId=self.client_id)
+        pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, False, physicsClientId=self.client_id)
         pybullet.configureDebugVisualizer(pybullet.COV_ENABLE_SHADOWS, shadows, physicsClientId=self.client_id)
 
-    def disconnect(self):
+    def disconnect(self, verbose: bool = False):
         """Disconnect from the PyBullet server."""
-        with redirect_stdout():
+        with redirect_stdout(enabled=not verbose):
             return pybullet.disconnect(physicsClientId=self.client_id)
 
     @property
@@ -137,40 +172,109 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     Parameters
     ----------
-    connection_type : :obj:`str`
-        Sets the connection type. Defaults to ``'gui'``.
-    verbose : :obj:`bool`
+    connection_type
+        Sets the connection type.
+        ``'gui'`` for a graphical user interface (default).
+        ``'direct'`` mode will create a headless physics engine and directly communicates with it.
+        ``'shared_memory'``, ``'udp'``, and ``'tcp'`` are not supported.
+
+    verbose
         Use verbose logging. Defaults to ``False``.
+
+    Attributes
+    ----------
+    verbose
+        Use verbose logging.
+    rigid_bodies_puids
+        Dictionary of rigid bodies and their PyBullet ids.
 
     Examples
     --------
     >>> from compas_fab.backends import PyBulletClient
-    >>> with PyBulletClient(connection_type='direct') as client:
-    ...     print('Connected: %s' % client.is_connected)
+    >>> with PyBulletClient(connection_type="direct") as client:
+    ...     print("Connected: %s" % client.is_connected)
     Connected: True
 
     """
 
-    def __init__(self, connection_type="gui", verbose=False):
+    def __init__(self, connection_type: str = "gui", verbose: bool = False, enable_debug_gui: bool = False):
         super(PyBulletClient, self).__init__(connection_type)
-        self.planner = PyBulletPlanner(self)
         self.verbose = verbose
-        self.collision_objects = {}
-        self.attached_collision_objects = {}
+        self.enable_debug_gui = enable_debug_gui
+
+        # Robot Cell
+        # The Pybullet client will not keep track of the Robot object directly but uses the one embedded in the RobotCell
+        # `robot_cell` and `robot_cell_state` are initialized in the ClientInterface
+
+        # PyBullet unique id
+        self.robot_puid = None
+        # Each robot joint has a unique id
+        self.robot_joint_puids: dict[str, int] = {}
+        # Each robot link has a unique id
+        self.robot_link_puids: dict[str, int] = {}
+
+        # Each RigidBody can have multiple meshes, so we store a list of puids
+        self.rigid_bodies_puids: dict[str, list[int]] = {}
+        # Each ToolModel is a single URDF, so we store a single puid
+        self.tools_puids: dict[str, int] = {}
+
         self.disabled_collisions = set()
-        self._cache_dir = None
+        # Backing handle for the lazily-created `_cache_dir` property.
+        self._cache_dir_handle = None
+
+    # NOTE: This function is overloaded from the ClientInterface to provide Pybullet specific docstring
+    @property
+    def robot_cell(self) -> RobotCell:
+        """The robot cell that is currently loaded in the PyBullet server.
+        It represents the last RobotCell that was passed to `planner.set_robot_cell()`.
+
+        In order to avoid side effects, the RobotCell object is a copy of the original object
+        passed to the client. Do not modify the returned object here.
+        """
+        return self._robot_cell
+
+    # NOTE: This function is overloaded from the ClientInterface to provide Pybullet specific docstring
+    @property
+    def robot_cell_state(self) -> RobotCellState:
+        """The state of the robot cell that is currently loaded in the PyBullet server.
+        It represents the last RobotCellState that was passed to `planner.set_robot_cell_state()`.
+
+        In order to avoid side effects, the RobotCellState object is a copy of the original object.
+        passed to the client. Do not modify the returned object here.
+
+        There is typically no reason to access this directly, as the state is managed by the client.
+        The state is also updated during the beginning of each CC, FK, IK and planning request.
+        However, it can be useful for debugging.
+        The planner uses this function internally for comparing object states that was changed.
+        """
+        return self._robot_cell_state
+
+    @property
+    def _cache_dir(self):
+        """Temporary directory for the meshes and URDFs streamed to PyBullet.
+
+        Created lazily on first access so the client works whether or not it is
+        used as a context manager (e.g. when ``connect()`` is called directly).
+        It is cleaned up on ``__exit__``; otherwise the underlying
+        ``TemporaryDirectory`` removes itself when it is garbage collected.
+        """
+        if self._cache_dir_handle is None:
+            self._cache_dir_handle = tempfile.TemporaryDirectory(prefix="compas_fab")
+        return self._cache_dir_handle
 
     def __enter__(self):
-        self._cache_dir = tempfile.TemporaryDirectory()
-        self.connect()
+        self.connect(verbose=self.verbose, enable_debug_gui=self.enable_debug_gui)
         return self
 
     def __exit__(self, *args):
-        self._cache_dir.cleanup()
-        self.disconnect()
+        if self._cache_dir_handle is not None:
+            self._cache_dir_handle.cleanup()
+            self._cache_dir_handle = None
+        self.disconnect(verbose=self.verbose)
 
     @property
-    def unordered_disabled_collisions(self):
+    def unordered_disabled_collisions(self) -> set:
+        """Returns the set of disabled collisions between robot links."""
         return {frozenset(pair) for pair in self.disabled_collisions}
 
     def step_simulation(self):
@@ -182,144 +286,196 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         """
         pybullet.stepSimulation(physicsClientId=self.client_id)
 
-    def load_ur5(self, load_geometry=False, concavity=False):
-        """ "Load a UR5 robot to PyBullet.
+    # ------------------------------------------
+    # Functions for loading and removing objects
+    # ------------------------------------------
+
+    # TODO: Discuss whether the following functions should all have '_' in the beginning of their names
+
+    def _set_robot(self, robot_model: RobotModel, robot_semantics: RobotSemantics, concavity: bool = False):
+        """Send a robot to PyBullet.
+
+        This function is used by SetRobotCell and should not be called directly by user.
+        The robot must contain geometry and semantics.
+
+        If a robot is already loaded, it will be replaced by the new robot.
 
         Parameters
         ----------
-        load_geometry : :obj:`bool`, optional
-            Indicate whether to load the geometry of the robot or not.
-        concavity : :obj:`bool`, optional
+        robot_model
+            The robot model to be loaded into PyBullet.
+        robot_semantics
+            The robot semantics to be loaded into PyBullet.
+        concavity
+            When ``True``, the mesh will be loaded as its concave hull
+            for collision checking purposes. Defaults to ``False``.
+
+        """
+        if self.robot_puid is not None:
+            self._remove_robot()
+
+        urdf_fp = self.robot_model_to_urdf(robot_model, concavity=concavity)
+        self.robot_puid = robot_puid = self._pybullet_load_urdf(urdf_fp)
+
+        # The root link of the robot have index of `-1` (refer to PyBullet API)
+        self.robot_link_puids[robot_model.root.name] = -1
+
+        # For the rest of the joints and links, their numbers are the same
+        # The id of the joint is the same as the id of its child link
+        for id in range(self._get_num_joints(robot_puid)):
+            joint_name = self._get_joint_name(id, robot_puid)
+            self.robot_joint_puids[joint_name] = id
+            link_name = self._get_link_name(id, robot_puid)
+            self.robot_link_puids[link_name] = id
+
+        # Note: Mimic joints are considered as a DOF in Pybullet and most functions
+        # that accept poses will require passing also the mimic joints.
+        # In compas_fab, mimic joints are not considered as DOF and are not included in get_configurable_joints().
+
+        self.disabled_collisions = robot_semantics.disabled_collisions
+
+    def _remove_robot(self):
+        """Remove the robot from the PyBullet server if it exists."""
+        if self.robot_puid is None:
+            return
+        pybullet.removeBody(self.robot_puid, physicsClientId=self.client_id)
+        self.robot_puid = None
+        self.robot_joint_puids = {}
+        self.robot_link_puids = {}
+
+    def _add_tool(self, name: str, tool_model: ToolModel):
+        """Load a ToolModel object to PyBullet.
+
+        Parameters
+        ----------
+        name
+            The name of the tool.
+        tool_model
+            The tool_model to be loaded into PyBullet.
+
+        """
+        file_path = self.robot_model_to_urdf(tool_model)
+        pybullet_uid = self._pybullet_load_urdf(file_path)
+        self.tools_puids[name] = pybullet_uid
+
+    def _remove_tool(self, name: str):
+        """Remove a tool from the PyBullet server if it exists.
+
+        Parameters
+        ----------
+        name
+            The name of the tool.
+        """
+        assert name in self.tools_puids
+
+        pybullet.removeBody(self.tools_puids[name], physicsClientId=self.client_id)
+        del self.tools_puids[name]
+
+    def _add_rigid_body(self, name: str, rigid_body: RigidBody, concavity: bool = False, mass: float = const.STATIC_MASS) -> int:
+        # Each Mesh in `collision_meshes` / `visual_meshes` becomes its own PyBullet body so
+        # disjoint sub-meshes are not lumped into one convex hull (which produces false-positive
+        # collisions). All sub-bodies share the same parent rigid-body name and are kept in
+        # `rigid_bodies_puids[name]` as a list; pose updates iterate the list.
+        visual_meshes = list(rigid_body.visual_meshes_in_meters or [])
+        collision_meshes = list(rigid_body.collision_meshes_in_meters or [])
+
+        n_subs = max(len(visual_meshes), len(collision_meshes))
+        if n_subs == 0:
+            return
+
+        # Pad the shorter list with None so we can zip pair-wise. Index i pairs the i-th visual
+        # with the i-th collision mesh; if one list is shorter the remaining sub-bodies have only
+        # the available channel.
+        def _padded(lst):
+            return list(lst) + [None] * (n_subs - len(lst))
+
+        sub_body_ids = []
+        for idx, (v_mesh, c_mesh) in enumerate(zip(_padded(visual_meshes), _padded(collision_meshes))):
+            visual_path = None
+            if v_mesh is not None:
+                visual_path = os.path.join(self._cache_dir.name, "{}_visual_{}.obj".format(rigid_body.guid, idx))
+                v_mesh.to_obj(visual_path)
+                visual_path = self._handle_concavity(visual_path, self._cache_dir.name, concavity, mass)
+
+            collision_path = None
+            if c_mesh is not None:
+                collision_path = os.path.join(self._cache_dir.name, "{}_collision_{}.obj".format(rigid_body.guid, idx))
+                c_mesh.to_obj(collision_path)
+                collision_path = self._handle_concavity(collision_path, self._cache_dir.name, concavity, mass)
+
+            pyb_body_id = self._body_from_obj(visual_path, collision_path, concavity=concavity, mass=mass)
+            assert not pyb_body_id == -1, "Error in creating rigid body in PyBullet. Returning ID is -1."
+            sub_body_ids.append(pyb_body_id)
+
+        self.rigid_bodies_puids[name] = sub_body_ids
+
+    def _remove_rigid_body(self, name: str):
+        """Remove a rigid body from the PyBullet server if it exists.
+
+        Parameters
+        ----------
+        name
+            The name of the rigid body.
+        """
+        if name not in self.rigid_bodies_puids:
+            return
+        for body_id in self.rigid_bodies_puids[name]:
+            pybullet.removeBody(body_id, physicsClientId=self.client_id)
+        del self.rigid_bodies_puids[name]
+
+    def _pybullet_load_urdf(self, urdf_file: str) -> int:
+        """Instruct PyBullet to load a URDF file.
+
+        Parameters
+        ----------
+        urdf_file
+            The file path to the URDF file.
+
+        Returns
+        -------
+        :obj:`int`
+            The internal PyBullet unique id of the loaded URDF model."""
+
+        with redirect_stdout(enabled=not self.verbose):
+            # From PyBullet Quickstart Guide:
+            # URDF_USE_INERTIA_FROM_FILE: by default, Bullet recomputed the inertia tensor based on mass and volume of the collision shape.
+            # If you can provide more accurate inertia tensor, use this flag.
+            # URDF_USE_SELF_COLLISION: by default, Bullet disables self-collision.
+            # This flag let's you enable it.
+            # You can customize the self-collision behavior using the following flags:
+            # URDF_USE_SELF_COLLISION_EXCLUDE_PARENT will discard self-collision between links that are directly connected (parent and child).
+            # URDF_USE_SELF_COLLISION_EXCLUDE_ALL_PARENTS will discard self-collisions between a child link and any of its ancestors (parents, parents of parents, up to the base).
+
+            # This function will use URDF_USE_SELF_COLLISION without the EXCLUDE_PARENT,
+            # the neighboring self-collision situation is micro-managed by planning algorithms.
+
+            # useFixedBase is set to false for allowing tool_models to move around.
+
+            flags = pybullet.URDF_USE_SELF_COLLISION
+            pybullet_uid = pybullet.loadURDF(urdf_file, useFixedBase=False, physicsClientId=self.client_id, flags=flags)
+
+            # loadURDF returns a body unique id, a non-negative integer value. If the URDF file cannot be
+            # loaded, this integer will be negative and not a valid body unique id.
+            assert pybullet_uid >= 0, "Pybullet Error in loading URDF file {}".format(urdf_file)
+
+            return pybullet_uid
+
+    def robot_model_to_urdf(self, robot_model: RobotModel, concavity: bool = False) -> str:
+        """Converts a robot_model to a URDF package.
+
+        Parameters
+        ----------
+        robot_model
+            The robot_model to be saved for use with PyBullet.
+        concavity
             When ``False`` (the default), the mesh will be loaded as its
             convex hull for collision checking purposes.  When ``True``,
             a non-static mesh will be decomposed into convex parts using v-HACD.
 
         Returns
         -------
-        :class:`compas_fab.robots.Robot`
-            A robot instance.
-        """
-        robot = RobotLibrary.ur5(client=self, load_geometry=load_geometry)
-        robot.ensure_semantics()
-
-        robot.attributes["pybullet"] = {}
-        if load_geometry:
-            self.cache_robot_model(robot, concavity)
-        else:
-            robot.attributes["pybullet"]["cached_robot_model"] = robot.model
-            robot.attributes["pybullet"]["cached_robot_filepath"] = compas_fab.get(
-                "robot_library/ur5_robot/urdf/robot_description.urdf"
-            )
-
-        urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
-
-        self._load_robot_to_pybullet(urdf_fp, robot)
-        self.disabled_collisions = robot.semantics.disabled_collisions
-
-        return robot
-
-    def load_robot(self, urdf_file, resource_loaders=None, concavity=False, precision=None):
-        """Create a pybullet robot using the input urdf file.
-
-        Parameters
-        ----------
-        urdf_file : :obj:`str` or file object
-            Absolute file path to the urdf file name or file object. The mesh file can be linked by either
-            `"package::"` or relative path.
-        resource_loaders : :obj:`list`
-            List of :class:`compas_robots.AbstractMeshLoader` for loading geometry of the robot.  That the
-            geometry of the robot model is loaded is required before adding or removing attached collision meshes
-            to or from the scene. Defaults to the empty list.
-        concavity : :obj:`bool`
-            When ``False`` (the default), the mesh will be loaded as its
-            convex hull for collision checking purposes.  When ``True``,
-            a non-static mesh will be decomposed into convex parts using v-HACD.
-        precision : int
-            Defines precision for importing/loading meshes. Defaults to ``compas.tolerance.TOL.precision``.
-
-        Notes
-        -----
-        By default, PyBullet will use the convex hull of any mesh loaded from a URDF for collision detection.
-        Amending the link tag as ``<link concave="yes" name="<name of link>">`` will make the mesh concave
-        for static meshes (see this `example <https://github.com/bulletphysics/bullet3/blob/master/data/samurai.urdf>`_).
-        For non-static concave meshes, use the ``concavity`` flag.
-        """
-        robot_model = RobotModel.from_urdf_file(urdf_file)
-        robot = Robot(robot_model, client=self)
-        robot.attributes["pybullet"] = {}
-        if resource_loaders:
-            robot_model.load_geometry(*resource_loaders, precision=precision)
-            self.cache_robot_model(robot, concavity)
-        else:
-            robot.attributes["pybullet"]["cached_robot_model"] = robot.model
-            robot.attributes["pybullet"]["cached_robot_filepath"] = urdf_file
-
-        urdf_fp = robot.attributes["pybullet"]["cached_robot_filepath"]
-
-        self._load_robot_to_pybullet(urdf_fp, robot)
-
-        return robot
-
-    def load_semantics(self, robot, srdf_filename):
-        """Loads the semantic information of a robot.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot to be saved for use with PyBullet.
-        srdf_filename  : :obj:`str` or file object
-            Absolute file path to the srdf file name.
-        """
-        cached_robot_model = self.get_cached_robot_model(robot)
-        robot.semantics = RobotSemantics.from_srdf_file(srdf_filename, cached_robot_model)
-        self.disabled_collisions = robot.semantics.disabled_collisions
-
-    def _load_robot_to_pybullet(self, urdf_file, robot):
-        cached_robot_model = self.get_cached_robot_model(robot)
-        with redirect_stdout(enabled=not self.verbose):
-            pybullet_uid = pybullet.loadURDF(
-                urdf_file, useFixedBase=True, physicsClientId=self.client_id, flags=pybullet.URDF_USE_SELF_COLLISION
-            )
-            cached_robot_model.attr["uid"] = pybullet_uid
-
-        self._add_ids_to_robot_joints(cached_robot_model)
-        self._add_ids_to_robot_links(cached_robot_model)
-
-    def reload_from_cache(self, robot):
-        """Reloads the PyBullet server with the robot's cached model.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot to be saved for use with PyBullet.
-
-        """
-        current_configuration = self.get_robot_configuration(robot)
-        cached_robot_model = self.get_cached_robot_model(robot)
-        cached_robot_filepath = self.get_cached_robot_filepath(robot)
-        robot_uid = self.get_uid(cached_robot_model)
-        pybullet.removeBody(robot_uid, physicsClientId=self.client_id)
-
-        cached_robot_model.to_urdf_file(cached_robot_filepath, prettify=True)
-        pybullet.setPhysicsEngineParameter(enableFileCaching=0)
-        self._load_robot_to_pybullet(cached_robot_filepath, robot)
-        pybullet.setPhysicsEngineParameter(enableFileCaching=1)
-
-        self.set_robot_configuration(robot, current_configuration)
-        self.step_simulation()
-
-    def cache_robot_model(self, robot, concavity=False):
-        """Saves an editable copy of the robot's model and its meshes
-        for shadowing the state of the robot on the PyBullet server.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot to be saved for use with PyBullet.
-        concavity : :obj:`bool`
-            When ``False`` (the default), the mesh will be loaded as its
-            convex hull for collision checking purposes.  When ``True``,
-            a non-static mesh will be decomposed into convex parts using v-HACD.
+        :obj:`str`
+            The file path to the robot model URDF package.
 
         Raises
         ------
@@ -327,244 +483,103 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             If geometry has not been loaded.
 
         """
-        robot.ensure_geometry()
-        # write meshes to cache
-        address_dict = {}
-        # must work with given robot.model here because it has the geometry loaded
-        for link in robot.model.links:
+        robot_model.ensure_geometry()
+        mesh_precision = 12
+
+        for link in robot_model.links:
+            # Assign a default material if none is provided.
+            # Otherwise, the default material in PyBullet is black and is completely illegible.
+            for visual in link.visual:
+                if not visual.material:
+                    visual.material = Material(name="undefined_gray", color=Color(0.7, 0.7, 0.7, alpha=1.0))
+
+            # Export meshes as obj and handle concavity
             for element in itertools.chain(link.visual, link.collision):
                 shape = element.geometry.shape
                 if isinstance(shape, MeshDescriptor):
-                    for mesh in shape.meshes:
-                        mesh_file_name = str(mesh.guid) + ".obj"
-                        fp = os.path.join(self._cache_dir.name, mesh_file_name)
-                        mesh.to_obj(fp)
-                        fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(mesh.guid))
-                        address_dict[shape.filename] = fp
+                    # Note: the MeshDescriptor.meshes object supports a list of compas meshes.
+                    #       However URDF `link/mesh` tag only supports one filename to hold all the meshes.
+                    #       Therefore, if there are multiple meshes in one Visual or Collision tag, the meshes
+                    #       will be saved as one mesh file.
+                    #       One the other hand, URDF allows multiple visual and collision tags under the same
+                    #       link object.
+
+                    # Join multiple meshes
+                    if len(shape.meshes) > 1:
+                        joined_mesh = Mesh()
+                        for mesh in shape.meshes:
+                            joined_mesh.join(mesh, False, precision=mesh_precision)
+                        print("robot_model_to_urdf(): Joined %i meshes for link: " % len(shape.meshes), link.name)
+                    else:
+                        joined_mesh = shape.meshes[0]
+
+                    # Export the joined mesh
+                    mesh_file_name = str(joined_mesh.guid) + ".obj"
+                    fp = os.path.join(self._cache_dir.name, mesh_file_name)
+                    joined_mesh.to_obj(fp, precision=mesh_precision)
+                    fp = self._handle_concavity(fp, self._cache_dir.name, concavity, 1, str(joined_mesh.guid))
+                    shape.filename = fp
+
+            # NOTE: PyBullet requires an inertial object to be present in each link or it prints ugly blue warning messages.
+            # We are fine filling some default values for the inertial object because we don't use the dynamics in PyBullet.
+            if link.inertial is None:
+                link.inertial = self._pybullet_empty_inertial()
 
         # create urdf with new mesh locations
-        urdf = URDF.from_robot(robot.model)
-        meshes = list(urdf.xml.root.iter("mesh"))
-        for mesh in meshes:
-            filename = mesh.attrib["filename"]
-            mesh.attrib["filename"] = address_dict[filename]
+        urdf = URDF.from_robot(robot_model)
 
         # write urdf
-        cached_robot_model_file_name = str(robot.model.guid) + ".urdf"
-        cached_robot_filepath = os.path.join(self._cache_dir.name, cached_robot_model_file_name)
-        urdf.to_file(cached_robot_filepath, prettify=True)
-        cached_robot_model = RobotModel.from_urdf_file(cached_robot_filepath)
-        robot.attributes["pybullet"]["cached_robot_model"] = cached_robot_model
-        robot.attributes["pybullet"]["cached_robot_filepath"] = cached_robot_filepath
-        robot.attributes["pybullet"]["robot_geometry_cached"] = True
+        urdf_file_name = str(robot_model.guid) + ".urdf"
+        urdf_filepath = os.path.join(self._cache_dir.name, urdf_file_name)
 
-    @staticmethod
-    def ensure_cached_robot_model(robot):
-        """Checks if a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
-        if not robot.attributes["pybullet"]["cached_robot_model"]:
-            raise Exception("This method is only callable once the robot has been cached.")
+        # Note: Set prettify to False will cause some URDF to fail, such as rfl and panda.
+        # Resulting in the non-debuggable "pybullet.error: Cannot load URDF file."
+        # There is probably a bug in the XMLWriter or PyBullet's URDF parser.
+        urdf.to_file(urdf_filepath, prettify=True)
 
-    @staticmethod
-    def ensure_cached_robot_model_geometry(robot):
-        """Checks if the geometry of a :class:`compas_fab.robots.Robot` has been cached for use with PyBullet."""
-        if not robot.attributes["pybullet"].get("robot_geometry_cached"):
-            raise Exception("This method is only callable once the robot with loaded geometry has been cached.")
+        return urdf_filepath
 
-    def get_cached_robot_model(self, robot):
-        # type: (Robot) -> RobotModel
-        """Returns the editable copy of the robot's model for shadowing the state
-        of the robot on the PyBullet server.
+    def _pybullet_empty_inertial(self) -> Inertial:
+        """Create an empty inertial object.
+        Useful for virtual links in URDF that does not have mass or inertial information.
+        However, PyBullet requires an inertial object to be present in each link or it prints ugly blue warning messages.
+        """
+        origin = Frame.worldXY()
+        mass = Mass(const.STATIC_MASS)
+        inertia = Inertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        inertial = Inertial(origin, mass, inertia)
+        return inertial
+
+    # --------------------------------
+    # Functions for collision checking
+    # --------------------------------
+
+    def _check_collision(
+        self,
+        body_1_id: int,
+        body_1_name: str,
+        body_2_id: int,
+        body_2_name: str,
+        link_index_1: Optional[int] = None,
+        link_index_2: Optional[int] = None,
+    ) -> None:
+        """Internal low-level API to interface with Pybullet for collision checking.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot saved for use with PyBullet.
-
-        Returns
-        -------
-        :class:`compas_robots.RobotModel`
-
-        Raises
-        ------
-        :exc:`Exception`
-            If the robot has not been cached.
-
+        body_1_id
+            The unique id (issued by Pybullet) of the first body.
+        body_1_name
+            The name of the first body. Used for logging and error reporting only.
+        body_2_id
+            The unique id (issued by Pybullet) of the second body.
+        body_2_name
+            The name of the second body. Used for logging and error reporting only.
+        link_index_1
+            The link index if the first body is a robot. Defaults to ``None``.
+        link_index_2
+            The link index if the second body is a robot. Defaults to ``None``.
         """
-        self.ensure_cached_robot_model(robot)
-        return robot.attributes["pybullet"]["cached_robot_model"]
-
-    def get_cached_robot_filepath(self, robot):
-        # type: (Robot) -> str
-        """Returns the filepath of the editable copy of the robot's model for shadowing the state
-        of the robot on the PyBullet server.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            The robot saved for use with PyBullet.
-
-        Returns
-        -------
-        :obj:`str`
-
-        Raises
-        ------
-        :exc:`Exception`
-            If the robot has not been cached.
-
-        """
-        self.ensure_cached_robot_model(robot)
-        return robot.attributes["pybullet"]["cached_robot_filepath"]
-
-    def get_uid(self, cached_robot_model):
-        """Returns the internal PyBullet id of the robot's model for shadowing the state
-        of the robot on the PyBullet server.
-
-        Parameters
-        ----------
-        cached_robot_model : :class:`compas_robots.RobotModel`
-            The robot model saved for use with PyBullet.
-
-        Returns
-        -------
-        :obj:`int`
-
-        """
-        return cached_robot_model.attr["uid"]
-
-    def _add_ids_to_robot_joints(self, cached_robot_model):
-        body_id = self.get_uid(cached_robot_model)
-        joint_ids = self._get_joint_ids(body_id)
-        for joint_id in joint_ids:
-            joint_name = self._get_joint_name(joint_id, body_id)
-            joint = cached_robot_model.get_joint_by_name(joint_name)
-            pybullet_attr = {"id": joint_id}
-            joint.attr.setdefault("pybullet", {}).update(pybullet_attr)
-
-    def _add_ids_to_robot_links(self, robot_model):
-        body_id = self.get_uid(robot_model)
-        joint_ids = self._get_joint_ids(body_id)
-        for link_id in joint_ids:
-            link_name = self._get_link_name(link_id, body_id)
-            link = robot_model.get_link_by_name(link_name)
-            pybullet_attr = {"id": link_id}
-            link.attr.setdefault("pybullet", {}).update(pybullet_attr)
-
-    def _get_joint_id_by_name(self, name, robot_model):
-        return robot_model.get_joint_by_name(name).attr["pybullet"]["id"]
-
-    def _get_joint_ids_by_name(self, names, robot_model):
-        return tuple(self._get_joint_id_by_name(name, robot_model) for name in names)
-
-    def _get_link_id_by_name(self, name, robot_model):
-        return robot_model.get_link_by_name(name).attr["pybullet"]["id"]
-
-    def _get_link_ids_by_name(self, names, robot_model):
-        return tuple(self._get_link_id_by_name(name, robot_model) for name in names)
-
-    def filter_configurations_in_collision(self, robot, configurations):
-        """Filters from a list of configurations those which are in collision.
-        Used for a custom inverse kinematics function.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            Robot whose configurations may be in collision.
-        configurations : :obj:`list` of :class:`compas_fab.robots.Configuration`
-            List of configurations to be checked for collisions.
-
-        Returns
-        -------
-        :obj:`list` of :class:`compas_fab.robots.Configuration`
-            The same list of configurations with those in collision replaced with ``None``.
-        """
-        for i, configuration in enumerate(configurations):
-            if not configuration:  # if an ik solution was already removed
-                continue
-            try:
-                self.check_collisions(robot, configuration)
-            except CollisionError:
-                configurations[i] = None
-
-    # =======================================
-    def check_collisions(self, robot, configuration=None):
-        """Checks whether the current or given configuration is in collision.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            Robot whose configuration may be in collision.
-        configuration : :class:`compas_fab.robots.Configuration`
-            Configuration to be checked for collisions.  If ``None`` is given, the current
-            configuration will be checked.  Defaults to ``None``.
-
-        Raises
-        ------
-        :class:`compas_fab.backends.pybullet.DetectedCollision`
-        """
-        cached_robot_model = self.get_cached_robot_model(robot)
-        body_id = self.get_uid(cached_robot_model)
-        if configuration:
-            joint_ids = self._get_joint_ids_by_name(configuration.joint_names, cached_robot_model)
-            self._set_joint_positions(joint_ids, configuration.joint_values, body_id)
-        self.check_collision_with_objects(robot)
-        self.check_robot_self_collision(robot)
-
-    def check_collision_with_objects(self, robot):
-        """Checks whether the robot and its attached collision objects with its current
-        configuration is is colliding with any collision objects.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            Robot whose configuration may be in collision.
-
-        Raises
-        ------
-        :class:`compas_fab.backends.pybullet.DetectedCollision`
-        """
-        for name, body_ids in self.collision_objects.items():
-            for body_id in body_ids:
-                self._check_collision(self.get_uid(self.get_cached_robot_model(robot)), "robot", body_id, name)
-
-    def check_robot_self_collision(self, robot):
-        """Checks whether the robot and its attached collision objects with its current
-        configuration is colliding with itself.
-
-        Parameters
-        ----------
-        robot : :class:`compas_fab.robots.Robot`
-            Robot whose configuration may be in collision.
-
-        Raises
-        ------
-        :class:`compas_fab.backends.pybullet.DetectedCollision`
-        """
-        cached_robot_model = self.get_cached_robot_model(robot)
-        body_id = self.get_uid(cached_robot_model)
-        link_names = [link.name for link in cached_robot_model.iter_links() if link.collision]
-        # check for collisions between robot links
-        for link_1_name, link_2_name in combinations(link_names, 2):
-            if {link_1_name, link_2_name} in self.unordered_disabled_collisions:
-                continue
-            link_1_id = self._get_link_id_by_name(link_1_name, cached_robot_model)
-            link_2_id = self._get_link_id_by_name(link_2_name, cached_robot_model)
-            self._check_collision(body_id, link_1_name, body_id, link_2_name, link_1_id, link_2_id)
-
-    def check_collision_objects_for_collision(self):
-        """Checks whether any of the collision objects are colliding.
-
-        Raises
-        ------
-        :class:`compas_fab.backends.CollisionError`
-        """
-        names = self.collision_objects.keys()
-        for name_1, name_2 in combinations(names, 2):
-            for body_1_id in self.collision_objects[name_1]:
-                for body_2_id in self.collision_objects[name_2]:
-                    self._check_collision(body_1_id, name_1, body_2_id, name_2)
-
-    def _check_collision(self, body_1_id, body_1_name, body_2_id, body_2_name, link_index_1=None, link_index_2=None):
         kwargs = {
             "bodyA": body_1_id,
             "bodyB": body_2_id,
@@ -576,10 +591,65 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         kwargs = {key: value for key, value in kwargs.items() if value is not None}
         pts = pybullet.getClosestPoints(**kwargs)
         if pts:
-            LOG.warning("Collision between '{}' and '{}'".format(body_1_name, body_2_name))
-            raise CollisionError(body_1_name, body_2_name)
+            message = "Collision between '{}' and '{}'".format(body_1_name, body_2_name)
+            raise CollisionCheckError(message)
 
-    # ======================================
+    # --------------------------------
+    # Functions related to puids
+    # --------------------------------
+
+    def _get_pose_joint_names_and_puids(self) -> list[tuple[str, int]]:
+        """Returns the robot joints names and their puids that are need to create a pose in PyBullet.
+        This include all joints that are not FIXED.
+        Mimic joints are also included.
+
+        The names and puids are ordered by PyBullet's unique ids.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`tuple` of :obj:`str`, :obj:`int`
+            A list of tuples containing the joint names and their PyBullet unique ids.
+        """
+        joint_names_and_puids = []
+        robot_puid = self.robot_puid
+        for puid in range(self._get_num_joints(robot_puid)):
+            joint_name = self._get_joint_name(puid, robot_puid)
+            joint_type = self._get_joint_type(puid, robot_puid)
+            if joint_type != const.JOINT_FIXED:
+                joint_names_and_puids.append((joint_name, puid))
+        return joint_names_and_puids
+
+    def _build_pose_for_pybullet(self, configuration: Configuration) -> list[float]:
+        """Builds a robot pose (list of joint values) for sending to PyBullet.
+
+        Parameters
+        ----------
+        configuration
+            The configuration to be converted.
+
+        Returns
+        -------
+        :obj:`list` of :obj:`float`
+            A list of joint values.
+        """
+        joint_names_and_puids = self._get_pose_joint_names_and_puids()
+
+        joint_values = []
+        for joint_name, joint_puid in joint_names_and_puids:
+            if joint_name in configuration:
+                joint_values.append(configuration[joint_name])
+            else:
+                # Check if this is mimic joint
+                joint = self.robot_cell.robot_model.get_joint_by_name(joint_name)
+                mimic: Mimic = joint.mimic
+                # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
+                if mimic:
+                    mimicked_joint_position = configuration[mimic.joint]
+                    joint_values.append(mimic.calculate_position(mimicked_joint_position))
+                else:
+                    raise ValueError("Joint value for '{}' is needed for Pybullet but not found in the provided configuration.".format(joint_name))
+        return joint_values
+
     def _get_base_frame(self, body_id):
         pose = pybullet.getBasePositionAndOrientation(body_id, physicsClientId=self.client_id)
         return frame_from_pose(pose)
@@ -588,17 +658,13 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return self._get_body_info(body_id).base_name.decode(encoding="UTF-8")
 
     def _get_link_state(self, link_id, body_id):
-        return const.LinkState(
-            *pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id)
-        )
+        return const.LinkState(*pybullet.getLinkState(body_id, link_id, computeForwardKinematics=True, physicsClientId=self.client_id))
 
     def _get_joint_state(self, joint_id, body_id):
         return const.JointState(*pybullet.getJointState(body_id, joint_id, physicsClientId=self.client_id))
 
     def _get_joint_states(self, joint_ids, body_id):
-        return [
-            const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)
-        ]
+        return [const.JointState(*js) for js in pybullet.getJointStates(body_id, joint_ids, physicsClientId=self.client_id)]
 
     def _get_body_info(self, body_id):
         return const.BodyInfo(*pybullet.getBodyInfo(body_id, physicsClientId=self.client_id))
@@ -606,20 +672,36 @@ class PyBulletClient(PyBulletBase, ClientInterface):
     def _get_joint_info(self, joint_id, body_id):
         return const.JointInfo(*pybullet.getJointInfo(body_id, joint_id, physicsClientId=self.client_id))
 
+    def _is_circular(self, body, joint):
+        joint_info = self._get_joint_info(body, joint)
+        if joint_info.jointType == const.JOINT_FIXED:
+            return False
+        return joint_info.jointUpperLimit < joint_info.jointLowerLimit
+
     def _get_num_joints(self, body_id):
         return pybullet.getNumJoints(body_id, physicsClientId=self.client_id)
 
-    def _get_joint_ids(self, body_id):
-        # type: (int) -> list[int]
-        return list(range(self._get_num_joints(body_id)))
-
     def _get_joint_name(self, joint_id, body_id):
         return self._get_joint_info(joint_id, body_id).jointName.decode("UTF-8")
+
+    def _get_joint_type(self, joint_id, body_id):
+        return self._get_joint_info(joint_id, body_id).jointType
 
     def _get_link_name(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:
             return self._get_base_name(body_id)
         return self._get_joint_info(link_id, body_id).linkName.decode("UTF-8")
+
+    def _get_joint_id_from_name(self, body_id, joint_name):
+        for joint_id in list(range(self._get_num_joints(body_id))):
+            parsed_jt_name = self._get_joint_name(joint_id, body_id)
+            if parsed_jt_name == joint_name:
+                return joint_id
+        raise ValueError(body_id, joint_name)
+
+    # ----------------------------------------
+    # Functions for configuration and frames
+    # ----------------------------------------
 
     def _get_link_frame(self, link_id, body_id):
         if link_id == const.BASE_LINK_ID:
@@ -628,7 +710,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         pose = (link_state.worldLinkFramePosition, link_state.worldLinkFrameOrientation)
         return frame_from_pose(pose)
 
-    # =======================================
     def _set_base_frame(self, frame, body_id):
         point, quaternion = pose_from_frame(frame)
         pybullet.resetBasePositionAndOrientation(body_id, point, quaternion, physicsClientId=self.client_id)
@@ -642,34 +723,97 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         for joint_id, value in zip(joint_ids, values):
             self._set_joint_position(joint_id, value, body_id)
 
-    def _get_joint_positions(self, joint_ids, body_id):
+    def _get_joint_positions(self, joint_ids: list[int], body_id: int) -> list[float]:
+        """Returns the joint positions of any robot-model-like object in the PyBullet server."""
         joint_states = self._get_joint_states(joint_ids, body_id)
         return [js.jointPosition for js in joint_states]
 
-    def set_robot_configuration(self, robot, configuration, group=None):
-        """Sets the robot's pose to the given configuration. Should be followed by
-        `step_simulation` for visualization purposes.
+    def _set_robot_configuration(self, configuration: Configuration):
+        """Sets the robot's pose to the given configuration.
+
+        Only the joint values in the configuration are set.
+        The other joint values are not changed.
 
         Parameters
         ----------
-        robot : :class:`compas_fab.robots.Robot`  The robot to be configured.
-        configuration : :class:`compas_fab.robots.Configuration`  If a full configuration is not given,
-            the values from :meth:`compas_fab.robots.Robot.zero_configuration` will be used for the
-            missing ones.  Joint names are expected to be supplied in the configuration.
+        configuration
+            The configuration to be set, ``joint_names`` must be included in the configuration.
         group : :obj:`str`, optional
             The planning group used for calculation. Defaults to the robot's
             main planning group.
-        """
-        cached_robot_model = self.get_cached_robot_model(robot)
-        body_id = self.get_uid(cached_robot_model)
-        default_config = robot.zero_configuration()
-        full_configuration = robot.merge_group_with_full_configuration(configuration, default_config, group)
-        joint_ids = self._get_joint_ids_by_name(full_configuration.joint_names, cached_robot_model)
-        self._set_joint_positions(joint_ids, full_configuration.joint_values, body_id)
-        return full_configuration
 
-    def get_robot_configuration(self, robot):
+        """
+        # Check if the robot has been loaded, careful, puid can be zero
+        assert self.robot_puid is not None, "PyBulletClient.robot_puid is None. Robot must be loaded before setting configuration."
+
+        assert configuration.joint_names != [], "Joint names must be provided in the configuration passed to set_robot_configuration."
+
+        # Iterate through all joints that are considered free by PyBullet
+        for joint_name, joint_puid in self._get_pose_joint_names_and_puids():
+            if joint_name in configuration:
+                self._set_joint_position(joint_puid, configuration[joint_name], self.robot_puid)
+            else:
+                # Check if this is mimic joint
+                joint = self.robot_cell.robot_model.get_joint_by_name(joint_name)
+                mimic: Mimic = joint.mimic
+                # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
+                if mimic:
+                    if mimic.joint in configuration:
+                        mimicked_joint_position = configuration[mimic.joint]
+                        self._set_joint_position(joint_puid, mimic.calculate_position(mimicked_joint_position), self.robot_puid)
+                    # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
+                    # This search and replace can be more elaborate in the future if needed.
+
+    def _set_tool_configuration(self, tool_name: str, configuration: Configuration):
+        """Sets the tool's pose to the given configuration.
+
+        Only the joint values in the configuration are set.
+        The other joint values are not changed.
+
+        Parameters
+        ----------
+        tool_name
+            Name of the tool to be configured.
+        configuration
+            The configuration to be set, ``joint_names`` must be included in the configuration.
+
+        """
+        # Check if the tool has been loaded
+        assert tool_name in self.tools_puids, f"Tool '{tool_name}' must be loaded before setting configuration."
+
+        tool_id = self.tools_puids[tool_name]
+
+        if configuration is None or configuration.joint_names == []:
+            return
+
+        # Get the PyBullet body unique id for the tool
+        tool_uid = self.tools_puids[tool_name]
+
+        # Iterate through all joints that are considered free by PyBullet for this tool
+        for joint_name in configuration.joint_names:
+            joint_puid = self._get_joint_id_from_name(tool_uid, joint_name)
+            if joint_name in configuration:
+                self._set_joint_position(joint_puid, configuration[joint_name], tool_id)
+            else:
+                pass
+                # TODO: Add support for mimic joints
+                # # Check if this is mimic joint
+                # tool_model = self.robot_cell.tool_models[tool_name]
+                # joint = tool_model.get_joint_by_name(joint_name)
+                # mimic: Mimic = joint.mimic
+                # # Get the value of the joint that is being mimicked (works only for non-cascaded mimic)
+                # if mimic:
+                #     if mimic.joint in configuration:
+                #         mimicked_joint_position = configuration[mimic.joint]
+                #         self._set_joint_position(
+                #             joint_puid, mimic.calculate_position(mimicked_joint_position), tool_id
+                #         )
+                #     # Note: If the joint that is being mimicked is not in the configuration, the mimic joint will not be set.
+                #     # This search and replace can be more elaborate in the future if needed.
+
+    def _get_robot_configuration(self) -> Configuration:
         """Gets the robot's current pose.
+        A full configuration is returned.
 
         Parameters
         ----------
@@ -679,74 +823,103 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         -------
         :class:`compas_robots.Configuration`
         """
-        cached_robot_model = self.get_cached_robot_model(robot)
-        body_id = self.get_uid(cached_robot_model)
-        default_config = robot.zero_configuration()
-        joint_ids = self._get_joint_ids_by_name(default_config.joint_names, cached_robot_model)
-        joint_values = self._get_joint_positions(joint_ids, body_id)
-        default_config.joint_values = joint_values
-        return default_config
+        robot_cell = self.robot_cell
+        configuration = robot_cell.zero_full_configuration()
+        for joint_name in configuration.joint_names:
+            joint_id = self.robot_joint_puids[joint_name]
+            joint_value = self._get_joint_positions([joint_id], self.robot_puid)[0]
+            configuration[joint_name] = joint_value
 
-    # =======================================
-    def convert_mesh_to_body(self, mesh, frame, _name=None, concavity=False, mass=const.STATIC_MASS):
-        """Convert compas mesh and its frame to a pybullet body.
+        return configuration
+
+    def _set_tool_base_frame(self, tool_name: str, frame: Frame):
+        """Sets the base frame of a tool.
 
         Parameters
         ----------
-        mesh : :class:`compas.datastructures.Mesh`
-        frame : :class:`compas.geometry.Frame`
-        _name : :obj:`str`, optional
-            Name of the mesh for tagging in PyBullet's GUI
-        concavity : :obj:`bool`, optional
-            When ``False`` (the default), the mesh will be loaded as its convex hull for collision checking purposes.
-            When ``True``, a non-static mesh will be decomposed into convex parts using v-HACD.
-        mass : :obj:`float`, optional
-            Mass of the body to be created, in kg.  If ``0`` mass is given (the default),
-            the object is static.
-
-        Returns
-        -------
-        :obj:`int`
-
-        Notes
-        -----
-        If this method is called several times with the same ``mesh`` instance, but the ``mesh`` has been modified
-        in between calls, PyBullet's default caching behavior will prevent it from recognizing these changes.  It
-        is best practice to create a new mesh instance or to make use of the `frame` argument, if applicable.  If
-        this is not possible, PyBullet's caching behavior can be changed with
-        ``pybullet.setPhysicsEngineParameter(enableFileCaching=0)``.
+        tool_name
+            Name of the tool.
+        frame
+            The frame to which the tool should be moved.
         """
-        tmp_obj_path = os.path.join(self._cache_dir.name, "{}.obj".format(mesh.guid))
-        mesh.to_obj(tmp_obj_path)
-        tmp_obj_path = self._handle_concavity(tmp_obj_path, self._cache_dir.name, concavity, mass)
-        pyb_body_id = self.body_from_obj(tmp_obj_path, concavity=concavity, mass=mass)
-        self._set_base_frame(frame, pyb_body_id)
-        # The following lines are for visual debugging purposes
-        # To be deleted or rewritten later.
-        # if name:
-        #     from pybullet_planning import add_body_name
-        #     add_body_name(pyb_body, name)
-        return pyb_body_id
+        tool_id = self.tools_puids[tool_name]
+        self._set_object_frame(tool_id, frame)
+
+    def _set_rigid_body_base_frame(self, rigid_body_name: str, frame: Frame):
+        """Sets the base frame of a rigid body.
+
+        Parameters
+        ----------
+        rigid_body_name
+            Name of the rigid body.
+        frame
+            The frame to which the rigid body should be moved.
+        """
+        body_ids = self.rigid_bodies_puids[rigid_body_name]
+        for body_id in body_ids:
+            self._set_object_frame(body_id, frame)
+
+    def _set_object_frame(self, body_id, frame):
+        (point, quat) = pose_from_frame(frame)
+        pybullet.resetBasePositionAndOrientation(body_id, point, quat, physicsClientId=self.client_id)
+
+    # ------------------------------------------------------------------------------------
+    # Helper functions for creating rigid bodies in PyBullet
+    # This includes loading meshes via OBJ files, setting up visual and collision objects
+    # ------------------------------------------------------------------------------------
 
     @staticmethod
     def _handle_concavity(tmp_obj_path, tmp_dir, concavity, mass, mesh_name=""):
+        """Decompose a mesh into convex parts using v-HACD if concavity is requested.
+
+        Parameters
+        ----------
+        tmp_obj_path : :obj:`str`
+            Path to the OBJ file as input.
+        tmp_dir : :obj:`str`
+            Path to the temporary directory for storing the output.
+        concavity : :obj:`bool`
+            When ``False``, the mesh will not be decomposed and the input path will be returned.
+        mass : :obj:`float`
+            Mass of the body to be created, in kg.  If ``0`` mass is given, the object is static.
+            Static objects will not be decomposed.
+        mesh_name : :obj:`str`, optional
+            A prefix for the temporary mesh file. Typically not required.
+            Defaults to ``""``, which generates a temporary file named ``vhacd_temp.obj``.
+
+        Returns
+        -------
+        :obj:`str`
+            Path to the OBJ file as output.
+        """
         if not concavity or mass == const.STATIC_MASS:
             return tmp_obj_path
         if mesh_name:
             mesh_name += "_"
         tmp_vhacd_obj_path = os.path.join(tmp_dir, mesh_name + "vhacd_temp.obj")
         tmp_log_path = os.path.join(tmp_dir, mesh_name + "log.txt")
-        with redirect_stdout():
-            pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
+        # with redirect_stdout(enabled=not self.verbose):
+        pybullet.vhacd(tmp_obj_path, tmp_vhacd_obj_path, tmp_log_path)
         return tmp_vhacd_obj_path
 
-    def body_from_obj(self, path, scale=1.0, concavity=False, mass=const.STATIC_MASS, collision=True, color=const.GREY):
+    def _body_from_obj(
+        self,
+        visual_path=None,
+        collision_path=None,
+        scale=1.0,
+        concavity=False,
+        mass=const.STATIC_MASS,
+        color=const.GREY,
+    ):
         """Create a PyBullet body from an OBJ file.
 
         Parameters
         ----------
-        path : :obj:`str`
-            Path to the OBJ file.
+        visual_path : :obj:`str`
+            Path to the OBJ file for the visual representation.
+        collision_path : :obj:`str`
+            Path to the OBJ file for the collision representation.
+            If None, there will be no collision detection for the object.
         scale : :obj:`float`, optional
             Factor by which to scale the mesh. Defaults to ``1.``
         concavity : :obj:`bool`, optional
@@ -756,8 +929,6 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         mass : :obj:`float`, optional
             Mass of the body to be created, in kg.  If `0` mass is given (the default),
             the object is static.
-        collision : :obj:`bool`
-            When ``True``, body will be included in collision checking calculations. Defaults to ``True``.
         color : :obj:`tuple` of :obj:`float`
             RGBa color components of the body.
 
@@ -766,18 +937,36 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         :obj:`int`
         """
         concavity &= mass == const.STATIC_MASS
-        geometry_args = self._get_geometry_args(path, concavity=concavity, scale=scale)
 
-        collision_args = self._get_collision_args(geometry_args)
-        collision_id = self._create_collision_shape(collision_args) if collision else const.NULL_ID
+        # Visual Meshes
+        if visual_path:
+            geometry_args = self._get_geometry_args(visual_path, concavity=concavity, scale=scale)
+            visual_args = self._get_visual_args(geometry_args, color=color)
+            visual_id = self._create_visual_shape(visual_args)
+        else:
+            visual_id = const.NULL_ID
 
-        visual_args = self._get_visual_args(geometry_args, color=color)
-        visual_id = self._create_visual_shape(visual_args)
+        # Collision Meshes
+        if collision_path:
+            geometry_args = self._get_geometry_args(collision_path, concavity=concavity, scale=scale)
+            collision_args = self._get_collision_args(geometry_args)
+            collision_id = self._create_collision_shape(collision_args)
+        else:
+            collision_id = const.NULL_ID
 
         body_id = self._create_body(collision_id, visual_id, mass=mass)
         return body_id
 
     def _create_body(self, collision_id=const.NULL_ID, visual_id=const.NULL_ID, mass=const.STATIC_MASS):
+        """Create a PyBullet MultiBodies from a collision and visual shape.
+
+        Refer to `btMultiBody` in Bullet documentation and `createMultiBody` in PyBullet documentation.
+
+        Returns
+        -------
+        :obj:`int`
+            A single PyBullet body id for the multi-body object.
+        """
         return pybullet.createMultiBody(
             baseMass=mass,
             baseCollisionShapeIndex=collision_id,
@@ -837,9 +1026,10 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 class AnalyticalPyBulletClient(PyBulletClient):
     """Combination of PyBullet as the client for Collision Detection and Analytical Inverse Kinematics."""
 
-    def __init__(self, connection_type="gui", verbose=False):
+    def __init__(self, connection_type="gui", verbose=False, enable_gui=False):
         super(AnalyticalPyBulletClient, self).__init__(connection_type=connection_type, verbose=verbose)
 
+    # TODO: Move the following function to AnalyticalPyBulletPlanner
     def inverse_kinematics(self, robot, frame_WCF, start_configuration=None, group=None, options=None):
         planner = AnalyticalInverseKinematics(self)
         return planner.inverse_kinematics(robot, frame_WCF, start_configuration, group, options)

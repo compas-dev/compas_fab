@@ -12,14 +12,14 @@ from compas.geometry import Frame
 from compas_fab.utilities import sign
 
 
-def forward_kinematics_offset_wrist(joint_values, params):
+def forward_kinematics_offset_wrist(joint_values: list[float], params: list[float]) -> Frame:
     """Forward kinematics function for offset wrist 6-axis robots.
 
     Parameters
     ----------
-    joint_values : list of float
+    joint_values
         List of 6 joint values in radians.
-    params : list of float
+    params
         The offset wrist parameters that specify the robot.
 
     Returns
@@ -65,19 +65,21 @@ def forward_kinematics_offset_wrist(joint_values, params):
     return frame
 
 
-def inverse_kinematics_offset_wrist(frame, params, q6_des=0.0):
+def inverse_kinematics_offset_wrist(frame: Frame, params: list[float], q6_des: float = 0.0) -> list[list[float]]:
     """Inverse kinematics function for offset wrist 6-axis robots.
 
     Parameters
     ----------
-    frame : :class:`compas.geometry.Frame`
+    frame
         The frame we want to calculate the inverse kinematics for.
-    params : list of float
+    params
         The offset wrist parameters that specify the robot.
 
     Returns
     -------
-    list of list
+    list of list of float
+        A list of all possible IK solutions.
+        The joint values are in radians.
 
     Notes
     -----
@@ -189,12 +191,7 @@ def inverse_kinematics_offset_wrist(frame, params, q6_des=0.0):
             s6 = sin(q6)
             x04x = -s5 * (T02 * c1 + T12 * s1) - c5 * (s6 * (T01 * c1 + T11 * s1) - c6 * (T00 * c1 + T10 * s1))
             x04y = c5 * (T20 * c6 - T21 * s6) - T22 * s5
-            p13x = (
-                d5 * (s6 * (T00 * c1 + T10 * s1) + c6 * (T01 * c1 + T11 * s1))
-                - d6 * (T02 * c1 + T12 * s1)
-                + T03 * c1
-                + T13 * s1
-            )
+            p13x = d5 * (s6 * (T00 * c1 + T10 * s1) + c6 * (T01 * c1 + T11 * s1)) - d6 * (T02 * c1 + T12 * s1) + T03 * c1 + T13 * s1
             p13y = T23 - d1 - d6 * T22 + d5 * (T21 * c6 + T20 * s6)
 
             c3 = (p13x * p13x + p13y * p13y - a2 * a2 - a3 * a3) / (2.0 * a2 * a3)

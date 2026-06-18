@@ -3,24 +3,20 @@ import math
 from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Rotation
-from compas.geometry import Sphere
 from compas.geometry import Vector
 from compas.geometry import intersection_plane_circle
 from compas.geometry import intersection_sphere_sphere
 from compas.geometry import tangent_points_to_circle_xy
 
-# TODO: This is very slow...
-# can this be improved? for example https://github.com/visose/Robots/blob/master/Robots/Kinematics.cs
 
-
-def forward_kinematics_spherical_wrist(joint_values, points):
+def forward_kinematics_spherical_wrist(joint_values: list[float], points: list[Point]) -> Frame:
     """Forward kinematics function for spherical wrist robots.
 
     Parameters
     ----------
-    joint_values : list of float
+    joint_values
         A list of 6 joint values in radians.
-    points : list of point
+    points
         A list of 4 points specifying the robot's joint positions.
 
     Returns
@@ -87,14 +83,14 @@ def forward_kinematics_spherical_wrist(joint_values, points):
     return axis_frames[5]
 
 
-def inverse_kinematics_spherical_wrist(target_frame, points):
+def inverse_kinematics_spherical_wrist(target_frame: Frame, points: list[Point]) -> list[list[float]]:
     """Inverse kinematics function for spherical wrist robots.
 
     Parameters
     ----------
-    frame : :class:`compas.geometry.Frame`
+    target_frame
         The frame we search the inverse kinematics for.
-    points : list of point
+    points
         A list of 4 points specifying the robot's joint positions.
 
     Returns
@@ -169,8 +165,8 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
         Rot1 = Rotation.from_axis_and_angle([0, 0, 1], -1 * axis1_angle, point=[0, 0, 0])
         p1A = p1_proj.transformed(Rot1)
         elbow_dir = Vector(1, 0, 0).transformed(Rot1)
-        sphere1 = Sphere(lower_arm_length, point=p1A)
-        sphere2 = Sphere(upper_arm_length, point=wrist)
+        sphere1 = (p1A, lower_arm_length)  # Sphere class is not necessary to work with compas low-level functions
+        sphere2 = (wrist, upper_arm_length)  # Sphere class is not necessary to work with compas low-level functions
         elbow_frame = Frame(p1A, elbow_dir, [0, 0, 1])
         elbow_plane = (p1A, elbow_frame.normal)
 
@@ -238,9 +234,4 @@ def inverse_kinematics_spherical_wrist(target_frame, points):
                 axis6_angle = math.atan2(endy, endx)
                 axis6_angles.append(axis6_angle)
 
-    return [
-        [a1, a2, a3, a4, a5, a6]
-        for a1, a2, a3, a4, a5, a6 in zip(
-            axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles
-        )
-    ]
+    return [[a1, a2, a3, a4, a5, a6] for a1, a2, a3, a4, a5, a6 in zip(axis1_angles, axis2_angles, axis3_angles, axis4_angles, axis5_angles, axis6_angles)]

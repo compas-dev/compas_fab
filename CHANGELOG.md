@@ -9,35 +9,361 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added `compas_fab.robots.Waypoints` class to represent a sequence of targets. It has two child classes: `FrameWaypoints` and `PointAxisWaypoints`.
-* Added `compas_fab.robots.Target` class to represent a motion planning target.
-* Added also child classes `FrameTarget`, `PointAxisTarget`, `ConfigurationTarget`, `ConstraintSetTarget`
-* Unlike previous constraints, `Targets` do not contain `group` as parameter. Instead, group parameter is passed to the planning call.
-* Target scaling function is now embeded in the code for Targets. `scaled()` should be called by the user before passing the target to the `plan_motion` function.
+* New `MoveItCheckCollision` backend feature: `MoveItPlanner` now implements the `CheckCollision` interface (the same `planner.check_collision(state)` as `PyBulletPlanner`), backed by MoveIt's `/check_state_validity` service (`moveit_msgs/GetStateValidity`). It does a stateless collision + constraint check of the state against the planning scene currently loaded into `move_group` — no planning, no IK — and raises `CollisionCheckError` listing the colliding body pairs. Adds `GetStateValidityRequest` / `GetStateValidityResponse` ROS message wrappers.
+* The `Inverse Kinematics`, `Plan Motion` and `Plan Cartesian Motion` Grasshopper components now explain a failure with a concise collision check on the start state, via a shared `collision_diagnostic` helper in `compas_fab.ghpython`: when the planner supports collision checking and the start state is in collision, the colliding pairs (e.g. `forearm_link<->shoulder_link, +2 more`) are appended; otherwise it notes the state is collision-free (likely a reachability issue). Planners without collision checking are handled gracefully. Each of these components also gained a `debug_info` output that mirrors the warning/error messages as a single string, so they can be read in a wired panel rather than only the component balloon.
+* New `Deconstruct Robot Cell` Grasshopper component that splits a `RobotCell` into its `robot_model`, registered `rigid_bodies` and `tools`, and a matching `default_cell_state`, the inverse of registering models via the `Load Robot Cell` components.
+* New `Deconstruct Planner` Grasshopper component that outputs the `robot_cell` and `robot_model` currently held by any planner (MoveIt, PyBullet, analytical). The cell state is intentionally not exposed — the planner's last-set state is rarely the one you want; build it explicitly via `Default Cell State` / the `Attach*` components instead.
+* New `MoveIt Planner Options` Grasshopper component (and `MoveItPlannerOptions` class in `compas_fab.ghpython`) that bundles the advanced load parameters (`urdf_param_name`, `srdf_param_name`, `http_file_server_base_url`) into a single object for the `MoveIt Planner`'s optional `options` input. It is a plain class rather than a dict/namedtuple so it crosses a Grasshopper wire as one object instead of being exploded into its keys.
+* `Load Robot Cell From Library` and `MoveIt Planner` auto-create a Boolean Toggle on their `load_geometry` input, and `ROS Client` auto-creates one (defaulting to off) on its `connect` input — via the new `ensure_boolean_toggle` helper in `compas_fab.ghpython`, so these can be flipped on/off with one click instead of wiring a separate toggle.
+* New `RobotCell.structural_signature()` method: a stable fingerprint (robot model name + sorted tool and rigid-body ids) of a cell's structural identity. Consolidates a helper that was previously duplicated as a private function in `ActionChain`, and is reused by the `MoveIt Planner` component to decide when the planning scene needs re-uploading.
+* `FrameInterpolator` and `PointAxisInterpolator` are now public (`compas_fab.robots`). They were private helpers buried in the PyBullet Cartesian-motion backend feature, but are backend-agnostic (only depend on `compas.geometry`) and useful on their own for interpolating between poses / point-axis pairs with bounded Cartesian and angular steps. Their constructors now take explicit keyword arguments (`max_step_distance`, `max_step_angle`, `min_step_distance`, `min_step_angle`) instead of an opaque `options` dict.
+* New API documentation pages for the analytical-kinematics backend (`compas_fab.backends.kinematics` and `compas_fab.backends.kinematics.backend_features`), which had no API page while the ROS and PyBullet backends did — so `AnalyticalKinematics`, `AnalyticalKinematicsClient`, `AnalyticalForwardKinematics`, `AnalyticalPybulletInverseKinematics`, `AnalyticalSetRobotCell` and `AnalyticalSetRobotCellState` were undocumented. `AnalyticalKinematics` (the solver base class) is now also re-exported from `compas_fab.backends.kinematics`.
+* `compas_fab.rhino` now re-exports its scene objects (`RigidBodyObject`, `RobotCellObject`, `RobotModelObject`) like `compas_fab.ghpython` already did, so they appear in the API docs instead of being hidden in a submodule.
+* `MoveItResetPlanningScene` is now exported from `compas_fab.backends.ros.backend_features` (it was the only one of the eight MoveIt backend-feature classes missing from the package `__init__`/`__all__`, so it never showed up in the docs).
+
+* New backend page [Analytical IK + PyBullet](backends/analytical_pybullet.md) for `AnalyticalPyBulletPlanner`, the hybrid planner that pairs closed-form analytical IK with PyBullet collision checking. Previously this backend was undocumented despite being shipped in `compas_fab.backends`.
+* `docs/backends/pybullet.md` now flags that free-space `plan_motion` is not yet implemented for `PyBulletPlanner` (Cartesian motion via `plan_cartesian_motion` works).
+* New `ros2-ur10e-demo` docker reference backend (ROS 2 Jazzy + MoveIt 2 + UR10e) with a `ur-sim` service running the official `universalrobots/ursim_e-series` Polyscope simulator, a `zenoh-router` service running `rmw_zenohd` as the RMW transport (replaces DDS, no more multicast discovery issues on Docker Desktop), a `ur-driver` service running the real `ur_robot_driver` against the simulator (with the ros2_control + RTDE update rate lowered from the default 500 Hz to 100 Hz via a baked-in `update_rate.yaml`, to stop the controller manager from spamming "Overrun detected!" warnings under Docker virtualisation), `moveit-demo` running `ur_moveit.launch.py`, rosbridge on `9090`, an HTTP file server on `9091` for serving meshes from `/opt/ros/jazzy/share/`, and a `theasp/novnc` web GUI on `8080` for viewing RViz.
+* New `compas_fab.backends.HttpFileServerLoader` that mirrors `RosFileServerLoader`'s interface but fetches meshes over plain HTTP and reads URDF/SRDF from rosbridge topics (the ROS 2 convention) instead of ROS parameters.
+* Migrated documentation from Sphinx to MkDocs Material, matching the structure used in `compas_robots`. New `mkdocs.yml` at the repository root; documentation sources are now Markdown (`docs/*.md`) with API pages driven by `mkdocstrings`. Backlinks are disabled. `inventories` includes `compas`, `compas_robots`, and `compas_viewer`. Sphinx config (`docs/conf.py`) and Sphinx-only `docs/requirements.txt` have been removed; `tasks.py` now invokes `compas_invocations2.mkdocs.docs` so `invoke docs` builds the MkDocs site.
+* New developer guide section: [Backend architecture](developer/architecture.md) ported from the old `docs/developer/backends.rst`, plus [Grasshopper components](developer/grasshopper.md) ported from `docs/developer/grasshopper.rst`.
+* New [Icon system](developer/icons/index.md) page documenting the Grasshopper component icon design system (24×24 artboard, 1.8 px monoline keyline, shared primitive kit — cube=cell, square=body, cone=tool, triad=frame, ring=goal, polyline=motion, brackets=library, chip=backend, teal accent for the semantic subject). Ships the editable SVG source (`icons.js`) and a standalone catalog/spec sheet (`icon_system.html`) showing all glyphs grouped by subcategory with a Grasshopper-style preview.
+* Re-rendered every `Cf_*` component `icon.png` from the new design system — consistent stroke weight, shared primitive kit, teal accent for the semantic subject of each icon. Affects every `src/compas_fab/ghpython/components_cpython/*/icon.png`.
+* New API pages explicitly exposing `compas_fab.backends.interfaces`, `compas_fab.backends.ros.backend_features` and `compas_fab.backends.pybullet.backend_features` via `mkdocstrings`, replacing the Sphinx `autosummary` tables that previously generated stub `.rst` files per symbol.
+* New `Target` and `Waypoints` classes to represent inputs of planning functions.
+  * New `PointAxisTarget` and `PointAxisWaypoint` classes for processes that have a cylindrical tool (e.g. drilling, milling, 3D printing).
+* New `TargetMode` enum to specify how planning functions interpret a target frame.
+  * New `TargetMode.Tool` mode allow users to specify the target location of the attached tool.
+  * New `TargetMode.WORKPIECE` mode allow the same for the attached workpiece.
+  * Forward kinematics functions also support target mode to return Robot, attached Tool or attached Workpiece frame.
+* New `RobotCell` class to represent all objects in a a robot cells, namely the RobotModel, ToolModel(s) and RigidBody(s). RobotSemantics is also here. Replaced `Robot` class.
+  * New `PlannerInterface.set_robot_cell` function for the user to pass the robot cell to the planner.
+  * New `RigidBody` class support separated Visual and Collision geometries.
+* New `RobotCellState` class to represent state of all objects in the robot cell, including robot Configuration, robot base frame (new), ToolState(s) and RigidBodyState(s).
+  * New `RobotCellState._robot_base_frame` (relative to WCF) can now be changed by user.
+    * Note that all RigidBody frames and Target frames are still relative to WCF (conceptually the same as before).
+  * New `ToolState` class includes tool configuration (for kinematic tools) and attachment state (group and attachment frame) of the tool to the robot.
+  * New `ToolState.attachment_frame` allows users to change the attachment location of a tool relative to the end-effector link.
+  * New `RigidBodyState` class can model both options of attaching the object to a robot link (e.g. cable dress-pack) and attaching to the tool (which is now referred to as a Workpiece).
+* Planning backends are redesigned to have stateless planning functions (e.g. `collision_check`, `inverse_kinematics`, `plan_motion`).
+  * Stateless planning functions requires `RobotCellState` input, allowing different object states between planning calls.
+  * It avoids the need for the user to keep track of the state in the planner between planning calls and even sessions.
+  * It allows cleaner implementation when batch planning multiple motions with different attachment relationships.
+* New functions for `PyBulletPlanner`.
+  * New `PlanCartesianMotion` function for `PyBulletPlanner`. Compatible with `FrameWaypoints` and `PointAxisWaypoints`.
+  * New `InverseKinematics` support for random restarts.
+  * New `CollisionCheck` function for `PyBulletPlanner`.
+* New support for `ToolModels` with kinematic joints.
+  * Supported by both `PyBulletPlanner` and `MoveItPlanner`.
+  * Allows users to model tools with moving parts (e.g. grippers jaws) for more accurate collision checking.
+* New `RobotCellLibrary`, `ToolLibrary` and `RigidBodyLibrary` classes to quickly load pre-defined objects for tests, examples and demos.
+  * New `RobotCellLibrary` contains pre-defined robots (e.g. UR5, UR10e, Panda, ABB IRB120, ABB IRB4600 and RFL) and also cells with tools and rigid bodies.
+  * New `ToolLibrary` contain examples of static and kinematic tools.
+  * New script to extract robot packages (URDF, SRDF and meshes) from the ROS docker to create new `RobotCellLibrary` objects.
+* New `SceneObject` classes for visualization
+  * Users should use the `RobotCellObject` class, which can visualize the entire robot cell.
+  * Users should first call `.update()` with the state class, then call `.draw()` to draw native CAD geometries.
+  * A temporary `RobotModelObject` class is provided to avoid changing the existing one in `compas_robots`
+* Redesigned the mechanism for dealing with non-meter scale input and output.
+  * Input: User created `RigidBody` can contain meshes that are not in meters by setting the `.native_scale` attribute.
+    * `RigidBody.visual_meshes_in_meters()` and `RigidBody.collision_meshes_in_meters()` functions can return the meshes in meters.
+  * Input: User created `ToolModel` must be in meters to align with `compas_robot.RobotModel` that is always in meters.
+  * Input: User created `Targets` and `Waypoints` can have a `.native_scale` attribute to specify the scale.
+    * Both classes have `.normalize_to_meters()` and `.normalized_to_meters()` functions to convert the target to meters.
+  * Output: Forward kinematics functions can return frames at other scales by setting the optional `native_scale` parameter.
+  * Output: `SceneObject` classes for visualization have a `native_scale` attribute to specify the drawing scale.
+  * Input / Output: `Configuration` and `Trajectory` objects always uses the Meter-Radian units, in accordance with ROS convention.
+    * Conversion of joint values to other units for execution should be done by the user based on robot controller requirements.
+  * All the `native_scale` attribute has the same meaning where `user_object_value * native_scale = meter_object_value`.
+    * In typical use, all `native_scale` attribute can be set to the same value, regardless of input or output.
+    * For example, if the user wants to work with millimeters, set all `native_scale` to `'0.001'`.
+* Added `compas_fab.robots.RobotCell` class.
+* Added `compas_fab.robots.RobotCellLibrary` class.
+* Added `compas_fab.backends.BackendTargetNotSupportedError`.
+* Added `compas_fab.backends.TargetModeMismatchError`.
+* Added `compas_fab.backends.PlanningGroupNotExistsError`.
+* Added `compas_fab.backends.CollisionCheckError`.
+* Added `compas_fab.backends.MotionPlanningError`.
+* Added `compas_fab.backends.MPStartStateInCollisionError`.
+* Added `compas_fab.backends.MPTargetInCollisionError`.
+* Added `compas_fab.backends.MPInterpolationInCollisionError`.
+* Added `compas_fab.backends.MPSearchTimeOutError`.
+* Added `compas_fab.backends.MPNoIKSolutionError`.
+* Added `compas_fab.backends.MPNoPlanFoundError`.
+* Added `compas_fab.backends.MPMaxJumpError`.
+* Added `compas_fab.backends.AnalyticalKinematicsClient`.
+* Added `compas_fab.backends.AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.AnalyticalPyBulletPlanner`.
+* Added `compas_fab.backends.CollisionCheckError`.
+* Added `compas_fab.backends.PlanningGroupNotSupported`.
+* Added `message` and `target_pcf` attributes to `InverseKinematicsError`.
+* Added `compas_fab.backends.CheckCollision` to backend features.
+* Added `compas_fab.backends.SetRobotCell` to backend features.
+* Added `compas_fab.backends.SetRobotCellState` to backend features.
+* Added `compas_fab.backends.ClientInterface.robot_cell` as read-only property.
+* Added `compas_fab.backends.ClientInterface.robot_cell_state` as read-only property.
+* Added `compas_fab.backends.ClientInterface.robot_model` as read-only property.
+* Added `compas_fab.backends.ClientInterface.robot_semantics` as read-only property.
+* Added `compas_fab.backends.PlannerInterface.set_robot_cell()` as a possible mix-in method.
+* Added `compas_fab.backends.PlannerInterface.set_robot_cell_state()` as a possible mix-in method.
+* Added `compas_fab.backends.PlannerInterface.check_collisions()` as a possible mix-in method.
+* Added `compas_fab.backends.PlannerInterface.iter_inverse_kinematics()` as a possible mix-in method.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalPlanCartesianMotion` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalForwardKinematics` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalInverseKinematics` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalSetRobotCell` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalSetRobotCellState` for `AnalyticalKinematicsPlanner`.
+* Added `compas_fab.backends.kinematics.backend_features.AnalyticalPybulletInverseKinematics` for `AnalyticalPyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletCheckCollision` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletPlanCartesianMotion` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletSetRobotCell` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.PyBulletSetRobotCellState` for `PyBulletPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.MoveItSetRobotCell` for `MoveItPlanner`.
+* Added `compas_fab.backends.pybullet.backend_features.MoveItSetRobotCellState` for `MoveItPlanner`.
+* Added `compas_fab.backends.ForwardKinematics.forward_kinematics_to_link()`.
+* Added `compas_fab.robots.ToolLibrary` class.
+* Added `compas_fab.robots.ToolLibrary.cone()`.
+* Added `compas_fab.robots.ToolLibrary.printing_tool()`.
+* Added `compas_fab.robots.ToolLibrary.static_gripper()`.
+* Added `compas_fab.robots.ToolLibrary.static_gripper_small()`.
+* Added `compas_fab.robots.ToolLibrary.kinematic_gripper()`. (example of a kinematic tool)
+* Added `compas_fab.robots.RigidBodyLibrary` class.
+* Added `compas_fab.robots.RigidBodyLibrary.target_marker()`.
+* Added `compas_fab.robots.RobotCellLibrary` class.
+* Added `compas_fab.robots.RobotCellLibrary.rfl()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur5()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur10e()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb120_3_58()`.
+* Added `compas_fab.robots.RobotCellLibrary.panda()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur5_cone_tool()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255_gripper_one_beam()`.
+* Added `compas_fab.robots.RobotCellLibrary.ur10e_gripper_one_beam()`.
+* Added `compas_fab.robots.RobotCellLibrary.abb_irb4600_40_255_printing_tool()`.
+* Added `compas_fab.robots.RigidBody` class.
+* Added `compas_fab.robots.RigidBodyState` class.
+* Added `compas_fab.robots.RobotCell` class.
+* Added `compas_fab.robots.RobotCellState` class.
+* Added `compas_fab.robots.ToolState` class.
+* Added `compas_fab.robots.RobotCell.from_urdf_and_srdf()`. Absolute paths passed for `local_package_mesh_folder` are now used as-is; relative paths still resolve against `compas_fab.DATA` (the existing shorthand for the bundled robot library, e.g. `"robot_library/ur5_robot"`, keeps working). Previously, routing absolute paths through `compas_fab.get()` stripped their leading slash and produced a malformed `<DATA>/<absolute-path>` join that never resolved.
+* Added `compas_fab.robots.Target` class.
+* Added `compas_fab.robots.ConfigurationTarget` class.
+* Added `compas_fab.robots.ConstraintSetTarget` class.
+* Added `compas_fab.robots.FrameTarget` class.
+* Added `compas_fab.robots.PointAxisTarget` class.
+* Added `compas_fab.robots.TargetMode` class.
+* Added `compas_fab.robots.Waypoints` class.
+* Added `compas_fab.robots.FrameWaypoints` class.
+* Added `compas_fab.robots.PointAxisWaypoints` class.
+* Added `compas_fab.robots.FrameWaypoints` class.
+* Added docker file for UR5-demo with GUI turned on by default.
+* Added various example files (detailed list to be added later).
+* Added `pragma: no cover` to all type-checking imports for better coverage report accuracy.
+* Added support for python '3.11'.
+* Added tests for `PyBulletClient` and `PyBulletPlanner` backend features, including Ik and FK agreement tests.
+* Redesigned the Grasshopper component library (CPython / Rhino 8) for the new stateless planning model. The legacy IronPython `components/` set was retired; all components now live under `src/compas_fab/ghpython/components_cpython/` and target Rhino 8 CPython exclusively. New categories under "COMPAS FAB":
+  * *Backends* — `Cf_RosClient` (with a `transport` input — `twisted`/`asyncio`/`cli` — forwarded to `roslibpy.Ros` via `RosClient`'s new `**kwargs` pass-through; falls back to roslibpy's process-wide default when empty; the input requires roslibpy >= 2.1 and is ignored with a warning on older versions), `Cf_MoveItPlanner`, `Cf_AnalyticalKinematicsPlanner`, `Cf_PyBulletPlanner` (in-process collision checking, FK/IK and Cartesian motion) and `Cf_AnalyticalPyBulletPlanner` (closed-form analytical IK paired with PyBullet collision checking, via a solver dropdown). Both PyBullet planner components manage their own in-process PyBullet client — pass a `RobotCell` and optionally pick the connection type (`direct`/`gui` via an auto-created dropdown); the component connects, builds the planner, applies `set_robot_cell`, and caches the client across canvas refreshes, so there is no separate client component to wire.
+  * *Robot Cell* — `Cf_LoadRobotCellFromLibrary` (with an auto-created dropdown listing every `RobotCellLibrary` entry), `Cf_LoadRobotCellFromUrdfSrdf`, `Cf_RigidBodyFromMesh`, `Cf_ToolFromLibrary`, `Cf_RigidBodyFromLibrary`. The two `LoadRobotCell*` components each take `tools` and `rigid_bodies` list inputs and register them into the cell as part of loading (keyed by each item's `.name`), so a complete cell reaches the planner in one shot — there is no separate `Add* → set_robot_cell()` step to forget. (Loading from ROS works the same way but is folded into the `MoveIt Planner` component, since MoveIt's cell can only come from `move_group`.) `RigidBody` gained a `name` field (surfaced as the `name` / `rigid_body_id` inputs on the rigid-body builders) so a body is self-describing like a `ToolModel`.
+  * *Cell State* — `Cf_DefaultCellState`, `Cf_SetRobotConfiguration`, `Cf_AttachToolToRobot` (auto-creates a dropdown of every tool in the wired cell when `tool_id` is unwired, refreshed when the cell's tool set changes; emits a remark naming the actual link the tool ends up attached to, e.g. `tool0` for UR groups — `attachment_plane` corrects any per-robot EE-axis convention quirks) and `Cf_AttachRigidBodyToLink` (both auto-default `touch_links` from the cell when unwired — `AttachToolToRobot` picks the group's end-effector link plus its parent when the EE link is geometry-less, e.g. UR `tool0` → `flange`; `AttachRigidBodyToLink` picks the link the body is attached to. A warning surfaces the auto-pick so it isn't silent), `Cf_AttachRigidBodyToTool`, `Cf_SetRigidBodyFrame`, `Cf_SetTouchLinks`.
+  * *Targets* — `Cf_FrameTarget`, `Cf_PointAxisTarget`, `Cf_ConfigurationTarget`, `Cf_FrameWaypoints`, `Cf_PointAxisWaypoints` (tightened `points` input to `list[Rhino.Geometry.Point3d]` so the script harness marshals each item as a real `Point3d` rather than the per-coord float flattening produced by the generic `List[object]` typing), `Cf_RobotConfiguration` (auto-creates one `GH_NumberSlider` per configurable joint with the joint's limits, all wired to a single `joints` list input — drop and wire a `robot_cell` and the slider bank appears; values flow through the standard GH solve path).
+  * *Planning* — `Cf_ForwardKinematics`, `Cf_InverseKinematics` (accepts a bare `compas.geometry.Frame` or Rhino `Plane` as `target` and auto-wraps it as `FrameTarget(target_mode=ROBOT)`; defaults `start_state` to a zero-config state derived from `planner.robot_cell` when unwired; warns when `planner` or `target` are wired but received None; emits both the `configuration` *and* an updated `cell_state` so `Visualize` / `ForwardKinematics` / the next planner step can wire straight in without a `Cf_SetRobotConfiguration` step in between), `Cf_PlanMotion` and `Cf_PlanCartesianMotion` (with `planes` and `polyline` outputs — Rhino planes at the planning group's EE per trajectory point and a polyline through their origins — via `JointTrajectory.to_frames_and_polyline`, computed locally through `RobotCell.forward_kinematics_target_frame` so no round trip per point. Planning failures flag the component red with the backend error message; no separate `error` output), `Cf_DeconstructTrajectory` (expands a `JointTrajectory` into a list of `Configurations`, parallel `RobotCellStates` derived from `trajectory.start_state`, and DataTrees of `velocities`/`accelerations`/`efforts` — one branch per point — for plotting the trajectory profile; pipe an index slider into the `cell_states` output to scrub through `VisualizeRobotCell`).
+  * *Display* — `Cf_VisualizeRobotCell` (uses the `RobotCellObject` scene object with native-geometry caching for smooth slider scrubbing).
+  * *ROS* — `Cf_RosTopicPublish`, `Cf_RosTopicSubscribe` (ported to the new `RosClient`).
+  * Planner calls take a `RobotCell` + `RobotCellState` + `Target` / `Waypoints` triple. Long-lived clients/planners use `scriptcontext.sticky`; user messages flow through `compas_ghpython.error`/`warning`/`remark`. Loader errors are caught and surfaced via clean error messages rather than letting tracebacks reach the GH canvas.
+* Added `Cf_TrajectoryAction`, `Cf_StateChangeAction`, and `Cf_ActionChain` Grasshopper components under *Planning*. The two action builders wrap a `JointTrajectory` (or a `RobotCellState` for a discrete state change) into a named `Action` next to the data that produced it — names cannot drift out of sync with the underlying object — and accept an optional comma-separated `tags` input that lands on the action's `attributes`. `Cf_ActionChain` takes the ordered `actions` list, an optional `robot_cell` (for signature verification on load), and emits the assembled `chain` plus composite visualisation outputs: a DataTree of EE planes with one branch per trajectory action, a parallel list of polylines (one per action), `duration` and `end_state`. The viz reuses `trajectory.to_frames_and_polyline` per action, walking the chain's state sequence so each segment's FK uses the correct pre-state. The helper's signature was relaxed to take `robot_cell` directly (instead of digging through `planner.client.robot_cell`), making it reusable from any caller that already has a cell.
+* Added `compas_fab.robots.Action` and `compas_fab.robots.ActionChain` — a higher-level assembly layer that threads a single `RobotCellState` through a sequence of `Action` objects. A single `Action` class covers both kinds: one carrying a `JointTrajectory` is a *planned* action and derives its post-state from the predecessor (last-point applied); one without a trajectory is an *unplanned* (state-change) action (gripper toggle, tool attach/detach) and carries an explicit post-state. Using one class means backtracking/undo just clears the trajectory instead of swapping class types. Each action also carries `tags` (over a free-form `attributes` bag) to drive differentiated downstream execution (e.g. `approach`/`retract`, linear vs. free motion). The canonical use case is pick-and-place: `ActionChain(name, start_state).append_trajectory(...).append_state_change(...)...`, fluent chaining. Lookup is by name (`chain.action_by_name(...)`) rather than index, so a future tree/branching extension won't force an API break. Optional `robot_cell` constructor argument stores a structural signature (robot name + tool/body ids, SHA-256) so `chain.verify_cell(cell)` fails loudly when a chain is loaded against the wrong cell. The chain owns the state sequence: each `Action.start_state` is mirrored onto the contained trajectory's `start_state`, and serialisation strips both (re-threaded on load) and omits the derived `post_state` of planned actions; only the chain's `start_state` and explicit state-change post-states are stored. Planners' return types are unchanged — `ActionChain` is purely an additive composition layer.
+* Added `compas_fab.robots.JointTrajectory.start_state` — an optional `RobotCellState` that carries the full cell context the trajectory was planned from (tools, rigid bodies, attached collision objects, robot configuration). MoveIt, PyBullet and analytical Cartesian planners now populate it. **Breaking change**: the `JointTrajectory` constructor signature is now `(trajectory_points, joint_names, start_state, fraction, attributes)` — `start_configuration` has been removed from the constructor and is set via the property only (`traj.start_configuration = config` after construction). The getter returns the explicit override if set, otherwise `start_state.robot_configuration`. `Cf_DeconstructTrajectory` derives its per-point cell states straight from `trajectory.start_state` (the `start_state` input was dropped — the trajectory carries it), and the `trajectory_to_planes_and_polyline` viz helper falls back to `trajectory.start_state` when its explicit `start_state` is unwired, so a planned trajectory now visualises end-to-end without re-wiring the cell state on the output side.
+* Added `compas_fab.ghpython.ensure_value_list`, a reusable helper for components that want to auto-create a Grasshopper `Value List` on an unconnected input (used by `Cf_LoadRobotCellFromLibrary` and intended for follow-on components like `Cf_FrameTarget`'s `target_mode` and solver-name pickers).
+* Added `JointTrajectory.to_frames_and_polyline` to ease visualization of trajectories.
 
 ### Changed
 
-
-* Renamed `PybulletClient.get_cached_robot` to `PybulletClient.get_cached_robot_model` to avoid confusion between the `RobotModel` and `Robot` class.
-* Renamed `PybulletClient.ensure_cached_robot` to `PybulletClient.ensure_cached_robot_model`.
-* Renamed `PybulletClient.ensure_cached_robot_geometry` to `PybulletClient.ensure_cached_robot_model_geometry`.
-* Renamed `PybulletClient.cache_robot` to `PybulletClient.cache_robot_model`.
-* Backend planners now use multi-inherence instead of `__call__` to include the backend functions. This allows for better generated documentation.
-* `Robot.plan_carteisan_motion()` now accepts `Waypoints` as target. Implementation for `FrameWaypoints` is supported with same functionality as before. Simply wrap `Frame` objects using `FrameWaypoints(frames)`.
-* Changed `BoundingVolume`, `Constraint`, `JointConstraint`, `OrientationConstraint`, `PositionConstraint` to inherit from `compas.data.Data` class.
-* Change the signature of `plan_motion()` to use `target` (`Target` class) instead of `goal_constraints`. Only one target is accepted. Users who wish to compose their own constraint sets can still use `ConstraintSetTarget`.
-* Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
-* Moved `Robot.position_constraint_from_frame()` to `PositionConstraint.from_frame()`, as constraints are no longer intended for users to use directly.
-* Moved `Robot.constraints_from_frame()` to ros.backend_features and is handled by `convert_target_to_goal_constraints()`. Users who wish to use a frame as target should use a `FrameTarget` instead.
-* Changed the behavior of Duration class when accepting both seconds (float) and nanoseconds (int) where the decimal point of seconds and the nanoseconds add up to more than 1 second.
+* `JointTrajectory.to_frames_and_polyline` gained an optional `target_mode` parameter (defaults to `TargetMode.ROBOT`), so the visualized path can be reported at the robot's planner frame, the attached tool's TCF, or the workpiece. The `Plan Motion` and `Plan Cartesian Motion` Grasshopper components now pass the `target_mode` of their `target` / `waypoints` through to it, so the previewed `planes` / `polyline` match what was actually planned (e.g. the tool tip path for a `TOOL`-mode target).
+* The `MoveIt Planner` Grasshopper component now loads the robot cell from ROS itself, and the separate `Load Robot Cell From ROS` component has been removed. MoveIt's planning scene is defined by the URDF/SRDF loaded into `move_group`, so the cell can only come from ROS — merging the two removes a fragile two-step wiring (and the previous `ros_client` pass-through workaround that enforced load-before-plan ordering). `MoveIt Planner` now takes `ros_client`, `tools` / `rigid_bodies` (registered into the cell and uploaded as collision objects), `load_geometry`, `reload`, and an optional `options` input, and outputs `planner` (first), `robot_cell`, and `detected_distro`. The cell is fetched once and cached (set `reload` to refetch), and re-uploaded to the planning scene only when it actually changes. The advanced load parameters (`urdf_param_name`, `srdf_param_name`, `http_file_server_base_url`) moved to a new `MoveIt Planner Options` component, so the default case is just `RosClient → MoveIt Planner`. Use `Deconstruct Planner` to recover the loaded cell / model when needed.
+* Reorganised the API reference into three groups that match the public-API surface: **Core** (`compas_fab.robots`, `compas_fab.backends`, `compas_fab.utilities`, `compas_fab.scene`) and **Integrations** (`compas_fab.blender`, `compas_fab.ghpython`, `compas_fab.rhino`) hold the classes end users call, while **Extending compas_fab** gathers the contributor material — the [Backend architecture](developer/architecture.md) guide, the backend interfaces and per-backend `*.backend_features` API pages, and the Grasshopper-component / icon-system / ActionChain notes (the former "Developer guide" section). With `inherited_members` enabled, each planner on the `compas_fab.backends` page now documents its full FK/IK/motion-planning method set directly (the methods it composes through multiple inheritance), so the feature mixins no longer need to be front-and-centre. The redundant per-backend pages (`compas_fab.backends.ros`/`.pybullet`/`.kinematics`) were removed — they were ~95–100% duplicates of the `compas_fab.backends` aggregator — and `AnalyticalKinematics` and `AnalyticalKinematicsClient` are now re-exported from `compas_fab.backends` so they remain documented in Core.
+* Unified the collision-checking option key across backends to `check_collision` (default `True` = collision-free solutions only). Previously `MoveItInverseKinematics` used `allow_collision` (inverted semantics) while the PyBullet/analytical backends already used `check_collision`. The MoveIt feature now accepts the legacy `allow_collision` key as a backward-compatible alias — when `check_collision` is unset and `allow_collision` is present, the latter is inverted and used — so existing callers and the `docs/backends/ros/files/04_ik_allow_collision.py` example continue to work unchanged. The new `Cf_InverseKinematics` `check_collision` boolean input passes straight through with no UI-layer translation.
+* Changed the default HTTP file server port used by `RosClient.load_robot_cell` (and `HttpFileServerLoader`) from `9091` to `9190`. The previous default collided with the rosbridge port `9091` commonly used when remapping a ROS 2 stack to coexist with a ROS 1 stack (rosbridge `9090` + ROS 2 rosbridge `9091`), causing HTTP 404s when the loader hit the bridge instead of the file server. `9190` stays clear of the 909x cluster while remaining mnemonic. The `docker-compose-ros2.yml` test stack and the `ros2-ur10e-demo` reference stack both default `ROS2_HTTP_PORT` and the container-internal port to `9190` to match.
+* Standardized every backend page (`docs/backends/{analytical,analytical_pybullet,pybullet,ros,ros2}.md`) to a common structure: *When to use → Trade-offs → Setup → First example (embedded) → More examples (linked) → API reference*. Each page now embeds one runnable example from `docs/backends/*/files/` via `pymdownx.snippets` and links the remaining ~50 examples to GitHub.
+* Rewrote `docs/backends/index.md` as a real decision guide: a "by intent" table keyed by what the user wants to do (rather than backend name), plus a "by capability" matrix and explicit setup-cost summary. Linked from both Home and Installation.
+* Split `docs/installation.md` into a focused library-install page (uv/pip/conda + verify) and a new `docs/frontends.md` covering CAD environment setup (Rhino 8, Grasshopper, Blender, COMPAS Viewer, headless). The new front-ends page also documents which CAD environments work with which backends, surfacing the limitation that PyBullet cannot run inside Rhino's interpreter.
+* Rebranded the old `tutorial.md` as `concepts.md`: a backend-agnostic walkthrough of the data model (`RobotCell`, `RobotCellState`, `Target`/`Waypoints`, `TargetMode`). No planner calls, the concepts page now reads as "this is the data; backends are how you execute it" and links out to the backends section for the actual planning calls.
+* Rewrote `docs/index.md` as a real landing page (was a 1-paragraph blurb): leads with the five-backend table, "I want to..." quick links, and a four-step what's-next list. Updated MkDocs nav to surface the new structure (Home → Installation → CAD front-ends → Concepts → Backends → API → Developer guide).
+* Bumped `compas_robots` requirement from `>=0.6,<1` to `>=1,<2`.
+* Migrated packaging to `pyproject.toml`.
+* Cleaned up `requirements-dev.txt`.
+* Python classifiers trimmed to 3.9 (minimum, required for Rhino 8) and 3.13 (latest).
+* Unpinned `roslibpy` from `1.8.1` to `>=2.0,<3` in preparation for ROS 2 support.
+* Updated `ActionClient` and `Goal` imports from `roslibpy.actionlib` to `roslibpy.ros1.actionlib` following the breaking namespace change in `roslibpy` 2.x.
+* Changed CI workflow for IronPython.
+* Updated compas requirement to > 2.3
+* Changed `client` parameter in `PlannerInterface(client)` to default to `None`.
+* Changed `PlannerInterface.client` to a read-only property.
+* Moved `PlannerInterface` from `backends/interfaces/client.py` to `backends/interfaces/planner.py`
+* Moved `AnalyticalInverseKinematics` to be a backend feature of `AnalyticalKinematicsPlanner`.
+* Moved `AnalyticalPlanCartesianMotion` to be a backend feature of `AnalyticalKinematicsPlanner`.
+* Change backend features to use multi-inherence instead of `__call__` to include the backend functions.
+* Changed parameters of `compas_fab.backends.SetRobotCell.set_robot_cell()` to accept `RobotCell` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.SetRobotCellState.set_robot_cell_state()` to accept `RobotCellState`.
+* Changed parameters of `compas_fab.backends.ForwardKinematics.forward_kinematics()` to accept `RobotCellState`, `TargetMode` and `scale`.
+* Changed parameters of `compas_fab.backends.InverseKinematics.inverse_kinematics()` to accept `Target` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.InverseKinematics.iter_inverse_kinematics()` to accept `Target` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.PlanMotion.plan_motion()` to accept `Target` and `RobotCellState`.
+* Changed parameters of `compas_fab.backends.PlanCartesianMotion.plan_cartesian_motion()` to accept `Waypoints` and `RobotCellState`.
+* Changed `compas_fab.robots.BoundingVolume` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.Constraint` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.JointConstraint` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.OrientationConstraint` to inherit from `compas.data.Data`.
+* Changed `compas_fab.robots.PositionConstraint` to inherit from `compas.data.Data`.
+* Moved `Robot.orientation_constraint_from_frame()` to `OrientationConstraint.from_frame()`.
+* Moved `Robot.position_constraint_from_frame()` to `PositionConstraint.from_frame()`.
+* Moved `Robot.constraints_from_frame()` to non-exposed `compas_fab.backends.ros.backend_features.convert_target_to_goal_constraints()`.
+* Changed `avoid_collisions` parameter in `plan_motion` to `allow_collisions` parameter.
+* Fixed error in `PyBulletForwardKinematics.forward_kinematics` where function would crash if `options` was not passed.
+* Fixed error in `PyBulletInverseKinematics._accurate_inverse_kinematics` where threshold was not squared for comparison.
+* Changed the behavior of `Duration` class when accepting both seconds (float) and nanoseconds (int) where the decimal point of seconds and the nanoseconds add up to more than 1 second.
 * Changed GH Component `ConstraintsFromPlane` to `FrameTargetFromPlane`.
 * Changed GH Component `ConstraintsFromTargetConfiguration` to `ConfigurationTarget`.
 * Changed `RosClient` constructor to take a type for planner backend instead of a string. This also changes the name of the argument from `planner_backend` to `planner_type`.
+* Changed type-hints from comment-style to standard Python 3.x type-hints
+* Changed `RosDistro` to be an enum instead of string.
+* Changed `TargetMode` to be an enum instead of string.
+* Changed default values for number of planning attempts in MoveIt to 5, and the allowed planning time to 1 second.
+* Changed cartesian motion planner of MoveIt to raise an exception (including the partial trajectory) if fraction is below 1.0 (ie. the trajectory is not possible).
+* Changed `PyBulletClient.connect()` and `PyBulletClient.disconnect()` to take a `verbose` parameter.
+* Changed `PyBulletClient._handle_concavity()` to ignore the `redirect_stdout` context manager to avoid the mysterious `WinError 6: The handle is invalid.` error.
+
+### Fixed
+
+* `Plan Motion` and `Plan Cartesian Motion` Grasshopper components raised a `NullReferenceException` when planning failed with no trajectory: the visualization helper (and, for Cartesian, the `fraction` read) dereferenced a `None` trajectory instead of just flagging the component. Both now short-circuit on a `None` trajectory and output empty geometry.
+* The PyBullet backend raised `NameError: name 'pybullet' is not defined` whenever the real `pybullet` module had already been imported elsewhere in the process (e.g. the user does `import pybullet` in the same Grasshopper script). The lazy-loader guard in `compas_fab.backends.pybullet.client` only bound the `pybullet` name when the module was *not* yet imported — being already in `sys.modules` never created the local binding. It now binds the (cached) real module in that case.
+* Auto-created Grasshopper dropdowns and boolean toggles (`ensure_value_list` / `ensure_boolean_toggle`) duplicated themselves on every recompute, stacking 2–4 value lists on each `target_mode` input and extra toggles on `load_geometry`. The widget was added with `AddObject`/`AddSource` inline during the running solution, which doesn't commit until the solution ends, so follow-up solves still read `SourceCount == 0` and added another. Creation now happens inside the `ScheduleSolution` callback (between solves, where the wire commits), guarded by a sticky pending flag, so exactly one widget is ever added.
+* The `Visualize Robot Cell` Grasshopper component failed with a `None` error when no `cell_state` was wired: it reads the `RobotCellObject`'s child scene objects directly, but those are only built when a state is applied via `update()`, which was skipped for an unwired state. It now falls back to the cell's `default_cell_state()`, drawing the cell in its default configuration.
+* `RigidBodyLibrary.floor()` built a flat plane at `Z=0`, which collided with the robot base under distance-0 collision checking and made every configuration fail (so e.g. PyBullet IK with a floor returned no solutions). A robot base's collision geometry can dip several millimetres below the origin (the UR5 `base_link_inertia` reaches about -7 mm), so `floor()` now takes a `clearance` parameter and sits below `Z=0` by default (1 cm). Adding the base link to the floor's `RigidBodyState.touch_links` remains the robot-agnostic alternative.
+* Outgoing ROS message headers were not JSON-serializable under `roslibpy` 2.0, breaking every `MoveItPlanner.set_robot_cell` (and any other header-carrying message) with `TypeError: Object of type Time is not JSON serializable`. `roslibpy` 2.0 wraps a header's `stamp` in a `UserDict`-based `roslibpy.core.Time`, which `json.dumps` rejects; `compas_fab`'s `std_msgs.Header.msg` / `format_header_for_distro` build outgoing headers via `dict(roslibpy.Header(...))`, embedding that `Time`. Both now flatten the roslibpy header (and its nested `stamp`) to plain `dict`s via a new `_to_plain` helper, keeping roslibpy's per-distro field shaping while emitting only JSON-native types. Regression-tested in `tests/backends/ros/messages/test_std_msgs.py::test_header_msg_is_json_serializable`.
+* `PyBulletClient` could not be used outside a `with` block: `_cache_dir` was only created in `__enter__`, so calling `connect()` directly left it `None` and every mesh/tool/URDF load failed with `AttributeError: 'NoneType' object has no attribute 'name'`. `_cache_dir` is now a lazily-created property (the `TemporaryDirectory` is made on first access and still cleaned up on `__exit__`), so the client works whether or not it is used as a context manager — which is how the Grasshopper `PyBullet Client` component drives it.
+* `redirect_stdout` (used throughout the PyBullet backend to silence native output) called `sys.stdout.fileno()` unconditionally, raising `io.UnsupportedOperation: fileno` inside embedded interpreters whose stdout has no OS-level file descriptor — e.g. Rhino 8's CPython, breaking `PyBulletClient.connect()` there. It already special-cased pytest and ipykernel for the same reason; it now also skips the fd-level redirect whenever `fileno()` is unavailable, so the PyBullet backend (and its new Grasshopper components) run in Rhino.
+* `AnalyticalPybulletInverseKinematics._iter_inverse_kinematics_frame_target` was silently dropping every collision-free IK candidate. The `try`/`except CollisionCheckError` block had no `else` branch — when the collision check passed (no exception), the configuration was never yielded. Added the missing `else: yield configuration`. Verified end-to-end with the `03_iter_ik_pybullet.py` example, which now returns 6 valid + 2 colliding configurations (was: 0 valid + all 8 reported as colliding).
+* `AnalyticalInverseKinematics.iter_inverse_kinematics` and its `_iter_inverse_kinematics_frame_target` helper had `group: Optional[str]` declared without a default, while the parent `InverseKinematics` interface and all example usages treat `group` as optional. Added `= None` so calls like `planner.iter_inverse_kinematics(target, start_state)` work as documented.
+* Cleared stale docstring parameters across `compas_fab.backends` interfaces and backend feature implementations (`robot`, `client`, `solver`, `planner_type`) that no longer matched their signatures, plus a confusingly-indented continuation line in `RigidBodyState.attached_to_link`. `invoke docs` now builds with zero warnings.
+* Fixed three analytical/PyBullet examples that crashed at startup due to cell-state desync after objects were added to the cell:
+  * `docs/backends/analytical_kinematics/files/02_inverse_kinematics with_tools.py`: now refreshes the state from the cell after adding the cone tool.
+  * `docs/backends/analytical_kinematics/files/03_analytical_pybullet_planner.py`: rewritten to use the pre-configured `RobotCellLibrary.abb_irb4600_40_255_printing_tool()` cell (which has the correct `touch_links` semantics) and derives its target frame via FK from a chosen seed pose. Was previously crashing on `KeyError: 'cone'` and then yielding 0 IK solutions even after that.
+  * `docs/backends/pybullet/files/04_ik_semi_constrained.py`: now creates the `target_marker` rigid body state explicitly (was crashing on `KeyError: 'target_marker'`).
+* `docs/backends/analytical_kinematics/files/03_iter_ik_pybullet.py` (already covered above) now derives its target via FK for clarity.
+* `docs/backends/analytical_kinematics/files/04_cartesian_path_analytic_pybullet.py` now has a comment noting that `matplotlib` is an optional dependency that must be installed separately.
+* All analytical-backend examples now import solver classes (`UR5Kinematics`, `ABB_IRB4600_40_255Kinematics`) from `compas_fab.backends` (the public top-level path), not the private `compas_fab.backends.kinematics.solvers`.
+* `MoveItPlanMotion.plan_motion` and `MoveItPlanCartesianMotion.plan_cartesian_motion` were re-raising every typed planner error (`MPNoPlanFoundError`, `MPStartStateInCollisionError`, …) wrapped in `RosValidationError`, so callers catching `MotionPlanningError` as documented were missing every real failure. Both methods now unwrap `RosValidationError` and re-raise `e.original_exception`, matching `MoveItInverseKinematics.iter_inverse_kinematics`.
+* `JointTrajectoryPoint.joint_names` was empty on points produced by the MoveIt and analytical Cartesian planners — the ROS message spec only carries names on the parent `JointTrajectory`, and the analytical path simply forgot. Both backends now attach the trajectory's `joint_names` per point at construction, matching PyBullet. Any consumer that walks points by name (the GH viz helper, `Cf_DeconstructTrajectory`) was silently FK-ing the start state for every point.
+* `ToolLibrary.cone()` was not initializing a link on the underlying `ToolModel` when `load_geometry=False`, which left the tool's robot tree malformed and made any downstream `iter_joints()` / `get_configurable_joints()` call raise `AttributeError: 'NoneType' object has no attribute 'joints'`. As a result `RobotCellLibrary.ur5_cone_tool(load_geometry=False)` always crashed. The factory now calls `add_link("cone_link", visual_meshes=[...], collision_meshes=[...])` (mirroring `ToolLibrary.printing_tool()`) so the model is structurally valid in both geometry modes.
+* Eliminated intermittent CI failures in `integration.yml` on the `RosClient` doctest under `pytest --doctest-modules` that raised `RosTimeoutError('Failed to connect to ROS')`. Both `>>> with RosClient() as client:` examples in `compas_fab.backends.ros.client` (the `RosClient` class docstring at line 162 and `RosClient.load_robot_cell` at line 257) are now marked `# doctest: +SKIP` — they remain as readable illustrations of the API but no longer run as live integration tests. The actual code path is exercised by `tests/backends/ros/test_ros_client.py` (9 cases against a module-scoped `ros1_client` fixture, never observed to flake). Earlier hypotheses — cold rosbridge startup (reverted in `2ffc37fac`) and a roslibpy 2.x reactor lifecycle issue (validated against [gramaziokohler/roslibpy@lifecycle-fixes](https://github.com/gramaziokohler/roslibpy/tree/lifecycle-fixes) via a temporary `requirements.txt` pin) — both failed to eliminate the flake, falsifying them; the root cause appears to be an interaction between doctest's evaluation context and roslibpy's twisted reactor that only the first `>>> with RosClient()` after the test-fixture suite triggers (the second such doctest always succeeds).
 
 ### Removed
 
+* All Sphinx-era documentation sources: every `docs/**/*.rst`, the `docs/conf.py` Sphinx config, the `docs/_static/` and `docs/_images/` asset folders, the `docs/developer/generated/` autosummary output, `docs/spelling_wordlist.txt` and `docs/doc_versions.txt` (the latter superseded by `mike`'s gh-pages versioning).
+* `.. autosummary::`, `.. toctree::` and `.. currentmodule::` directives from all module-level `__init__.py` docstrings (replaced with prose + intra-doc Markdown links resolved by `mkdocstrings`).
+* Removed `DirectUrActionClient` and associated `direct_ur` messages module since this UR-specific action client was outdated and unused.
+* Removed support for Python '3.8'.
+* Removed `compas_fab.backends.CollisionError`.
+* Removed `compas_fab.backends.AddCollisionMesh` from backend features.
+* Removed `compas_fab.backends.AppendCollisionMesh` from backend features.
+* Removed `compas_fab.backends.RemoveCollisionMesh` from backend features.
+* Removed `compas_fab.backends.AddAttachedCollisionMesh` from backend features.
+* Removed `compas_fab.backends.RemoveAttachedCollisionMesh` from backend features.
+* Removed `compas_fab.backends.ClientInterface.planner` attribute.
+* Removed `compas_fab.backends.ClientInterface.inverse_kinematics()`.
+* Removed `compas_fab.backends.ClientInterface.forward_kinematics()`.
+* Removed `compas_fab.backends.ClientInterface.plan_cartesian_motion()`.
+* Removed `compas_fab.backends.ClientInterface.plan_motion()`.
+* Removed `compas_fab.backends.ClientInterface.get_planning_scene()`.
+* Removed `compas_fab.backends.ClientInterface.reset_planning_scene()`.
+* Removed `compas_fab.backends.ClientInterface.add_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.remove_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.append_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.add_attached_collision_mesh()`.
+* Removed `compas_fab.backends.ClientInterface.remove_attached_collision_mesh()`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletAddAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletAddCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletAppendCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletRemoveAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.PyBulletRemoveCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItAddAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItAddCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItAppendCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItRemoveAttachedCollisionMesh`.
+* Removed `compas_fab.backends.pybullet.backend_features.MoveItRemoveCollisionMesh`.
+* Removed `compas_fab.backends.PyBulletClient.collision_objects` attribute.
+* Removed `compas_fab.backends.PyBulletClient.attached_collision_objects` attribute.
+* Removed `compas_fab.backends.PyBulletClient.load_ur5()`.
+* Removed `compas_fab.backends.PyBulletClient.load_robot()`.
+* Removed `compas_fab.robots.AttachedCollisionMesh`.
+* Removed `compas_fab.robots.CollisionMesh`.
+* Removed `compas_fab.robots.PlanningScene`.
+* Removed `compas_fab.robots.Robot`. (Use `RobotCell` instead)
+* Removed `compas_fab.robots.RobotLibrary`. (Use `RobotCellLibrary` instead)
+* Removed `compas_fab.robots.Tool`. (Use `ToolModel` directly in `RobotCell` instead)
+* Removed `compas_fab.robots.Robot.transformed_frames`. (use the one in `RobotModel` instead)
+* Removed `compas_fab.robots.Robot.transformed_axes`. (use the one in `RobotModel` instead)
+* Removed `compas_fab.robots.Robot.merge_group_with_full_configuration` as it can be covered by `Configuration.merged`.
+* Removed `compas_fab.robots.Robot.get_position_by_joint_name` as Configuration class can now be directly accessed by joint name.
+* Removed `compas_fab.robots.Robot.get_group_names_from_link_name` as it is too oddly specific.
+* Removed `compas_fab.robots.JointTrajectory.attached_collision_meshes` attribute from `` class.
+* Removed `inverse_kinematics`, `plan_cartesian_motion`, and `plan_motion` methods from Robot, access them using the planner instead.
 * Removed `plan_cartesian_motion_deprecated` and `plan_motion_deprecated` methods from `Robot` class
 * Removed `forward_kinematics_deprecated` and `inverse_kinematics_deprecated` method from `Robot` class
+* Removed `compas_fab.sensors` module.
+* Removed support for IronPython.
+
+## [1.1.0] 2025-04-17
+
+### Added
+
+### Changed
+
+* Made `pybullet` entirely optional. To install `pybullet`, use `pip install compas_fab.[pybullet]` or install `pybullet` manually.
+
+### Removed
+
+
+## [1.0.5] 2025-04-17
+
+### Added
+
+### Changed
+
+* Rhino CPython support: change `pybullet` to be optional requirements inside Rhino.
+
+### Removed
+
+
+## [1.0.4] 2025-04-15
+
+### Added
+
+### Changed
+
+### Removed
+
+
+## [1.0.3] 2025-04-15
+
+### Added
+
+* Added helper function `message` to `compas_fab.ghpython.components`.
+* Added helper function `error` to `compas_fab.ghpython.components`.
+* Added helper function `remark` to `compas_fab.ghpython.components`.
+* Added helper function `warning` to `compas_fab.ghpython.components`.
+* Added GH component definitions compatible with CPython in Rhino8.
+
+### Changed
+
+* Updated dev dependency to `compas_invocations2`.
+* Fixed `AttributeError` in `inverse_kinematics_spherical_wrist()`.
+* Fixed `AttributeError` in VisualizeRobot GH component.
+
+### Removed
+
+* Removed `create_id` from `compas_fab.ghpython.components`, using `compas_ghpython.create_id` instead.
+
 
 ## [1.0.2] 2024-02-22
 

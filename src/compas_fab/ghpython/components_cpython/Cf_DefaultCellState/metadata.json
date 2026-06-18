@@ -1,0 +1,24 @@
+{
+    "name": "Default Cell State",
+    "nickname": "Default State",
+    "category": "COMPAS FAB",
+    "subcategory": "Cell State",
+    "description": "Create a default RobotCellState from a RobotCell. The state has the robot at zero configuration with no tools/bodies attached.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "The RobotCell to build a default state for."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "default_cell_state",
+                "description": "Default RobotCellState matching the cell."
+            }
+        ]
+    }
+}

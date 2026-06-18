@@ -1,0 +1,68 @@
+{
+    "name": "Action Chain",
+    "nickname": "Action Chain",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Assemble an ActionChain from a list of Actions (built upstream by Cf_TrajectoryAction / Cf_StateChangeAction). Threads the cell state through the chain, validates each action, and emits the assembled chain plus the composite EE planes/polyline for visualisation (one branch per trajectory action).",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Chain identifier.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "start_state",
+                "description": "RobotCellState the chain starts from."
+            },
+            {
+                "name": "actions",
+                "description": "Ordered list of Action objects, typically from Cf_TrajectoryAction and Cf_StateChangeAction components.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "robot_cell",
+                "description": "Optional RobotCell. When provided, a structural signature is stored on the chain so a mismatched cell on load can be detected via verify_cell()."
+            },
+            {
+                "name": "group",
+                "description": "Planning group name used for the FK visualisation. Defaults to the cell's main group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "description",
+                "description": "Optional free-form description of the chain.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "chain",
+                "description": "The assembled ActionChain. Serialisable via to_json / to_jsonstring."
+            },
+            {
+                "name": "planes",
+                "description": "DataTree of Rhino planes — one branch per trajectory action, one plane per trajectory point. Flatten for a single combined list."
+            },
+            {
+                "name": "polyline",
+                "description": "List of Rhino polylines — one per trajectory action, through the EE origins."
+            },
+            {
+                "name": "cell_states",
+                "description": "Flat list of RobotCellState snapshots covering the whole chain — one per trajectory point plus one per state-change action. Pair with an index slider + VisualizeRobotCell to scrub through the entire motion."
+            },
+            {
+                "name": "duration",
+                "description": "Sum of trajectory durations along the realized path, in seconds. Backends that do not time their trajectories report 0."
+            },
+            {
+                "name": "end_state",
+                "description": "RobotCellState at the end of the realized path."
+            }
+        ]
+    }
+}

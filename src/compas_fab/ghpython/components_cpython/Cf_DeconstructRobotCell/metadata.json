@@ -1,0 +1,36 @@
+{
+    "name": "Deconstruct Robot Cell",
+    "nickname": "Deconstruct Robot Cell",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Deconstruct a RobotCell into its robot model, registered rigid bodies and tools, and a matching default RobotCellState. The inverse of registering models via Load Robot Cell.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "The RobotCell to deconstruct (typically the output of a Load Robot Cell component)."
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot_model",
+                "description": "The cell's RobotModel."
+            },
+            {
+                "name": "rigid_bodies",
+                "description": "The registered RigidBody models (values of `cell.rigid_body_models`), in no particular order."
+            },
+            {
+                "name": "tools",
+                "description": "The registered ToolModel tools (values of `cell.tool_models`), in no particular order."
+            },
+            {
+                "name": "default_cell_state",
+                "description": "The default RobotCellState for this cell: every tool/body present but nothing attached. The same state Load Robot Cell returns."
+            }
+        ]
+    }
+}

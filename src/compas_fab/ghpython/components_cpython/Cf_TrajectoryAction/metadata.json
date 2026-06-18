@@ -1,0 +1,39 @@
+{
+    "name": "Trajectory Action",
+    "nickname": "Trajectory Action",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Wrap a JointTrajectory into a named Action, ready to feed into Cf_ActionChain. The name, tags + description live next to the trajectory that produced them, so they cannot drift out of sync.",
+    "exposure": 4,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Unique name for this action within the chain (e.g. 'approach', 'descend', 'retract').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "trajectory",
+                "description": "JointTrajectory output of a planner (Plan Motion / Plan Cartesian Motion)."
+            },
+            {
+                "name": "tags",
+                "description": "Optional comma-separated tags driving differentiated downstream execution (e.g. 'approach, linear'). Stored on the action's attributes.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "description",
+                "description": "Optional free-form human description.",
+                "typeHintID": "str"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "action",
+                "description": "Action — wire into Cf_ActionChain's `actions` input."
+            }
+        ]
+    }
+}

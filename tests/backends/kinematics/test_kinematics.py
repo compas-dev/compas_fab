@@ -23,3 +23,7 @@ def test_kinematic_functions():
     frame = kin.forward(q)
     sol = kin.inverse(frame)
     assert allclose(sol[0], q)
+
+
+if __name__ == "__main__":
+    test_kinematic_functions()

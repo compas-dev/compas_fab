@@ -1,50 +1,3 @@
-"""
-********************************************************************************
-compas_fab
-********************************************************************************
-
-.. currentmodule:: compas_fab
-
-This library provides tools to plan and execute robotic fabrication processes using
-the COMPAS Framework with a special focus on enabling its usage from within CAD
-environments.
-
-Robots
-------
-
-The core features are located in the ``robots`` module.
-The backend implementations for motion planning are located in the ``backends`` module.
-
-.. toctree::
-    :maxdepth: 2
-
-    compas_fab.robots
-    compas_fab.backends
-
-CAD integration
----------------
-
-The following modules provide functions for use within different CAD environments.
-
-.. toctree::
-    :maxdepth: 1
-
-    compas_fab.blender
-    compas_fab.ghpython
-    compas_fab.rhino
-
-Utilities
----------
-
-.. toctree::
-    :maxdepth: 1
-
-    compas_fab.sensors
-    compas_fab.utilities
-
-
-"""
-
 import os
 
 import compas
@@ -95,9 +48,7 @@ except Exception:
 
 
 __all_plugins__ = [
-    "compas_fab.rhino.install",
     "compas_fab.rhino.scene",
-    "compas_fab.ghpython.install",
     "compas_fab.ghpython.scene",
     "compas_fab.blender.scene",
 ]

@@ -4,13 +4,14 @@ on:
     types: [assigned, opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
+      - LTS-main-1.x
 
 jobs:
   build:
     name: Check Actions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v6
       - name: Changelog check
         uses: Zomzog/changelog-checker@v1.1.0
         with:

@@ -12,7 +12,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17809165.svg)](https://doi.org/10.5281/zenodo.17809165)
 [![Twitter Follow](https://img.shields.io/twitter/follow/compas_dev?style=social)](https://twitter.com/compas_dev)
 
-*Robotic fabrication package for the COMPAS Framework** that facilitates the
+*Robotic fabrication package for the COMPAS Framework* that facilitates the
 planning and execution of robotic fabrication processes. It provides interfaces
 to existing software libraries and tools available in the field of robotics
 (e.g. OMPL, ROS) and makes them accessible from within the parametric design
@@ -27,7 +27,7 @@ architecture, engineering and digital fabrication.
 * Planning tools: kinematic solvers, path planning, etc.
 * Execution tools: feedback loops, robot control, etc.
 
-**COMPAS FAB** runs on Python 3.x and IronPython 2.7.
+**COMPAS FAB** runs on Python 3.x.
 
 
 ## Getting Started
@@ -42,7 +42,6 @@ It can also be installed using `pip`:
 
 
 > On Windows, you may need to install [Microsoft Visual C++ 14.0](https://www.scivision.co/python-windows-visual-c++-14-required/).
-
 
 Once the installation is completed, you can verify your setup.
 Start Python from the command prompt and run the following:
@@ -93,4 +92,4 @@ Ready to release a new version of **COMPAS FAB**? Here's how to do it:
 ## Credits
 
 This package is maintained by Gramazio Kohler Research [`@gramaziokohler`](https://github.com/gramaziokohler)
-and a long list of [contributors](https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.rst).
+and a long list of [contributors](https://github.com/compas-dev/compas_fab/blob/main/AUTHORS.md).

@@ -1,7 +1,3 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import binascii
 import logging
 import os
@@ -47,7 +43,7 @@ def _write_file(filename, file_contents, mode="w"):
         f.write(file_contents)
 
 
-class RosFileServerLoader(object):
+class RosFileServerLoader:
     """Allows to retrieve the mesh files specified in the robot model from the
     ROS File Server. Optionally, it stores them on the local file system,
     allowing for faster re-loads as well as enabling them to be loaded by
@@ -73,9 +69,7 @@ class RosFileServerLoader(object):
         self.local_cache_enabled = local_cache
 
         if self.local_cache_enabled:
-            self.local_cache_directory = local_cache_directory or os.path.join(
-                os.path.expanduser("~"), "robot_description"
-            )
+            self.local_cache_directory = local_cache_directory or os.path.join(os.path.expanduser("~"), "robot_description")
 
     @property
     def _robot_resource_path(self):
@@ -302,24 +296,18 @@ def _dae_mesh_importer(filename, precision):
 
                     if instance_effect is not None:
                         instance_effect_id = instance_effect.attrib["url"][1:]
-                        colors = effects.findall(
-                            'effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id)
-                        )
+                        colors = effects.findall('effect[@id="{}"]/profile_COMMON/technique/phong/*/color'.format(instance_effect_id))
                         for color_node in colors:
                             rgba = [float(i) for i in color_node.text.split()]
                             if "sid" in color_node.attrib:
                                 mesh_colors["mesh_color.{}".format(color_node.attrib["sid"])] = rgba
                 except Exception:
-                    LOGGER.exception(
-                        "Exception while loading materials, all materials of mesh file %s will be ignored ", filename
-                    )
+                    LOGGER.exception("Exception while loading materials, all materials of mesh file %s will be ignored ", filename)
 
             # Parse vertices
             all_offsets = sorted([int(i.attrib["offset"]) for i in primitive_element_set.findall("input[@offset]")])
             if not all_offsets:
-                raise Exception(
-                    "Primitive element node does not contain offset information! Primitive tag={}".format(primitive_tag)
-                )
+                raise Exception("Primitive element node does not contain offset information! Primitive tag={}".format(primitive_tag))
 
             vertices_input = primitive_element_set.find('input[@semantic="VERTEX"]')
             vertices_id = vertices_input.attrib["source"][1:]
@@ -340,9 +328,7 @@ def _dae_mesh_importer(filename, precision):
                 vcount = [int(v) for v in primitive_element_set.find("vcount").text.split()]
 
             if len(vcount) != primitive_count:
-                raise Exception(
-                    "Primitive count does not match vertex per face count, vertex input id={}".format(vertices_id)
-                )
+                raise Exception("Primitive count does not match vertex per face count, vertex input id={}".format(vertices_id))
 
             fkeys = [int(f) for f in primitive_set_data[::skip_step]]
             faces = []

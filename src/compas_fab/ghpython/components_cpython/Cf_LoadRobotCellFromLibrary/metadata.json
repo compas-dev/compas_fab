@@ -1,0 +1,48 @@
+{
+    "name": "Load Robot Cell From Library",
+    "nickname": "Cell from Library",
+    "category": "COMPAS FAB",
+    "subcategory": "Robot Cell",
+    "description": "Load a pre-defined RobotCell and matching default RobotCellState from RobotCellLibrary (e.g. 'ur5', 'ur10e', 'abb_irb4600_40_255', 'panda', 'ur5_cone_tool'). Tools and rigid bodies wired into `tools`/`rigid_bodies` are registered into the cell in one go, so no separate Add* + set_robot_cell() step is needed.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "name",
+                "description": "Name of the RobotCellLibrary classmethod to call. A dropdown is auto-created on first use with every available cell (e.g. 'ur5', 'ur10e', 'abb_irb4600_40_255', 'panda', 'rfl', 'ur5_cone_tool', 'abb_irb4600_40_255_printing_tool').",
+                "typeHintID": "str"
+            },
+            {
+                "name": "load_geometry",
+                "description": "Whether to load the robot's mesh geometry. Required for visualization. Defaults to True when unwired. A Boolean Toggle is auto-created on this input when nothing is wired."
+            },
+            {
+                "name": "reload",
+                "description": "Force a reload (bypass cache). Defaults to False.",
+                "typeHintID": "bool"
+            },
+            {
+                "name": "tools",
+                "description": "Optional list of ToolModels to register into the cell. Each is keyed by its `.name`.",
+                "scriptParamAccess": 1
+            },
+            {
+                "name": "rigid_bodies",
+                "description": "Optional list of RigidBodies to register into the cell. Each is keyed by its `.name` (set it on the Rigid Body From… component).",
+                "scriptParamAccess": 1
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "robot_cell",
+                "description": "The loaded RobotCell."
+            },
+            {
+                "name": "robot_cell_state",
+                "description": "The default RobotCellState matching the cell."
+            }
+        ]
+    }
+}

@@ -1,12 +1,10 @@
-from __future__ import absolute_import
-
 from .std_msgs import Header
 from .std_msgs import ROSmsg
 from .std_msgs import Time
 
 
 class GoalID(ROSmsg):
-    """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalID.html"""
+    """https://docs.ros.org/en/noetic/api/actionlib_msgs/html/msg/GoalID.html"""
 
     ROS_MSG_TYPE = "actionlib_msgs/GoalID"
 
@@ -22,7 +20,7 @@ class GoalID(ROSmsg):
 
 
 class GoalStatus(ROSmsg):
-    """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatus.html"""
+    """https://docs.ros.org/en/noetic/api/actionlib_msgs/html/msg/GoalStatus.html"""
 
     ROS_MSG_TYPE = "actionlib_msgs/GoalStatus"
 
@@ -59,7 +57,7 @@ class GoalStatus(ROSmsg):
 
 
 class GoalStatusArray(ROSmsg):
-    """https://docs.ros.org/api/actionlib_msgs/html/msg/GoalStatusArray.html"""
+    """https://docs.ros.org/en/noetic/api/actionlib_msgs/html/msg/GoalStatusArray.html"""
 
     ROS_MSG_TYPE = "actionlib_msgs/GoalStatusArray"
 

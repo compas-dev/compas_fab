@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .geometry_msgs import PoseStamped
 from .moveit_msgs import Constraints
 from .moveit_msgs import MoveItErrorCodes
@@ -13,10 +11,13 @@ from .moveit_msgs import TrajectoryConstraints
 from .moveit_msgs import WorkspaceParameters
 from .std_msgs import Header
 from .std_msgs import ROSmsg
+from .std_msgs import format_header_for_distro
 
 
 class GetPositionIKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionIK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionIK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionIKRequest"
 
@@ -25,7 +26,9 @@ class GetPositionIKRequest(ROSmsg):
 
 
 class GetPositionIKResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionIK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionIK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionIK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionIKResponse"
 
@@ -41,7 +44,9 @@ class GetPositionIKResponse(ROSmsg):
 
 
 class GetPositionFKRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionFK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionFK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionFKRequest"
 
@@ -50,9 +55,15 @@ class GetPositionFKRequest(ROSmsg):
         self.fk_link_names = fk_link_names or []
         self.robot_state = robot_state or RobotState()
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+        self.robot_state.filter_fields_for_distro(ros_distro)
+
 
 class GetPositionFKResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/srv/GetPositionFK.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPositionFK.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPositionFK.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPositionFKResponse"
 
@@ -69,8 +80,51 @@ class GetPositionFKResponse(ROSmsg):
         return cls(pose_stamped, fk_link_names, error_code)
 
 
+class GetStateValidityRequest(ROSmsg):
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetStateValidity.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetStateValidity.html
+    """
+
+    ROS_MSG_TYPE = "moveit_msgs/GetStateValidityRequest"
+
+    def __init__(self, robot_state=None, group_name="", constraints=None):
+        self.robot_state = robot_state or RobotState()
+        self.group_name = group_name
+        self.constraints = constraints or Constraints()
+
+    def filter_fields_for_distro(self, ros_distro):
+        self.robot_state.filter_fields_for_distro(ros_distro)
+
+
+class GetStateValidityResponse(ROSmsg):
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetStateValidity.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetStateValidity.html
+    """
+
+    ROS_MSG_TYPE = "moveit_msgs/GetStateValidityResponse"
+
+    def __init__(self, valid=False, contacts=None, cost_sources=None, constraint_result=None):
+        self.valid = valid
+        # `contacts` are moveit_msgs/ContactInformation; kept as raw dicts since we
+        # only need the colliding body names for the report.
+        self.contacts = contacts or []
+        self.cost_sources = cost_sources or []
+        self.constraint_result = constraint_result or []
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(
+            valid=msg.get("valid", False),
+            contacts=msg.get("contacts", []),
+            cost_sources=msg.get("cost_sources", []),
+            constraint_result=msg.get("constraint_result", []),
+        )
+
+
 class GetCartesianPathRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetCartesianPath.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetCartesianPath.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetCartesianPathRequest"
 
@@ -96,9 +150,15 @@ class GetCartesianPathRequest(ROSmsg):
         self.avoid_collisions = avoid_collisions
         self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.header = format_header_for_distro(self.header, ros_distro)
+        self.start_state.filter_fields_for_distro(ros_distro)
+
 
 class GetCartesianPathResponse(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetCartesianPath.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetCartesianPath.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetCartesianPath.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetCartesianPathResponse"
 
@@ -117,7 +177,9 @@ class GetCartesianPathResponse(ROSmsg):
 
 
 class SetPlannerParamsRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/SetPlannerParams.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/SetPlannerParams.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/SetPlannerParams.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/SetPlannerParamsRequest"
 
@@ -129,7 +191,9 @@ class SetPlannerParamsRequest(ROSmsg):
 
 
 class MotionPlanRequest(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanRequest.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/MotionPlanRequest.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/MotionPlanRequest.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/MotionPlanRequest"
 
@@ -151,9 +215,7 @@ class MotionPlanRequest(ROSmsg):
         self.start_state = start_state or RobotState()  # moveit_msgs/RobotState
         self.goal_constraints = goal_constraints or []  # moveit_msgs/Constraints[]
         self.path_constraints = path_constraints or Constraints()  # moveit_msgs/Constraints
-        self.trajectory_constraints = (
-            trajectory_constraints or TrajectoryConstraints()
-        )  # moveit_msgs/TrajectoryConstraints
+        self.trajectory_constraints = trajectory_constraints or TrajectoryConstraints()  # moveit_msgs/TrajectoryConstraints
         self.planner_id = planner_id  # string
         self.group_name = group_name  # string
         self.num_planning_attempts = int(num_planning_attempts)  # int32
@@ -166,9 +228,19 @@ class MotionPlanRequest(ROSmsg):
         msg = super(MotionPlanRequest, self).msg
         return {"motion_plan_request": msg}
 
+    def filter_fields_for_distro(self, ros_distro):
+        self.workspace_parameters.filter_fields_for_distro(ros_distro)
+        self.start_state.filter_fields_for_distro(ros_distro)
+        for constraint in self.goal_constraints:
+            constraint.filter_fields_for_distro(ros_distro)
+        self.path_constraints.filter_fields_for_distro(ros_distro)
+        self.trajectory_constraints.filter_fields_for_distro(ros_distro)
+
 
 class MotionPlanResponse(ROSmsg):
-    """https://docs.ros.org/kinetic/api/moveit_msgs/html/msg/MotionPlanResponse.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/msg/MotionPlanResponse.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/msg/MotionPlanResponse.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/MotionPlanResponse"
 
@@ -189,7 +261,9 @@ class MotionPlanResponse(ROSmsg):
 
 
 class GetPlanningSceneRequest(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPlanningSceneRequest"
 
@@ -198,7 +272,9 @@ class GetPlanningSceneRequest(ROSmsg):
 
 
 class GetPlanningSceneResponse(ROSmsg):
-    """https://docs.ros.org/melodic/api/moveit_msgs/html/srv/GetPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/GetPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/GetPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/GetPlanningSceneResponse"
 
@@ -211,7 +287,9 @@ class GetPlanningSceneResponse(ROSmsg):
 
 
 class ApplyPlanningSceneRequest(ROSmsg):
-    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/ApplyPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ApplyPlanningSceneRequest"
 
@@ -220,7 +298,9 @@ class ApplyPlanningSceneRequest(ROSmsg):
 
 
 class ApplyPlanningSceneResponse(ROSmsg):
-    """http://docs.ros.org/kinetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html"""
+    """ROS 1: https://docs.ros.org/en/noetic/api/moveit_msgs/html/srv/ApplyPlanningScene.html
+    ROS 2: https://docs.ros.org/en/jazzy/p/moveit_msgs/interfaces/srv/ApplyPlanningScene.html
+    """
 
     ROS_MSG_TYPE = "moveit_msgs/ApplyPlanningSceneResponse"
 

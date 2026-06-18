@@ -1,0 +1,22 @@
+name: compas_fab
+version: {{ version }}
+authors:
+  - Gramazio Kohler Research, ETH Zurich
+description: "Robotic fabrication package for the COMPAS Framework** that facilitates the planning and execution of robotic fabrication processes."
+url: "https://github.com/compas-dev/compas_fab"
+keywords: [
+    "COMPAS",
+    "compas",
+    "framework",
+    "architecture",
+    "engineering",
+    "digital",
+    "fabrication",
+    "construction",
+    "robotics",
+    "robots",
+    "robotic",
+    "planning",
+    "motion",
+    "kinematics",
+]

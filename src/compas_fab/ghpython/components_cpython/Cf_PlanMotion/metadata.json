@@ -1,0 +1,69 @@
+{
+    "name": "Plan Motion",
+    "nickname": "Plan Motion",
+    "category": "COMPAS FAB",
+    "subcategory": "Planning",
+    "description": "Plan a free-space (joint-interpolated) motion to a target using the given planner. Result is cached; trigger via `compute`.",
+    "exposure": 2,
+    "ghpython": {
+        "isAdvancedMode": true,
+        "iconDisplay": 2,
+        "inputParameters": [
+            {
+                "name": "planner",
+                "description": "A planner that supports plan_motion (e.g. MoveItPlanner, PyBulletPlanner)."
+            },
+            {
+                "name": "target",
+                "description": "Target to reach (FrameTarget, PointAxisTarget, ConfigurationTarget, ConstraintSetTarget)."
+            },
+            {
+                "name": "start_state",
+                "description": "Starting RobotCellState. The robot's configuration in this state is used as the seed."
+            },
+            {
+                "name": "group",
+                "description": "Planning group name. Defaults to the cell's main planning group.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "planner_id",
+                "description": "MoveIt planner algorithm name (e.g. 'RRTConnect', 'PRMstar'). Defaults to 'RRTConnect'.",
+                "typeHintID": "str"
+            },
+            {
+                "name": "num_planning_attempts",
+                "description": "Number of randomized attempts to make. Defaults to 5 for MoveIt.",
+                "typeHintID": "int"
+            },
+            {
+                "name": "allowed_planning_time",
+                "description": "Planning timeout in seconds. Defaults to 1.0.",
+                "typeHintID": "float"
+            },
+            {
+                "name": "compute",
+                "description": "Trigger planning. Defaults to False so the canvas does not plan on every refresh.",
+                "typeHintID": "bool"
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "trajectory",
+                "description": "Resulting JointTrajectory, or a partial trajectory on planning failure. The component is flagged red (with the backend error) when planning fails outright."
+            },
+            {
+                "name": "planes",
+                "description": "List of Rhino planes — one per trajectory point — at the planning group's end-effector frame (target_mode=ROBOT). Computed via FK on the planner with the start_state's attachments preserved."
+            },
+            {
+                "name": "polyline",
+                "description": "Polyline connecting the plane origins in trajectory order. None when the trajectory has fewer than two points."
+            },
+            {
+                "name": "debug_info",
+                "description": "The failure message (including a collision diagnostic on a full failure), as a single string. Wire a panel to read it; empty on success."
+            }
+        ]
+    }
+}
