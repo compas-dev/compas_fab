@@ -1,0 +1,39 @@
+from compas.geometry import Frame
+
+from compas_fab.backends import AnalyticalKinematicsPlanner
+from compas_fab.backends import UR5Kinematics
+from compas_fab.robots import FrameTarget
+from compas_fab.robots import RobotCellLibrary
+from compas_fab.robots import TargetMode
+
+# Not loading the robot's geometry because AnalyticalKinematicsPlanner does not use it for collision checking
+robot_cell, robot_cell_state = RobotCellLibrary.ur5(load_geometry=False)
+
+# The kinematics_solver must match the robot's kinematics
+planner = AnalyticalKinematicsPlanner(UR5Kinematics())
+
+# This is a simple robot cell with only the robot
+planner.set_robot_cell(robot_cell)
+
+# IK Target
+frame_WCF = Frame((0.381, 0.093, 0.382), (0.371, -0.292, -0.882), (0.113, 0.956, -0.269))  # Frame(point, xaxis, yaxis)
+target = FrameTarget(frame_WCF, TargetMode.ROBOT)
+
+# The start state is not important here because there is no tools involved
+start_state = robot_cell.default_cell_state()
+
+# iter_inverse_kinematics() will return a generator that would yield possible IK solutions
+print("\nResults of iter_inverse_kinematics():")
+for config in planner.iter_inverse_kinematics(target, start_state):
+    # Note that although eight configurations are returned.
+    # Some of the configurations may be in self-collision
+    print(config)
+
+# inverse_kinematics() will return each possible IK solutions one at a time.
+print("\nResults of inverse_kinematics():")
+for i in range(9):
+    # Note that the last configuration is the same as the first one
+    # because the robot has 8 possible solutions for this target
+    # and calling the function repeatedly will return the same cycle of results
+    config = planner.inverse_kinematics(target, start_state)
+    print(config)

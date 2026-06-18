@@ -1,0 +1,4162 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://compas.dev/compas_fab/2.0.1/api/compas_fab.backends.ros.backend_features/">
+      
+      
+        <link rel="prev" href="../compas_fab.backends.interfaces/">
+      
+      
+        <link rel="next" href="../compas_fab.backends.pybullet.backend_features/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../_logo/favicon.ico">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>compas_fab.backends.ros.backend_features - COMPAS FAB</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/print-site.css">
+    
+      <link rel="stylesheet" href="../../css/print-site-material.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#compas_fab.backends.ros.backend_features" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://compas.dev/compas_fab" title="COMPAS FAB" class="md-header__button md-logo" aria-label="COMPAS FAB" data-md-component="logo">
+      
+  <img src="../../_logo/compas_logo_white_transparent.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            COMPAS FAB
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              compas_fab.backends.ros.backend_features
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/compas-dev/compas_fab" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    compas-dev/compas_fab
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://compas.dev/compas_fab" title="COMPAS FAB" class="md-nav__button md-logo" aria-label="COMPAS FAB" data-md-component="logo">
+      
+  <img src="../../_logo/compas_logo_white_transparent.png" alt="logo">
+
+    </a>
+    COMPAS FAB
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/compas-dev/compas_fab" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    compas-dev/compas_fab
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CAD front-ends
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CAD front-ends
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../frontends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../frontends/ghpython/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Grasshopper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../backends/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backends
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backends
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backends/analytical/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical IK
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backends/analytical_pybullet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analytical IK + PyBullet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backends/pybullet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyBullet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backends/ros/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 1 + MoveIt 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backends/ros2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 + MoveIt 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../core/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.robots/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.robots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.backends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.scene/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.scene
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../integrations/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.blender/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.blender
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.ghpython/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.ghpython
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.rhino/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.rhino
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extending compas_fab
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_4" id="__nav_6_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Extending compas_fab
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.backends.interfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.backends.interfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.backends.ros.backend_features
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.backends.ros.backend_features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItCheckCollision
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItCheckCollision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision.check_collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;check_collision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItForwardKinematics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItForwardKinematics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;forward_kinematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;forward_kinematics_async
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_to_link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;forward_kinematics_to_link
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItInverseKinematics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItInverseKinematics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics.inverse_kinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;inverse_kinematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics.iter_inverse_kinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;iter_inverse_kinematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItPlanCartesianMotion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItPlanCartesianMotion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_cartesian_motion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_frame_waypoints_async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_cartesian_motion_with_frame_waypoints_async
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_point_axis_waypoints_async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_cartesian_motion_with_point_axis_waypoints_async
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItPlanMotion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItPlanMotion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion.plan_motion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_motion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItPlanningScene
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItPlanningScene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene.get_planning_scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_planning_scene
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItResetPlanningScene
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItResetPlanningScene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene.reset_planning_scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset_planning_scene
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItSetRobotCell
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItSetRobotCell">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell.set_robot_cell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_robot_cell
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItSetRobotCellState
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItSetRobotCellState">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState.set_robot_cell_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_robot_cell_state
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.backends.pybullet.backend_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.backends.pybullet.backend_features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compas_fab.backends.kinematics.backend_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    compas_fab.backends.kinematics.backend_features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/action/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ActionChain design notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/grasshopper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Grasshopper components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer/icons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Icon system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../citing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItCheckCollision
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItCheckCollision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision.check_collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;check_collision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItForwardKinematics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItForwardKinematics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;forward_kinematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;forward_kinematics_async
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_to_link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;forward_kinematics_to_link
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItInverseKinematics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItInverseKinematics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics.inverse_kinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;inverse_kinematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics.iter_inverse_kinematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;iter_inverse_kinematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItPlanCartesianMotion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItPlanCartesianMotion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_cartesian_motion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_frame_waypoints_async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_cartesian_motion_with_frame_waypoints_async
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_point_axis_waypoints_async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_cartesian_motion_with_point_axis_waypoints_async
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItPlanMotion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItPlanMotion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion.plan_motion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;plan_motion
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItPlanningScene
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItPlanningScene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene.get_planning_scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;get_planning_scene
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItResetPlanningScene
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItResetPlanningScene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene.reset_planning_scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset_planning_scene
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItSetRobotCell
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItSetRobotCell">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell.set_robot_cell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_robot_cell
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MoveItSetRobotCellState
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MoveItSetRobotCellState">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Methods:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState.set_robot_cell_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;set_robot_cell_state
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h1 id="compas_fab.backends.ros.backend_features" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">compas_fab.backends.ros.backend_features</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features" class="headerlink" title="Permanent link">¤</a></h1>
+
+    <div class="doc doc-contents first">
+
+        <p>Backend feature implementations for the ROS + MoveIt backend.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<h2 id="compas_fab.backends.ros.backend_features-classes">Classes<a href="#compas_fab.backends.ros.backend_features-classes" class="headerlink" title="Permanent link">¤</a></h2>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItCheckCollision" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItCheckCollision</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItCheckCollision</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to check a robot cell state for collisions using MoveIt.</p>
+<p>Backed by MoveIt's <code>/check_state_validity</code> service
+(<code>moveit_msgs/GetStateValidity</code>), which runs a stateless collision +
+constraint check of the given configuration against the planning scene
+currently loaded into <code>move_group</code> - no planning, no IK.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItCheckCollision-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItCheckCollision.check_collision" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">check_collision</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItCheckCollision.check_collision" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">check_collision</span><span class="p">(</span><span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check whether <code>robot_cell_state</code> is collision-free in MoveIt's planning scene.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The robot cell state to check. Its <code>robot_configuration</code> is checked,
+and its tool / rigid-body attachment is reflected in the planning scene.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing the following key-value pairs:</p>
+<ul>
+<li><code>"group"</code>: (:obj:<code>str</code>, optional) The planning group to check.
+  Defaults to the robot's main planning group.</li>
+</ul>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>``None``</code>
+          –
+          <div class="doc-md-description">
+            <p>Returns <code>None</code> if the state is collision-free.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>:class:`compas_fab.backends.exceptions.CollisionCheckError`</code>
+            –
+          <div class="doc-md-description">
+            <p>If the state is in collision (or otherwise invalid). The message lists the
+colliding body pairs reported by MoveIt, and <code>collision_pairs</code> carries them.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItForwardKinematics" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItForwardKinematics</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItForwardKinematics</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to calculate the robot's forward kinematic.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItForwardKinematics-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">forward_kinematics</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">forward_kinematics</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">target_mode</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetMode (compas_fab.robots.TargetMode)" href="../compas_fab.robots/#compas_fab.robots.TargetMode">TargetMode</a></span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">native_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculate the target frame of the robot (relative to WCF) from the provided RobotCellState.</p>
+<p>The returned coordinate frame is dependent on the chosen <code>target_mode</code>:</p>
+<ul>
+<li><code>"Target.ROBOT"</code> will return the planner coordinate frame (PCF).</li>
+<li><code>"Target.TOOL"</code> will return the tool coordinate frame (TCF) if a tool is attached.</li>
+<li><code>"Target.WORKPIECE"</code> will return the workpiece's object coordinate frame (OCF)
+  if a workpiece is attached (via an attached tool).</li>
+</ul>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The robot cell state describing the robot cell.
+The attribute <code>robot_configuration</code>, must contain the full configuration of the robot corresponding to the planning group.
+The robot cell state should also reflect the attachment of tools, if any.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>target_mode</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            TargetMode (compas_fab.robots.TargetMode)" href="../compas_fab.robots/#compas_fab.robots.TargetMode">TargetMode</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The target mode to select which frame to return.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>group</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The planning group of the robot.
+Defaults to the robot's main planning group.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>native_scale</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The scaling factor to apply to the resulting frame.
+It is defined as <code>user_object_value * native_scale = meter_object_value</code>.
+For example, if the resulting frame is to be used in a millimeters environment, <code>native_scale</code> should be set to <code>'0.001'</code>.
+Defaults to None, which means no scaling is applied.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing the following key-value pairs:</p>
+<ul>
+<li><code>"base_link"</code>: (:obj:<code>str</code>) Name of the base link.
+  Defaults to the model's root link.</li>
+</ul>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>class:`Frame`</code>
+          –
+          <div class="doc-md-description">
+            <p>The frame in the world's coordinate system (WCF).</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_async" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">forward_kinematics_async</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_async" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">forward_kinematics_async</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">errback</span><span class="p">,</span> <span class="n">configuration</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Asynchronous handler of MoveIt FK service.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_to_link" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">forward_kinematics_to_link</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItForwardKinematics.forward_kinematics_to_link" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">forward_kinematics_to_link</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">link_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">native_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculate the frame of the specified robot link from the provided RobotCellState.</p>
+<p>This function operates similar to :meth:<code>compas_fab.backends.PyBulletForwardKinematics.forward_kinematics</code>,
+but allows the user to specify which link to return. The function will return the frame of the specified
+link relative to the world coordinate frame (WCF).</p>
+<p>This can be convenient in scenarios where user objects (such as a camera) are attached to one of the
+robot's links and the user needs to know the position of the object relative to the world coordinate frame.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The robot cell state describing the robot cell.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>link_name</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The name of the link to calculate the forward kinematics for.
+Defaults to the last link of the provided planning group.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>native_scale</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The scaling factor to apply to the resulting frame.
+It is defined as <code>user_object_value * native_scale = meter_object_value</code>.
+For example, if the resulting frame is to be used in a millimeters environment, <code>native_scale</code> should be set to <code>'0.001'</code>.
+Defaults to None, which means no scaling is applied.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing the following key-value pairs:</p>
+<ul>
+<li><code>"base_link"</code>: (:obj:<code>str</code>) Name of the base link.
+  Defaults to the model's root link.</li>
+</ul>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItInverseKinematics" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItInverseKinematics</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItInverseKinematics</span><span class="p">()</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to calculate the robot's inverse kinematics for a given frame.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItInverseKinematics-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItInverseKinematics.inverse_kinematics" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">inverse_kinematics</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics.inverse_kinematics" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">inverse_kinematics</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">target</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FrameTarget (compas_fab.robots.FrameTarget)" href="../compas_fab.robots/#compas_fab.robots.FrameTarget">FrameTarget</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="            PointAxisTarget (compas_fab.robots.PointAxisTarget)" href="../compas_fab.robots/#compas_fab.robots.PointAxisTarget">PointAxisTarget</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculate the robot's inverse kinematic for a given target.</p>
+<p>The actual implementation can be found in the :meth:<code>iter_inverse_kinematics</code> method.
+Calling <code>inverse_kinematics()</code> will return the first solution found by the iterator,
+subsequent calls will return the next solution from the iterator. Once
+all solutions have been exhausted, the iterator will be re-initialized.</p>
+<p>MoveIt's inverse kinematics solver accepts FrameTarget as input.
+(PointAxisTarget is not yet supported)</p>
+<p>For target-specific implementation details, see
+:meth:<code>_iter_inverse_kinematics_frame_target</code> for
+:class:<code>compas_fab.robots.FrameTarget</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>target</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            FrameTarget (compas_fab.robots.FrameTarget)" href="../compas_fab.robots/#compas_fab.robots.FrameTarget">FrameTarget</a> | <a class="autorefs autorefs-internal" title="            PointAxisTarget (compas_fab.robots.PointAxisTarget)" href="../compas_fab.robots/#compas_fab.robots.PointAxisTarget">PointAxisTarget</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The target to calculate the inverse kinematics for.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The starting state to calculate the inverse kinematics for.
+The robot's configuration in the scene is taken as the starting configuration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>group</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The planning group used for calculation.
+Defaults to the robot's main planning group.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing arguments specific to the solver.
+See the <code>options</code> parameter in :meth:<code>iter_inverse_kinematics</code> for details.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>obj:`compas_robots.Configuration`</code>
+          –
+          <div class="doc-md-description">
+            <p>One of the possible IK configurations that reaches the target.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>:class:`compas_fab.backends.exceptions.InverseKinematicsError`</code>
+            –
+          <div class="doc-md-description">
+            <p>If no configuration can be found.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code>:class:`compas_fab.backends.exceptions.TargetModeMismatchError`</code>
+            –
+          <div class="doc-md-description">
+            <p>If the selected TargetMode is not possible with the provided robot cell state.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItInverseKinematics.iter_inverse_kinematics" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">iter_inverse_kinematics</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItInverseKinematics.iter_inverse_kinematics" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">iter_inverse_kinematics</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">target</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FrameTarget (compas_fab.robots.FrameTarget)" href="../compas_fab.robots/#compas_fab.robots.FrameTarget">FrameTarget</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="            PointAxisTarget (compas_fab.robots.PointAxisTarget)" href="../compas_fab.robots/#compas_fab.robots.PointAxisTarget">PointAxisTarget</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculate the robot's inverse kinematic for a given target.</p>
+<p>The MoveIt inverse kinematics solver make use of the IK solver pre-configured in
+the MoveIt config file.</p>
+<p>This particular function wraps the MoveIt IK solver to provide a generator
+that can yield multiple IK solutions. The solver will make multiple attempts
+to find a solution. The first attempt will start from the robot's current configuration
+provided in the <code>robot_cell_state</code>. The subsequent attempts will start from a random
+configuration, so the results may vary between calls.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>target</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            FrameTarget (compas_fab.robots.FrameTarget)" href="../compas_fab.robots/#compas_fab.robots.FrameTarget">FrameTarget</a> | <a class="autorefs autorefs-internal" title="            PointAxisTarget (compas_fab.robots.PointAxisTarget)" href="../compas_fab.robots/#compas_fab.robots.PointAxisTarget">PointAxisTarget</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The target to calculate the inverse kinematics for.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The starting state to calculate the inverse kinematics for.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>group</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The planning group used for calculation. Defaults to the robot's
+main planning group.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing the following key-value pairs:</p>
+<ul>
+<li><code>"max_results"</code>: (:obj:<code>int</code>) Maximum number of results to return.
+  If set to 1, the solver will be deterministic, descending from the initial
+  robot configuration.
+  Defaults to <code>100</code>.</li>
+<li><code>"solution_uniqueness_threshold_prismatic"</code>: (:obj:<code>float</code>, optional) The minimum
+  distance between two solutions in the prismatic joint space to consider them unique.
+  Units are in meters. Defaults to <code>3e-4</code>.</li>
+<li><code>"solution_uniqueness_threshold_revolute"</code>: (:obj:<code>float</code>, optional) The minimum
+  distance between two solutions in the revolute joint space to consider them unique.
+  Units are in radians. Defaults to <code>1e-3</code>.</li>
+<li><code>"return_full_configuration"</code>: (:obj:<code>bool</code>, optional)
+    Whether or not to return the full configuration. Defaults to <code>False</code>.</li>
+<li><code>"verbose"</code>: (:obj:<code>bool</code>, optional)
+    Whether or not to print verbose output. Defaults to <code>False</code>.</li>
+<li><code>"check_collision"</code>: (:obj:<code>bool</code>, optional) When True (default), MoveIt is asked to
+  return only collision-free solutions; when False, in-collision solutions are accepted.
+  Defaults to <code>True</code>. The legacy key <code>"allow_collision"</code> (inverted meaning) is also
+  accepted for backward compatibility.</li>
+<li><code>"constraints"</code>: (:obj:<code>list</code> of :class:<code>compas_fab.robots.Constraint</code>, optional)
+  An extra set of MoveIt constraints where the final link of the planning group must satisfy.
+  Defaults to <code>None</code>.</li>
+<li><code>"timeout"</code>: (:obj:<code>int</code>, optional) Maximum allowed time for one inverse kinematic
+  calculation by the backend. If <code>max_results</code> is greater than 1, this timeout is
+  applied to each calculation.
+  Unit is seconds. Defaults to <code>2</code>.
+  This value supersedes the <code>"attempts"</code> argument used before ROS Noetic.</li>
+</ul>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>:class:`compas_fab.backends.InverseKinematicsError`</code>
+            –
+          <div class="doc-md-description">
+            <p>Indicates that no IK solution could be found by the kinematic solver
+after the maximum number of attempts (<code>max_results</code>). This can be caused by
+reachability or collision or both.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code>:class:`compas_fab.backends.TargetModeMismatchError`</code>
+            –
+          <div class="doc-md-description">
+            <p>If the selected TargetMode is not possible with the provided robot cell state.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code>:class:`compas_fab.backends.CollisionCheckError`</code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>check_collision</code> is enabled and the configuration is in collision.
+This is only raised if <code>max_results</code> is set to 1. In this case, the solver is
+deterministic (descending from the initial robot configuration) and this error
+indicates that the problem is caused by collision and not because of reachability.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Yields:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>obj:`compas_robots.Configuration`</code>
+          –
+          <div class="doc-md-description">
+            <p>One of the possible IK configurations that reaches the target.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItPlanCartesianMotion</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItPlanCartesianMotion</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to calculate a cartesian motion path (linear in tool space).</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">plan_cartesian_motion</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plan_cartesian_motion</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">waypoints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Waypoints (compas_fab.robots.Waypoints)" href="../compas_fab.robots/#compas_fab.robots.Waypoints">Waypoints</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">start_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            JointTrajectory (compas_fab.robots.JointTrajectory)" href="../compas_fab.robots/#compas_fab.robots.JointTrajectory">JointTrajectory</a></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculates a cartesian motion path (linear in tool space).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>waypoints</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            Waypoints (compas_fab.robots.Waypoints)" href="../compas_fab.robots/#compas_fab.robots.Waypoints">Waypoints</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The waypoints for the robot to follow.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>start_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The starting state of the robot cell at the beginning of the motion.
+The attribute <code>robot_configuration</code>, must be provided.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>group</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The planning group used for calculation. Defaults to the robot's
+main planning group.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing the following key-value pairs:</p>
+<ul>
+<li><code>"base_link"</code>: (:obj:<code>str</code>) Name of the base link.</li>
+<li><code>"link"</code>: (:obj:<code>str</code>, optional) The name of the link to
+  calculate the forward kinematics for. Defaults to the group's end
+  effector link.</li>
+<li><code>"max_step"</code>: (:obj:<code>float</code>, optional) The approximate distance between the
+  calculated points. (Defined in the robot's units.) Defaults to <code>0.01</code>.</li>
+<li><code>"jump_threshold"</code>: (:obj:<code>float</code>, optional)
+  The maximum allowed distance of joint positions between consecutive
+  points. If the distance is found to be above this threshold, the
+  path computation fails. It must be specified in relation to max_step.
+  If this threshold is <code>0</code>, 'jumps' might occur, resulting in an invalid
+  cartesian path. Defaults to :math:<code>\pi / 2</code>.</li>
+<li><code>"avoid_collisions"</code>: (:obj:<code>bool</code>, optional)
+  Whether or not to avoid collisions. Defaults to <code>True</code>.</li>
+<li><code>"path_constraints"</code>: (:obj:<code>list</code> of :class:<code>compas_fab.robots.Constraint</code>, optional)
+  Optional constraints that can be imposed along the solution path.
+  Note that path calculation won't work if the start_configuration
+  violates these constraints. Defaults to <code>None</code>.</li>
+<li><code>"attached_collision_meshes"</code>: (:obj:<code>list</code> of :class:<code>compas_fab.robots.AttachedCollisionMesh</code>)
+  Defaults to <code>None</code>.</li>
+</ul>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>class:`compas_fab.robots.JointTrajectory`</code>
+          –
+          <div class="doc-md-description">
+            <p>The calculated trajectory.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_frame_waypoints_async" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">plan_cartesian_motion_with_frame_waypoints_async</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_frame_waypoints_async" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plan_cartesian_motion_with_frame_waypoints_async</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">callback</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">errback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">waypoints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            FrameWaypoints (compas_fab.robots.FrameWaypoints)" href="../compas_fab.robots/#compas_fab.robots.FrameWaypoints">FrameWaypoints</a></span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">start_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Asynchronous handler of MoveIt cartesian motion planner service.</p>
+<p>:class:<code>compas_fab.robots.FrameWaypoints</code> are converted to :class:<code>compas_fab.backends.ros.messages.Pose</code> that is native to ROS communication</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_point_axis_waypoints_async" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">plan_cartesian_motion_with_point_axis_waypoints_async</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanCartesianMotion.plan_cartesian_motion_with_point_axis_waypoints_async" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plan_cartesian_motion_with_point_axis_waypoints_async</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">callback</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">errback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">waypoints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PointAxisWaypoints (compas_fab.robots.PointAxisWaypoints)" href="../compas_fab.robots/#compas_fab.robots.PointAxisWaypoints">PointAxisWaypoints</a></span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">start_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Asynchronous handler of MoveIt cartesian motion planner service.</p>
+<p>AFAIK MoveIt does not support planning for a relaxed axis under this</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItPlanMotion" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItPlanMotion</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItPlanMotion</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to find a path in joint space for the robot to move from its <code>start_configuration</code> to the <code>target</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItPlanMotion-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItPlanMotion.plan_motion" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">plan_motion</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanMotion.plan_motion" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plan_motion</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">target</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Target (compas_fab.robots.Target)" href="../compas_fab.robots/#compas_fab.robots.Target">Target</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">start_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Calculates a motion path.</p>
+<p>The PyBullet Planner supports ConstraintSetTarget, ConfigurationTarget and FrameTarget.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>target</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            Target (compas_fab.robots.Target)" href="../compas_fab.robots/#compas_fab.robots.Target">Target</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The goal for the robot to achieve.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>start_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The starting state of the robot cell at the beginning of the motion.
+The attribute <code>robot_configuration</code>, must be provided.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>group</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The name of the group to plan for. Defaults to the robot's main
+planning group.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Dictionary containing the following key-value pairs:</p>
+<ul>
+<li><code>"base_link"</code>: (:obj:<code>str</code>) Name of the base link.
+  Defaults to the robot's root link.</li>
+<li><code>"path_constraints"</code>: (:obj:<code>list</code> of :class:<code>compas_fab.robots.Constraint</code>, optional)
+  Optional constraints that can be imposed along the solution path.
+  Note that path calculation won't work if the start_configuration
+  violates these constraints. Defaults to <code>None</code>.</li>
+<li><code>"planner_id"</code>: (:obj:<code>str</code>)
+  The name of the algorithm used for path planning.
+  Defaults to <code>'RRTConnect'</code>.</li>
+<li><code>"num_planning_attempts"</code>: (:obj:<code>int</code>, optional)
+  Normally, if one motion plan is needed, one motion plan is computed.
+  However, for algorithms that use randomization in their execution
+  (like 'RRT'), it is likely that different planner executions will
+  produce different solutions. Setting this parameter to a value above
+  <code>1</code> will run many additional motion plans, and will report the
+  shortest solution as the final result. Defaults to <code>1</code>.</li>
+<li><code>'allowed_planning_time'</code>: (:obj:<code>float</code>)
+  The number of seconds allowed to perform the planning. Defaults to <code>2</code>.</li>
+<li><code>"max_velocity_scaling_factor"</code>: (:obj:<code>float</code>)
+  Defaults to <code>1</code>.</li>
+<li><code>"max_acceleration_scaling_factor"</code>: (:obj:<code>float</code>)
+  Defaults to <code>1</code>.</li>
+</ul>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>class:`compas_fab.robots.JointTrajectory`</code>
+          –
+          <div class="doc-md-description">
+            <p>The calculated trajectory.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItPlanningScene" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItPlanningScene</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItPlanningScene</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to retrieve the planning scene.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItPlanningScene-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItPlanningScene.get_planning_scene" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_planning_scene</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItPlanningScene.get_planning_scene" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_planning_scene</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve the planning scene.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Unused parameter.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>class:`compas_fab.backends.ros.messages.moveit_msgs.PlanningScene`</code>
+          –
+          <div class="doc-md-description">
+            
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItResetPlanningScene" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItResetPlanningScene</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to add a collision mesh to the planning scene.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItResetPlanningScene-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItResetPlanningScene.reset_planning_scene" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">reset_planning_scene</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItResetPlanningScene.reset_planning_scene" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">reset_planning_scene</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Resets the planning scene, removing all added collision meshes.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Unused parameter.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code>``None``</code>
+          –
+          <div class="doc-md-description">
+            
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItSetRobotCell" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItSetRobotCell</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItSetRobotCell</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Callable to add a collision mesh to the planning scene.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItSetRobotCell-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItSetRobotCell.set_robot_cell" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_robot_cell</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCell.set_robot_cell" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_robot_cell</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">robot_cell</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCell (compas_fab.robots.RobotCell)" href="../compas_fab.robots/#compas_fab.robots.RobotCell">RobotCell</a></span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Pass the models in the robot cell to the planning client.</p>
+<p>The client keeps the robot cell models in memory and uses them for planning.
+Calling this method will override the previous robot cell in the client.
+This function will perform a comparison between the previous robot cell and not modify the
+objects that are identical and already in the planning scene.
+Note that the comparison can still be slow,
+therefore it should be called only if the robot cell models have changed.</p>
+<p>Note that after modifying the robot cell, the robot_cell_state in the backend is undetermined.
+However, the next planning request will call <code>set_robot_cell_state</code> automatically to update
+the robot cell state.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCell (compas_fab.robots.RobotCell)" href="../compas_fab.robots/#compas_fab.robots.RobotCell">RobotCell</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The robot cell instance to set on the client.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The robot cell state instance to set on the client after setting the robot cell.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Unused.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="compas_fab.backends.ros.backend_features.MoveItSetRobotCellState" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MoveItSetRobotCellState</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">MoveItSetRobotCellState</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Mix-in interface for implementing a planner's set robot cell state feature.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+<h4 id="compas_fab.backends.ros.backend_features.MoveItSetRobotCellState-functions">Methods:<a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState-functions" class="headerlink" title="Permanent link">¤</a></h4>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="compas_fab.backends.ros.backend_features.MoveItSetRobotCellState.set_robot_cell_state" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_robot_cell_state</span>
+
+
+<a href="#compas_fab.backends.ros.backend_features.MoveItSetRobotCellState.set_robot_cell_state" class="headerlink" title="Permanent link">¤</a></h5>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_robot_cell_state</span><span class="p">(</span><span class="n">robot_cell_state</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set the robot cell state to the client.</p>
+<p>This function is called automatically by planning functions that takes a RobotCellState as input.
+In normal use cases, you should not need to call this function directly.
+However, one exception is when you want to set the robot cell state to the client for visualization purposes.</p>
+<p>There are three steps to setting the robot cell state:
+1. Remove all AttachedCollisionObjects from the robot state.
+2. Update the position of all tools and rigid bodies in the scene.
+3. Re-create AttachedCollisionObjects for all attached rigid bodies and tools.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>robot_cell_state</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            RobotCellState (compas_fab.robots.RobotCellState)" href="../compas_fab.robots/#compas_fab.robots.RobotCellState">RobotCellState</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The robot cell state to set.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>options</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Unused.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../compas_fab.backends.interfaces/" class="md-footer__link md-footer__link--prev" aria-label="Previous: compas_fab.backends.interfaces">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                compas_fab.backends.interfaces
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../compas_fab.backends.pybullet.backend_features/" class="md-footer__link md-footer__link--next" aria-label="Next: compas_fab.backends.pybullet.backend_features">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                compas_fab.backends.pybullet.backend_features
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026, Gramazio Kohler Research
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.footnote.tooltips", "navigation.expand", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.top", "search.highlight", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../js/print-site.js"></script>
+      
+    
+  </body>
+</html>
