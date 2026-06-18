@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Assemble an ActionChain from a list of Actions and emit the composite trajectory visualisation.
 
@@ -14,7 +14,7 @@ RobotCellState snapshots -one per trajectory point plus one per state
 change- so a single index slider + VisualizeRobotCell can scrub through
 the whole chain frame by frame.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper

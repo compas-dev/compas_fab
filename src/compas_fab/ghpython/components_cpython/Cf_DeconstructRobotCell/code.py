@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Deconstruct a RobotCell into its parts: the robot model, the registered
 rigid bodies and tools, and a matching default RobotCellState.
@@ -12,7 +12,7 @@ into the Attach* components.
 This is the inverse of registering models via the `Load Robot Cell`
 components; it reads the cell and never mutates it.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper

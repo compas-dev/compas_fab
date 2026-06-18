@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Attach a tool to a robot planning group inside a RobotCellState.
 
@@ -29,7 +29,7 @@ the planning group's end-effector link as returned by
 `robot_cell.get_end_effector_link_name(group)`. Override that effective
 frame via the `attachment_plane` input.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 from copy import deepcopy

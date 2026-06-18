@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Plan a free-space (joint-interpolated) motion to a target.
 
@@ -14,7 +14,7 @@ state is collision-checked (when the planner supports it) and a concise hint
 appended. The message is also exposed on the `debug_info` output so it can be
 read in a wired panel.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper

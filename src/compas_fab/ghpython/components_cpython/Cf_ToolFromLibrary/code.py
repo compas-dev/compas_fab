@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Load a pre-defined ToolModel from ToolLibrary.
 
@@ -8,7 +8,7 @@ Supported entries include 'cone', 'printing_tool', 'static_gripper',
 Also returns the tool's visual meshes as Rhino geometry for preview, drawn
 in the tool's own base frame (not yet attached to any robot).
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper

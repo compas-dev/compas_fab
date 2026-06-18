@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Return a new RobotCellState with `robot_configuration` overridden.
 
@@ -6,7 +6,7 @@ This is the common bridge between planning outputs (which produce a
 Configuration) and visualization / further planning (which consume a
 RobotCellState). The input state is not mutated.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper

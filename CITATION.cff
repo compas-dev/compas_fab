@@ -57,7 +57,7 @@ authors:
 url: "https://github.com/compas-dev/compas_fab"
 repository-code: "https://github.com/compas-dev/compas_fab"
 license: MIT
-version: "2.0.0"
+version: "2.0.1"
 date-released: 2018-09-01
 doi: 10.5281/zenodo.3469478
 identifiers:

@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Draw a RobotCell at the configuration described by a RobotCellState.
 
@@ -12,7 +12,7 @@ state changes only update transforms (fast).
 The robot model, tools, and rigid bodies are returned as separate outputs to
 make wiring downstream styling/filtering easy.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper

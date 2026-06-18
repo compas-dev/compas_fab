@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Expand a JointTrajectory into per-point Configurations and RobotCellStates,
 plus the per-point velocity/acceleration/effort profiles.
@@ -21,7 +21,7 @@ When the trajectory's joint set is a subset of `start_state.robot_configuration`
 finger), the values are merged by joint name so the unrelated joints keep
 the value they had in `start_state`.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 from copy import deepcopy

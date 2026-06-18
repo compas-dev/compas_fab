@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.0
+# r: compas_fab>=2.0.1
 """
 Create a PyBulletPlanner with its own in-process PyBullet physics server.
 
@@ -11,7 +11,7 @@ Supports collision checking, forward/inverse kinematics and Cartesian motion
 in-process (no ROS). Free-space `plan_motion` is not yet implemented for this
 backend.
 
-COMPAS FAB v2.0.0
+COMPAS FAB v2.0.1
 """
 
 import Grasshopper
