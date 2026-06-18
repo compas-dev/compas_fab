@@ -14,11 +14,12 @@ jobs:
         python: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
-      - uses: compas-dev/compas-actions.build@v3
+      - uses: compas-dev/compas-actions.build@v5
+        env:
+          CFLAGS: ${{ startsWith(matrix.os, 'macos') && '-fno-define-target-os-macros' || '' }}
         with:
           python: ${{ matrix.python }}
           invoke_lint: true
-          check_import: true
 
   publish:
     needs: build
