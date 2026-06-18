@@ -1,11 +1,11 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Create a PointAxisTarget: a position with a free rotation around the Z axis.
 
 Useful for cylindrically symmetric tools (drilling, milling, 3D printing) where
 rotation around the tool axis is unconstrained.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import Grasshopper

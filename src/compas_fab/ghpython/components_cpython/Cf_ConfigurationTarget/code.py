@@ -1,4 +1,4 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Create a ConfigurationTarget: a target defined by joint values, not a pose.
 
@@ -6,7 +6,7 @@ Useful for "go to home" or "move to a specific joint configuration" motions.
 Per-joint tolerances default to 0.001 m (prismatic) and 1 degree (revolute)
 if not specified.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import math

@@ -1,4 +1,4 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Deconstruct a planner into the robot cell it currently holds: the
 `robot_cell` and its `robot_model`.
@@ -13,7 +13,7 @@ state you need from `Default Cell State` / the `Attach*` components instead.
 
 Works with any planner (MoveIt, PyBullet, Analytical, …).
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import Grasshopper

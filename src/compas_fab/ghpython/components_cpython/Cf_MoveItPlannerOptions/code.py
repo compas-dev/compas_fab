@@ -1,4 +1,4 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Bundle advanced MoveIt load options into a single object for the MoveIt Planner.
 
@@ -7,7 +7,7 @@ All inputs are optional. Wire the `options` output into the MoveIt Planner's
 MoveIt Planner falls back to sensible defaults (`/robot_description` and
 `/robot_description_semantic`); this is only for non-standard ROS setups.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import Grasshopper

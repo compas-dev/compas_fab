@@ -1,4 +1,4 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Plan a Cartesian (linear-in-tool-space) motion through waypoints.
 
@@ -12,7 +12,7 @@ the partial trajectory is surfaced. On a full failure the start state is
 collision-checked (when the planner supports it) and a concise hint appended.
 The message is also exposed on the `debug_info` output for reading in a panel.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import Grasshopper

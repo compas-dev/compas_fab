@@ -1,8 +1,8 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Publishes messages to a ROS topic
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import time

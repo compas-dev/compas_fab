@@ -1,4 +1,4 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Attach a RigidBody to a tool inside a RobotCellState.
 
@@ -7,7 +7,7 @@ Use this for workpieces grasped by the tool tip. The body becomes a
 
 Passthrough builder: the input state is copied.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 from copy import deepcopy

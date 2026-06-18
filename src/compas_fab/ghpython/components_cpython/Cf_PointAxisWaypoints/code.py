@@ -1,4 +1,4 @@
-# r: compas_fab>=1.1.0
+# r: compas_fab>=2.0.0
 """
 Create PointAxisWaypoints from parallel lists of points and Z-axes.
 
@@ -6,7 +6,7 @@ Useful for cylindrically symmetric tools (drilling, milling, 3D printing)
 following a sequence of targets where rotation around the tool axis is
 unconstrained. The `points` and `axes` lists must have the same length.
 
-COMPAS FAB v1.1.0
+COMPAS FAB v2.0.0
 """
 
 import Grasshopper
