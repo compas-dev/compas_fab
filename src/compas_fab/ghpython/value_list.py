@@ -245,10 +245,7 @@ def ensure_dynamic_value_list(
 
     # If something else is wired (user's own source, or a VL we don't track),
     # stay out of the way.
-    foreign_sources = [
-        s for s in target_param.Sources
-        if existing_vl is None or str(s.InstanceGuid) != str(existing_vl.InstanceGuid)
-    ]
+    foreign_sources = [s for s in target_param.Sources if existing_vl is None or str(s.InstanceGuid) != str(existing_vl.InstanceGuid)]
     if existing_vl is None and foreign_sources:
         return
 
@@ -259,9 +256,7 @@ def ensure_dynamic_value_list(
 
     def _rebuild(_doc):
         if existing_vl is not None:
-            previous_selection = next(
-                (it.Name for it in existing_vl.ListItems if it.Selected), None
-            )
+            previous_selection = next((it.Name for it in existing_vl.ListItems if it.Selected), None)
             existing_vl.ListItems.Clear()
             for opt in options:
                 existing_vl.ListItems.Add(Grasshopper.Kernel.Special.GH_ValueListItem(opt, '"{}"'.format(opt)))

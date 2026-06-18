@@ -73,9 +73,7 @@ class AttachToolToRobot(Grasshopper.Kernel.GH_ScriptInstance):
         if robot_cell is not None and tool_id not in robot_cell.tool_models:
             error(  # noqa: F821
                 ghenv.Component,  # noqa: F821
-                "Tool id '{}' is not in the robot cell. Available tools: {}.".format(
-                    tool_id, ", ".join(sorted(robot_cell.tool_models.keys())) or "(none)"
-                ),
+                "Tool id '{}' is not in the robot cell. Available tools: {}.".format(tool_id, ", ".join(sorted(robot_cell.tool_models.keys())) or "(none)"),
             )
             return cell_state
 

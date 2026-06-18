@@ -51,7 +51,6 @@ class RobotConfigurationComponent(Grasshopper.Kernel.GH_ScriptInstance):
             values = [float(v) for v in joints]
 
         configuration = Configuration(joint_values=values, joint_types=types, joint_names=names)
-        cell_state =robot_cell.default_cell_state()
+        cell_state = robot_cell.default_cell_state()
         cell_state.robot_configuration = configuration
         return (configuration, cell_state)
-

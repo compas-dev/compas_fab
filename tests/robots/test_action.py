@@ -143,9 +143,7 @@ def test_tags_default_and_assignment(cell_and_state, traj1):
 
 def test_tags_preserved_through_chain(cell_and_state, traj1):
     cell, state = cell_and_state
-    chain = ActionChain(name="tags", start_state=state).append_trajectory(
-        "move", traj1, tags=["approach", "linear"]
-    )
+    chain = ActionChain(name="tags", start_state=state).append_trajectory("move", traj1, tags=["approach", "linear"])
     assert chain.action_by_name("move").tags == ["approach", "linear"]
 
 
@@ -195,12 +193,7 @@ def test_append_action_state_change_without_post_state_raises(cell_and_state):
 def test_iter_cell_states_covers_every_point_and_state_change(cell_and_state, traj1, traj2):
     cell, state = cell_and_state
     grasped = state.copy()
-    chain = (
-        ActionChain(name="iter", start_state=state)
-        .append_trajectory("descend", traj1)
-        .append_state_change("grasp", grasped)
-        .append_trajectory("retract", traj2)
-    )
+    chain = ActionChain(name="iter", start_state=state).append_trajectory("descend", traj1).append_state_change("grasp", grasped).append_trajectory("retract", traj2)
     states = list(chain.iter_cell_states())
     # 2 (traj1) + 1 (state change) + 2 (traj2)
     assert len(states) == 5
@@ -258,10 +251,8 @@ def test_serialization_roundtrip(cell_and_state, traj1, traj2):
     assert approach.trajectory is not None
     assert approach.trajectory.start_state is not None
     # the restored start_state matches the chain's start_state for the first action
-    assert approach.trajectory.start_state.robot_configuration.joint_values == \
-        loaded.start_state.robot_configuration.joint_values
+    assert approach.trajectory.start_state.robot_configuration.joint_values == loaded.start_state.robot_configuration.joint_values
 
     # second trajectory's start_state == grasped_state (the post_state preceding it)
     retract = loaded.action_by_name("retract")
-    assert retract.trajectory.start_state.robot_configuration.joint_values == \
-        loaded.action_by_name("grasp").post_state.robot_configuration.joint_values
+    assert retract.trajectory.start_state.robot_configuration.joint_values == loaded.action_by_name("grasp").post_state.robot_configuration.joint_values

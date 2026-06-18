@@ -367,14 +367,10 @@ class ActionChain(Data):
             `post_state`.
         """
         if action.is_trajectory:
-            return self.append_trajectory(
-                action.name, action.trajectory, action.description, attributes=action.attributes
-            )
+            return self.append_trajectory(action.name, action.trajectory, action.description, attributes=action.attributes)
         if action.post_state is None:
             raise ValueError("State-change action {!r} requires an explicit post_state".format(action.name))
-        return self.append_state_change(
-            action.name, action.post_state, action.description, attributes=action.attributes
-        )
+        return self.append_state_change(action.name, action.post_state, action.description, attributes=action.attributes)
 
     def verify_cell(self, robot_cell: "RobotCell") -> None:
         """Verify the chain was assembled against `robot_cell`.
@@ -391,10 +387,7 @@ class ActionChain(Data):
             return
         actual = robot_cell.structural_signature()
         if actual != self.cell_signature:
-            raise ValueError(
-                "Chain {!r} was assembled against a different cell. "
-                "Expected signature {}..., got {}...".format(self.name, self.cell_signature[:16], actual[:16])
-            )
+            raise ValueError("Chain {!r} was assembled against a different cell. Expected signature {}..., got {}...".format(self.name, self.cell_signature[:16], actual[:16]))
 
     def _assert_name_unused(self, name: str) -> None:
         if any(a.name == name for a in self._actions):
@@ -409,9 +402,7 @@ class ActionChain(Data):
         traj_joints = set(trajectory.joint_names or [])
         if traj_joints and not traj_joints.issubset(cell_joints):
             missing = sorted(traj_joints - cell_joints)
-            raise ValueError(
-                "Trajectory references joints {} that are not present in the cell state".format(missing)
-            )
+            raise ValueError("Trajectory references joints {} that are not present in the cell state".format(missing))
 
     @staticmethod
     def _derive_post_state(pre_state: "RobotCellState", trajectory: JointTrajectory) -> "RobotCellState":
@@ -470,7 +461,5 @@ class ActionChain(Data):
                 chain.append_trajectory(ad["name"], traj, description=ad.get("description", ""), attributes=attributes)
             else:
                 post_state = cast("RobotCellState", RobotCellState.__from_data__(ad["post_state"]))
-                chain.append_state_change(
-                    ad["name"], post_state, description=ad.get("description", ""), attributes=attributes
-                )
+                chain.append_state_change(ad["name"], post_state, description=ad.get("description", ""), attributes=attributes)
         return chain

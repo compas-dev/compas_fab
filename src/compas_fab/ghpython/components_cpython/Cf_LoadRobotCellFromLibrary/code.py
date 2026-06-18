@@ -23,11 +23,7 @@ from compas_fab.ghpython import ensure_value_list
 from compas_fab.ghpython import register_models_into_cell
 from compas_fab.robots import RobotCellLibrary
 
-_LIBRARY_NAMES = sorted(
-    name
-    for name in dir(RobotCellLibrary)
-    if not name.startswith("_") and callable(getattr(RobotCellLibrary, name))
-)
+_LIBRARY_NAMES = sorted(name for name in dir(RobotCellLibrary) if not name.startswith("_") and callable(getattr(RobotCellLibrary, name)))
 
 
 class LoadRobotCellFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
@@ -62,9 +58,7 @@ class LoadRobotCellFromLibrary(Grasshopper.Kernel.GH_ScriptInstance):
                 st.pop(key, None)
                 error(  # noqa: F821
                     ghenv.Component,  # noqa: F821
-                    "Failed to load '{}' (load_geometry={}): {}: {}".format(
-                        name, load_geometry, type(exc).__name__, exc
-                    ),
+                    "Failed to load '{}' (load_geometry={}): {}: {}".format(name, load_geometry, type(exc).__name__, exc),
                 )
                 return (None, None)
             st[key] = base_cell
