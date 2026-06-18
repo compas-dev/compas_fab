@@ -47,12 +47,13 @@ robot moves live in the viewport.
 
 ## More examples
 
-Each is a self-contained `.gh` file. Start at the top and work down — the
-backends get progressively heavier (in-process → PyBullet → ROS).
+Each is a self-contained Grasshopper file. Start at the top and work down.
 
 ### Kinematics (no server required)
 
-- [`02_inverse_kinematics.gh`](ghpython/files/02_inverse_kinematics.gh){: download="02_inverse_kinematics.gh" }:
+![Inverse Kinematics for an ABB robot](ghpython/files/02_inverse_kinematics.png)
+
+- [`02_inverse_kinematics.ghx`](ghpython/files/02_inverse_kinematics.ghx){: download="02_inverse_kinematics.ghx" }:
   solve **inverse kinematics** to a target plane with the in-process
   **Analytical Planner**: Load Robot Cell → Analytical Planner → Frame Target →
   Inverse Kinematics → Visualize. Move the target plane and watch the robot
@@ -60,26 +61,23 @@ backends get progressively heavier (in-process → PyBullet → ROS).
 
 ### Building a robot cell
 
-- [`03_build_robot_cell.gh`](ghpython/files/03_build_robot_cell.gh){: download="03_build_robot_cell.gh" }:
+- [`03_build_robot_cell.ghx`](ghpython/files/03_build_robot_cell.ghx){: download="03_build_robot_cell.ghx" }:
   add a **tool** and a **rigid body** to a cell and attach the tool to the
   robot, then visualize the result. Shows the
   *load registers models → state attaches them* split.
 
 ### Motion planning
 
-- [`04_plan_motion.gh`](ghpython/files/04_plan_motion.gh){: download="04_plan_motion.gh" }:
+- [`04_plan_motion.ghx`](ghpython/files/04_plan_motion.ghx){: download="04_plan_motion.ghx" }:
   plan a **free-space motion** with **MoveIt** over a ROS bridge: ROS Client →
   MoveIt Planner → Frame Target → Plan Motion, then **Deconstruct Trajectory**
   with an index slider to scrub the path through **Visualize Robot Cell**.
   Requires a running ROS + MoveIt backend ([set one up](../backends/ros.md)).
-- [`05_plan_cartesian_motion.gh`](ghpython/files/05_plan_cartesian_motion.gh){: download="05_plan_cartesian_motion.gh" }:
-  plan a **linear Cartesian path** through **Frame Waypoints** and preview the
-  tool-tip polyline. The `planes`/`polyline` outputs follow the waypoints'
-  `target_mode`.
+
 
 ### Putting it together
 
-- [`kitchen_sink.gh`](ghpython/files/kitchen_sink.gh){: download="kitchen_sink.gh" }:
+- [`05_kitchen_sink.ghx`](ghpython/files/05_kitchen_sink.ghx){: download="05_kitchen_sink.ghx" }:
   a fuller canvas combining cell building, targets, planning, and visualization,
   for reference once the basics click.
 
