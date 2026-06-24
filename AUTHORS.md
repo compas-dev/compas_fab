@@ -17,3 +17,4 @@
 - Edvard Bruun <<ebruun@princeton.edu>> [@ebruun](https://github.com/ebruun)
 - Victor Pok Yin Leung <<leung@arch.ethz.ch>> [@yck011522](https://github.com/yck011522)
 - Begüm Saral <<begum.saral@tum.de>> [@begums](https://github.com/begums)
+- Swastik Verma <<swastikjee09@gmail.com>> [@Swastik-Verma](https://github.com/Swastik-Verma)
