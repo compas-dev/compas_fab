@@ -450,8 +450,11 @@ class RobotCell(Data):
         base_link_name = self.get_base_link_name(group)
         end_effector_link_name = self.get_end_effector_link_name(group)
         link_names = []
-        for link in self.robot_model.iter_link_chain(base_link_name, end_effector_link_name):
-            link_names.append(link.name)
+        if base_link_name is not None and base_link_name == end_effector_link_name:
+            link_names.append(base_link_name)
+        else:
+            for link in self.robot_model.iter_link_chain(base_link_name, end_effector_link_name):
+                link_names.append(link.name)
         return link_names
 
     def get_link_names_with_collision_geometry(self) -> list[str]:

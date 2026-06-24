@@ -178,6 +178,9 @@ def test_get_link_names(panda, rfl, ur10e_gripper_one_beam, abb_irb4600_40_255_g
     _test(*rfl)
     _test(*ur10e_gripper_one_beam)
     _test(*abb_irb4600_40_255_gripper_one_beam)
+    robot_cell, robot_cell_state = ur10e_gripper_one_beam
+    link_names = robot_cell.get_link_names("endeffector")
+    assert link_names == ["tool0"]
 
 
 def test_default_touch_links_returns_first_geometry_bearing_link():
