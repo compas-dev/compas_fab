@@ -12,3 +12,4 @@ pythonnet
 ruff
 tomlkit
 twine
+compas-forge >= 0.2.0
