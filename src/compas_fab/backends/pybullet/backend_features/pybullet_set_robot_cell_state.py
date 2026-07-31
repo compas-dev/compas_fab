@@ -89,7 +89,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 if not robot_cell_state.robot_configuration:
                     continue
                 # If tool is attached to a group, update the tool's base frame using the group's FK frame
-                link_name = client.robot_cell.get_link_names(tool_state.attached_to_group)[-1]
+                link_name = client.robot_cell.get_end_effector_link_name(tool_state.attached_to_group)
                 _robot_configuration = robot_cell_state.robot_configuration
                 # Get PCF of the Robot
                 pcf_link_id = client.robot_link_puids[link_name]
