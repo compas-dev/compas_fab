@@ -3,6 +3,7 @@ from typing import Generator
 from typing import Optional
 
 from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas_robots import Configuration
 
 from compas_fab.backends.exceptions import BackendTargetNotSupportedError
@@ -138,6 +139,12 @@ class AnalyticalInverseKinematics(InverseKinematics):
         solver = planner.kinematics_solver
 
         keep_order = options.get("keep_order", False)
+
+        # The target is a PCF, i.e. at the end effector link of the URDF model, but the
+        # solver ends at its own frame -- the UR solvers, for one, end at the flange while
+        # the planning group ends at `tool0`. Take that offset back out before solving.
+        if solver.flange_frame is not None:
+            frame_WCF = Frame.from_transformation(Transformation.from_frame(frame_WCF) * Transformation.from_frame(solver.flange_frame).inverted())
 
         # convert the frame WCF to RCF
         if solver.base_frame is not None:
