@@ -33,15 +33,23 @@ class ToolLibrary:
     The kinematic chain is represented similar to a RobotModel. The configuration of the kinematic chain can be described
     in the context of a RobotCell using [`ToolState`][compas_fab.robots.ToolState] objects in [`RobotCellState`][compas_fab.robots.RobotCellState].tool_states.
 
-    All the tools are modelled following [ROS REP 199](https://gavanderhoorn.github.io/rep/rep-0199.html) recommendations,
-    where the tool's base frame is attached to the link named 'flange' in the RobotModel.
-    The 'flange' link frame must have its Positive X (x+) point away from the last link.
+    All the tools are modelled to reach along the Positive Z (z+) axis of their base frame,
+    which is the frame the robot's flange takes hold of them at.
+    This matches the planning groups of the robots in [`RobotCellLibrary`][compas_fab.robots.RobotCellLibrary],
+    which all end at a link whose z+ points away from the last link — `tool0` for the industrial
+    robots, `panda_hand_tcp` for the Panda. Any tool can therefore be attached to any of these
+    robots interchangeably, with no rotation in the attachment frame.
 
-    Note that this convention is present in many of Robots loaded from URDF files, but not all.
-    Be aware that the 'flange' link is not necessary equal to the 'tool0' frame displayed on the robot controller,
-    the orientation of the 'tool0' frame is robot-brand-dependent.
-    The rationale of using a consistent 'flange' frame is that any tool can be attached to any robot interchangeably
-    without additional rotations to align the tool model and the robot flange.
+    Note that a `flange` link, where a robot model has one, follows the opposite convention:
+    [ROS REP 199](https://gavanderhoorn.github.io/rep/rep-0199.html) puts its x+ away from the
+    last link. Only some robot models ship one, which is why the z+ convention is used here.
+    Be aware also that the 'tool0' link is not necessary equal to the tool frame displayed on
+    the robot controller, though for the robots in this library it is.
+
+    When modelling your own tool, you do not have to draw it along its Z axis to comply:
+    pass the `base_frame` of [`ToolModel`][compas_robots.ToolModel] (the `base_plane` input of the
+    `Tool From Mesh` Grasshopper component) to state where the flange takes hold of the geometry,
+    in the coordinate system you modelled in.
 
     Examples
     --------
@@ -50,17 +58,40 @@ class ToolLibrary:
     >>> tool = ToolLibrary.cone()
     >>> tool.name
     'cone'
+    >>> tool.frame.point  # the TCF reaches along z+ of the tool's base frame
+    Point(x=0.000, y=0.000, z=0.100)
     """
+
+    # The tools below are modelled reaching along their own x+, following REP 199, and are
+    # re-framed onto the z+ convention of this library on the way out. Expressed the other
+    # way round: the flange takes hold of them at the plane whose z+ runs along their x+.
+    REP199_MOUNTING_PLANE = Frame([0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0])
+
+    @classmethod
+    def _mount_along_z(cls, tool_model: ToolModel, align_tcf: bool = True) -> ToolModel:
+        """Re-frame a tool modelled along x+ onto the z+ mounting convention of this library.
+
+        The TCF's Z axis states the direction the tool works in, which is the axis a
+        `TargetMode.TOOL` target aligns the tool to. For a tool that works along the axis
+        it is mounted on — a cone drawing, a gripper approaching — that is the mounting
+        axis itself, so the TCF keeps its position and takes the orientation of the base
+        frame. Pass `align_tcf=False` for a tool that works in some other direction, and
+        the TCF is carried along with the geometry instead.
+        """
+        tool_model.reframe_base(cls.REP199_MOUNTING_PLANE)
+        if align_tcf:
+            tool_model.frame = Frame(tool_model.frame.point, [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+        return tool_model
 
     @classmethod
     def cone(cls, load_geometry: bool = True, radius: float = 0.02, length: float = 0.1) -> ToolModel:
         """Create and return a cone as ToolModel, useful for simulating a drawing tool.
 
-        The cone points towards the positive X-axis of the tool frame.
+        The cone points towards the positive Z-axis of the tool's base frame.
         The tool has only one visual mesh, which is also used for collision mesh.
 
         The tool TCF is located at the tip of the cone,
-        it is a translation offset from T0CF by its length (default 0.1) along the X-axis of the T0CF.
+        it is a translation offset from the base frame by its length (default 0.1) along its Z-axis.
         The tool name is 'cone'.
 
         Parameters
@@ -89,22 +120,21 @@ class ToolLibrary:
             # tool_mesh = Mesh.from_stl(compas_fab.get("planning_scene/cone.stl"))
         tool_model.add_link("cone_link", visual_meshes=meshes, collision_meshes=meshes)
 
-        return tool_model
+        return cls._mount_along_z(tool_model)
 
     @classmethod
     def printing_tool(cls, load_geometry: bool = True, tool_size: float = 1.0) -> ToolModel:
         """Create and return a printing tool as ToolModel, useful for simulating a 3D printing tool.
 
         The Tool Frame is located at the tip of the tool,
-        equal to `Frame([0.2, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])`.
-        It has the same orientation as its base frame.
+        equal to `Frame([0.0, 1.0, 0.2], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])`.
         Its Z-axis points out of the printing nozzle into the material being printed.
         Therefor, the printing targets should be defined with the Z-axis pointing towards the object being printed.
 
         The tool name is 'printing_tool'.
 
         Changing the `tool_size` parameter will scale the tool.
-        The default size is 1.0, corresponding to the tool tip being 1m away (Z-direction) from the base frame.
+        The default size is 1.0, corresponding to the tool tip being 1m away from the base frame.
 
         Parameters
         ----------
@@ -128,7 +158,9 @@ class ToolLibrary:
 
         tool_model.add_link("printing_tool_link", visual_meshes=meshes, collision_meshes=meshes)
 
-        return tool_model
+        # The nozzle points across the mounting axis rather than along it, so the TCF is
+        # carried along with the geometry to keep its Z axis pointing out of the nozzle.
+        return cls._mount_along_z(tool_model, align_tcf=False)
 
     @classmethod
     def static_gripper(cls, load_geometry: bool = True) -> ToolModel:
@@ -139,9 +171,9 @@ class ToolLibrary:
         The tool has three visual meshes representing the gripper body and the jaws.
         The visual mesh is also used for collision mesh.
         The tool TCF is located at the gripper face of the gripper,
-        it is a translation offset from T0CF by +0.1 along the X-axis of the T0CF.
+        it is a translation offset from the base frame by +0.1 along its Z-axis.
         The tool name is 'gripper'.
-        Bar material can be held with the gripper with the long axis matching the Z axis of the TCF.
+        Bar material can be held with the gripper with the long axis matching the Y axis of the TCF.
 
         Parameters
         ----------
@@ -177,7 +209,7 @@ class ToolLibrary:
             meshes.append(Mesh.from_shape(shape).transformed(t))
         tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
 
-        return tool_model
+        return cls._mount_along_z(tool_model)
 
     @classmethod
     def static_gripper_small(cls, load_geometry: bool = True) -> ToolModel:
@@ -188,9 +220,9 @@ class ToolLibrary:
         The tool has three visual meshes representing the gripper body and the jaws.
         The visual mesh is also used for collision mesh.
         The tool TCF is located at the gripper face of the gripper,
-        it is a translation offset from T0CF by +0.1 along the X-axis of the T0CF.
+        it is a translation offset from the base frame by +0.1 along its Z-axis.
         The tool name is 'gripper'.
-        Bar material can be held with the gripper with the long axis matching the Z axis of the TCF.
+        Bar material can be held with the gripper with the long axis matching the Y axis of the TCF.
 
         Parameters
         ----------
@@ -226,7 +258,7 @@ class ToolLibrary:
             meshes.append(Mesh.from_shape(shape).transformed(t))
         tool_model.add_link("gripper_body", visual_meshes=meshes, collision_meshes=meshes)
 
-        return tool_model
+        return cls._mount_along_z(tool_model)
 
     @classmethod
     def kinematic_gripper(cls, load_geometry: bool = True) -> ToolModel:
@@ -244,9 +276,9 @@ class ToolLibrary:
 
         The tool has the same visual and collision mesh.
         The tool's TCF is located at the tip of the gripper fingers,
-        which is a translation offset from T0CF by +0.15 along the X-axis of the T0CF.
+        which is a translation offset from the base frame by +0.15 along its Z-axis.
         The tool name is 'gripper'.
-        Bar material can be held with the gripper if the long axis of the bar matches the Z axis of the TCF.
+        Bar material can be held with the gripper if the long axis of the bar matches the Y axis of the TCF.
 
         Parameters
         ----------
@@ -262,7 +294,9 @@ class ToolLibrary:
 
         tool_model = json_load(compas_fab.get("tool_library/kinematic_gripper/gripper.json"))
         assert isinstance(tool_model, ToolModel)
-        return tool_model
+
+        # The serialized model is modelled along x+, like the programmatic tools above
+        return cls._mount_along_z(tool_model)
 
 
 class RigidBodyLibrary:
@@ -597,10 +631,9 @@ class RobotCellLibrary:
 
         # Attach the tool to the robot's main group
         touch_links = ["wrist_3_link"]
-        # UR5 has the last planning link as 'tool0' not 'flange', therefore the cone tool
-        # that is REP 199 compliant is attached with the following rotation to match.
-        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
-        robot_cell_state.set_tool_attached_to_group("cone", robot_cell.main_group_name, attachment_frame=attachment_frame, touch_links=touch_links)
+        # The cone of the ToolLibrary mounts along z+, same as the planning group's last
+        # link ('tool0'), so no rotation is needed in the attachment frame.
+        robot_cell_state.set_tool_attached_to_group("cone", robot_cell.main_group_name, touch_links=touch_links)
 
         # ------------------------------------------------------------------------
         # Static Rigid Body Touch Links
@@ -649,9 +682,9 @@ class RobotCellLibrary:
         # Load Rigid Bodies
         # ---------------------------------------------------------------------
 
-        # Z axis is the length of the beam, X axis points away from the robot
+        # Authored in the gripper's TCF: Y axis is the length of the beam, Z axis points away from the robot
         beam_length = 0.4
-        beam = Box.from_corner_corner_height([0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length)
+        beam = Box.from_corner_corner_height([-0.05, -beam_length * 0.5, 0.0], [0.05, beam_length * 0.5, 0.0], 0.1)
         beam_mesh = Mesh.from_shape(beam)
         robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
@@ -668,22 +701,20 @@ class RobotCellLibrary:
         # Tool Attachment
         # ------------------------------------------------------------------------
 
-        # Attach the tool to the robot's main group
-        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+        # Attach the tool to the robot's main group.
+        # The gripper of the ToolLibrary mounts along z+, same as the planning group's last
+        # link ('tool0'), so no rotation is needed in the attachment frame.
 
         # Gripper is allowed to touch the last link of the robot.
-        # However, do not use the following line to get the end effector link name,
+        # However, do not use the end effector link name as touch link,
         # because it is not guaranteed to be the last link that has geometry in the robot chain.
-        # ee_link_name = robot.get_end_effector_link_name(robot_cell.main_group_name)
-
-        # Instead, check the robot model and hard code the actual link name.
+        # Instead, check the robot model and hard code the actual link name,
+        # or use `robot_cell.default_touch_links()`.
         touch_links = ["wrist_3_link"]
-        # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
-        # However the last link with geometry attached is `wrist_3_link`.
+        # For UR5, the end effector link is `tool0`, which has no geometry.
+        # The last link with geometry attached is `wrist_3_link`.
 
-        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, attachment_frame, touch_links)
-        # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
-        # does not follow the REP 199 convention.
+        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, touch_links=touch_links)
 
         # ------------------------------------------------------------------------
         # Workpiece Attachment
@@ -740,9 +771,9 @@ class RobotCellLibrary:
         # Load Rigid Bodies
         # ---------------------------------------------------------------------
 
-        # Z axis is the length of the beam, X axis points away from the robot
+        # Authored in the gripper's TCF: Y axis is the length of the beam, Z axis points away from the robot
         beam_length = 1.0
-        beam = Box.from_corner_corner_height([0.0, -0.1, -beam_length * 0.5], [0.2, 0.1, -beam_length * 0.5], beam_length)
+        beam = Box.from_corner_corner_height([-0.1, -beam_length * 0.5, 0.0], [0.1, beam_length * 0.5, 0.0], 0.2)
         beam_mesh = Mesh.from_shape(beam)
         robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
@@ -756,10 +787,9 @@ class RobotCellLibrary:
         robot_cell_state = robot_cell.default_cell_state()
 
         # Attach the tool to the robot's main group
-        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
-        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, attachment_frame)
-        # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
-        # does not follow the REP 199 convention.
+        # The tools of the ToolLibrary mount along z+, same as the planning group's last link,
+        # so no rotation is needed in the attachment frame.
+        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name)
 
         # Attach the beam to the gripper
         robot_cell_state.set_rigid_body_attached_to_tool("beam", "gripper")
@@ -804,9 +834,9 @@ class RobotCellLibrary:
         # Load Rigid Bodies
         # ---------------------------------------------------------------------
 
-        # Z axis is the length of the beam, X axis points away from the robot
+        # Authored in the gripper's TCF: Y axis is the length of the beam, Z axis points away from the robot
         beam_length = 0.4
-        beam = Box.from_corner_corner_height([0.0, -0.05, -beam_length * 0.5], [0.1, 0.05, -beam_length * 0.5], beam_length)
+        beam = Box.from_corner_corner_height([-0.05, -beam_length * 0.5, 0.0], [0.05, beam_length * 0.5, 0.0], 0.1)
         beam_mesh = Mesh.from_shape(beam)
         robot_cell.rigid_body_models["beam"] = RigidBody.from_mesh(beam_mesh)
 
@@ -823,22 +853,20 @@ class RobotCellLibrary:
         # Tool Attachment
         # ------------------------------------------------------------------------
 
-        # Attach the tool to the robot's main group
-        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+        # Attach the tool to the robot's main group.
+        # The gripper of the ToolLibrary mounts along z+, same as the planning group's last
+        # link ('tool0'), so no rotation is needed in the attachment frame.
 
         # Gripper is allowed to touch the last link of the robot.
-        # However, do not use the following line to get the end effector link name,
+        # However, do not use the end effector link name as touch link,
         # because it is not guaranteed to be the last link that has geometry in the robot chain.
-        # ee_link_name = robot.get_end_effector_link_name(robot_cell.main_group_name)
-
-        # Instead, check the robot model and hard code the actual link name.
+        # Instead, check the robot model and hard code the actual link name,
+        # or use `robot_cell.default_touch_links()`.
         touch_links = ["wrist_3_link"]
-        # For UR10e, the last logical link is `tool0` (from robot.get_end_effector_link_name)
-        # However the last link with geometry attached is `wrist_3_link`.
+        # For UR10e, the end effector link is `tool0`, which has no geometry.
+        # The last link with geometry attached is `wrist_3_link`.
 
-        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, attachment_frame, touch_links)
-        # Note: There is a rotation to match the gripper's orientation because the last link in the abb robot
-        # does not follow the REP 199 convention.
+        robot_cell_state.set_tool_attached_to_group("gripper", robot_cell.main_group_name, touch_links=touch_links)
 
         # ------------------------------------------------------------------------
         # Workpiece Attachment
@@ -908,9 +936,10 @@ class RobotCellLibrary:
         # ------------------------------------------------------------------------
 
         # Attach the tool to the robot's main group
-        attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+        # The tools of the ToolLibrary mount along z+, same as the planning group's last link,
+        # so no rotation is needed in the attachment frame.
         touch_links = ["link_6"]
-        robot_cell_state.set_tool_attached_to_group("printing_tool", robot_cell.main_group_name, attachment_frame, touch_links=touch_links)
+        robot_cell_state.set_tool_attached_to_group("printing_tool", robot_cell.main_group_name, touch_links=touch_links)
 
         # ------------------------------------------------------------------------
         # Static Rigid Body Touch Links

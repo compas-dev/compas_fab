@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+
 ### Changed
+
+* The tools in `ToolLibrary` now mount along the +Z axis of their base frame instead of +X. Every planning group in `RobotCellLibrary` ends at a link whose +Z points away from the arm (`tool0` for the industrial robots, `panda_hand_tcp` for the Panda), so with this the same tool attaches to any of them with an identity attachment frame — previously each cell carried a rotation to bridge the two conventions, and a tool authored for one robot did not necessarily fit another. Their TCF states the tool's working direction with its own Z axis too, so a `TargetMode.TOOL` target aligns the tool along the target's Z — previously the TCF's X axis ran along the tool, which put every tool-mode target 90 degrees out. The tools are still modelled along +X internally and re-framed on the way out via `ToolModel.reframe_base`. The beams held by the gripper cells are authored in TCF coordinates and were re-authored to match, so they stay put. Poses are unchanged: the attached tools and workpieces of every cell land exactly where they did, only the tool's base frame is now the end effector link's frame rather than a rotated version of it. Requires the `reframe_base` support of the next `compas_robots` release.
 
 ### Removed
 

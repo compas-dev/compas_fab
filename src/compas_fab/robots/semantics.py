@@ -194,6 +194,25 @@ class RobotSemantics(Data):
     def get_end_effector_link_name(self, group: Optional[str] = None) -> str:
         """Get the name of the last link (end effector link) in a planning group.
 
+        The frame of this link is the robot's Planner Coordinate Frame (PCF),
+        where tools are attached.
+
+        Planning groups conventionally end at the robot's `tool0` link, whose
+        positive Z axis points away from the last link. That holds across brands
+        — it is what ROS Industrial support packages ship — and robots without a
+        `tool0` tend to end at an equivalent frame anyway (e.g. Panda's
+        `panda_hand_tcp`). The tools in [`ToolLibrary`][compas_fab.robots.ToolLibrary]
+        are modelled to mount along that same positive Z axis, so they attach to
+        any of these robots without a compensating rotation.
+
+        Note that a `flange` link, where a robot model has one, follows the
+        opposite convention: [ROS REP 199](https://gavanderhoorn.github.io/rep/rep-0199.html)
+        puts its positive X axis away from the last link. Since only some robot
+        models ship one, chaining a planning group to it would leave the cell with
+        two mounting conventions depending on the robot. If your group does end at
+        a flange, state the tool's mounting plane on the tool itself, see
+        [`ToolModel.reframe_base`][compas_robots.ToolModel.reframe_base].
+
         Parameters
         ----------
         group
@@ -203,6 +222,12 @@ class RobotSemantics(Data):
         -------
         `str`
             The name of the end effector link.
+
+        Examples
+        --------
+        >>> robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+        >>> robot_cell.robot_semantics.get_end_effector_link_name()
+        'tool0'
         """
 
         if not group:

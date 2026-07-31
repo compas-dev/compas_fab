@@ -31,8 +31,10 @@ with RosClient() as client:
     robot_cell_state.rigid_body_states["beam"].frame = Frame([1.2, 0, 0], [0, 0, 1], [1, 0, 0])
 
     # Attach the gripper to the robot
+    # The gripper mounts along z+, same as the last link of the UR5's planning group
+    # ('tool0'), so the attachment frame does not need any rotation.
     robot_cell_state.tool_states["gripper"].attached_to_group = robot_cell.main_group_name
-    robot_cell_state.tool_states["gripper"].attachment_frame = Frame([0, 0, 0], [0, 0, 1], [1, 0, 0])
+    robot_cell_state.tool_states["gripper"].attachment_frame = Frame.worldXY()
 
     # Set the robot cell state in the planner
     planner.set_robot_cell_state(robot_cell_state)
