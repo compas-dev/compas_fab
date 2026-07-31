@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* The `Tool From Mesh` Grasshopper component gained a `base_plane` input: where the robot's flange takes hold of the geometry, expressed in the coordinates the mesh was modelled in. Its Z axis points away from the robot, so a tool drawn reaching along world Z needs none, and a tool drawn along another axis is mounted by wiring a plane instead of redrawing the geometry. Backed by the new `base_frame` argument of `compas_robots.ToolModel`; nothing is baked into the mesh, so the plane can be re-wired at any time. The component also surfaces a remark when the TCP does not sit roughly on the tool's +Z, since that means the tool will point sideways once attached — the direction from the mount to the TCP is only a hint (it says nothing about roll), so it is reported rather than applied.
 
 ### Changed
 
