@@ -1,0 +1,97 @@
+name: robot-cell-snapshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: robot-cell-snapshots-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    name: Generate robot-cell GLB snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Bring up ROS 1 and ROS 2 integration stacks
+        run: |
+          docker compose -f tests/integration_setup/docker-compose.yml up -d --build
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml up -d --build
+          docker ps -a
+
+      - name: Install project and snapshot dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install --no-cache-dir -e ".[dev]"
+
+      - name: Generate local robot-cell snapshots
+        run: |
+          python scripts/generate_robot_cell_gltf_snapshots.py \
+            --cells all \
+            --output-dir artifacts/robot-cell-snapshots/local
+
+      - name: Generate ROS 1 robot-cell snapshots
+        env:
+          ROSLIBPY_TRANSPORT: asyncio
+        run: |
+          python scripts/generate_robot_cell_gltf_snapshots.py \
+            --solvers ros \
+            --ros-host localhost \
+            --ros-port 9090 \
+            --output-dir artifacts/robot-cell-snapshots/ros1
+
+      - name: Generate ROS 2 robot-cell snapshots
+        env:
+          ROSLIBPY_TRANSPORT: asyncio
+        run: |
+          python scripts/generate_robot_cell_gltf_snapshots.py \
+            --solvers ros \
+            --ros-host localhost \
+            --ros-port 9091 \
+            --ros-http-file-server http://localhost:9190 \
+            --output-dir artifacts/robot-cell-snapshots/ros2
+
+      - name: Upload GLB snapshots
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: robot-cell-glb-snapshots
+          path: |
+            artifacts/robot-cell-snapshots/**/*.glb
+            artifacts/robot-cell-snapshots/**/manifest.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Show ROS container logs on failure
+        if: failure()
+        run: |
+          docker compose -f tests/integration_setup/docker-compose.yml logs --no-color
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml logs --no-color
+
+      - name: Tear down ROS integration stacks
+        if: always()
+        run: |
+          docker compose -f tests/integration_setup/docker-compose.yml down
+          docker compose -f tests/integration_setup/docker-compose-ros2.yml down
