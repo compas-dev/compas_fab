@@ -2,6 +2,7 @@ import math
 from typing import Optional
 
 from compas_robots import Configuration
+from compas_robots.model import Joint
 
 from compas_fab.robots import RobotCell
 
@@ -26,19 +27,18 @@ def fit_within_bounds(angle, lower, upper):
 
 
 def try_to_fit_configurations_between_bounds(robot_cell: RobotCell, configurations: list[Configuration], group: Optional[str] = None) -> list[Configuration]:
-    j1, j2, j3, j4, j5, j6 = robot_cell.get_configurable_joints(group=group)
+    joints = robot_cell.get_configurable_joints(group=group)
     for i, c in enumerate(configurations):
         if c is None:
             continue
-        a1, a2, a3, a4, a5, a6 = c.values()
         try:
-            a1 = fit_within_bounds(a1, j1.limit.lower, j1.limit.upper)
-            a2 = fit_within_bounds(a2, j2.limit.lower, j2.limit.upper)
-            a3 = fit_within_bounds(a3, j3.limit.lower, j3.limit.upper)
-            a4 = fit_within_bounds(a4, j4.limit.lower, j4.limit.upper)
-            a5 = fit_within_bounds(a5, j5.limit.lower, j5.limit.upper)
-            a6 = fit_within_bounds(a6, j6.limit.lower, j6.limit.upper)
-            configurations[i].joint_values = [a1, a2, a3, a4, a5, a6]
+            fitted = []
+            for angle, joint in zip(c.values(), joints):
+                if joint.type == Joint.CONTINUOUS:
+                    fitted.append(get_smaller_angle(angle))
+                else:
+                    fitted.append(fit_within_bounds(angle, joint.limit.lower, joint.limit.upper))
+            configurations[i].joint_values = fitted
         except AssertionError:
             configurations[i] = None
     return configurations

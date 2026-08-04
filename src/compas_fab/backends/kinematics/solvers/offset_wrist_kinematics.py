@@ -62,6 +62,15 @@ UR3e_PARAMS = {
     "d6": 0.0921,
 }
 
+UR16e_PARAMS = {
+    "d1": 0.1807,
+    "a2": -0.4784,
+    "a3": -0.36,
+    "d4": 0.17415,
+    "d5": 0.11985,
+    "d6": 0.11655,
+}
+
 
 class OffsetWristKinematics(AnalyticalKinematics):
     """ """
@@ -117,7 +126,7 @@ class UR5eKinematics(OffsetWristKinematics):
 
 
 class UR10Kinematics(OffsetWristKinematics):
-    """Analytical IK solver for UR10 e-Series robots."""
+    """Analytical IK solver for UR10 robots."""
 
     def __init__(self):
         params = [UR10_PARAMS[k] for k in ["d1", "a2", "a3", "d4", "d5", "d6"]]
@@ -130,3 +139,11 @@ class UR10eKinematics(OffsetWristKinematics):
     def __init__(self):
         params = [UR10e_PARAMS[k] for k in ["d1", "a2", "a3", "d4", "d5", "d6"]]
         super(UR10eKinematics, self).__init__(params)
+
+
+class UR16eKinematics(OffsetWristKinematics):
+    """Analytical IK solver for UR16e robots."""
+
+    def __init__(self):
+        params = [UR16e_PARAMS[k] for k in ["d1", "a2", "a3", "d4", "d5", "d6"]]
+        super(UR16eKinematics, self).__init__(params)
