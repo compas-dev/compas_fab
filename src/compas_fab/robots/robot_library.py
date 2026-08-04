@@ -1,3 +1,5 @@
+from typing import Optional
+
 from compas import json_load
 from compas.datastructures import Mesh
 from compas.geometry import Box
@@ -392,6 +394,22 @@ class RobotCellLibrary:
     # ---------------------------------------------------------------------
 
     @classmethod
+    def _robot_only(
+        cls,
+        library_name: str,
+        load_geometry: bool,
+        mesh_root: Optional[str] = None,
+    ) -> tuple[RobotCell, RobotCellState]:
+        """Load a robot-only cell and its matching default state."""
+        library_path = "robot_library/{}".format(library_name)
+        robot_cell = RobotCell.from_urdf_and_srdf(
+            urdf_filename=compas_fab.get("{}/urdf/robot_description.urdf".format(library_path)),
+            srdf_filename=compas_fab.get("{}/robot_description_semantic.srdf".format(library_path)),
+            local_package_mesh_folder=(mesh_root or library_path) if load_geometry else None,
+        )
+        return robot_cell, robot_cell.default_cell_state()
+
+    @classmethod
     def rfl(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
         """Create and return the RFL robot with 4 ABB irb 4600 and twin-gantry setup.
 
@@ -420,63 +438,44 @@ class RobotCellLibrary:
         return robot_cell, robot_cell_state
 
     @classmethod
+    def ur3(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
+        """Create a UR3 robot-only cell and its default state."""
+        return cls._robot_only("ur3_robot", load_geometry, "robot_library")
+
+    @classmethod
+    def ur3e(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
+        """Create a UR3e robot-only cell and its default state."""
+        return cls._robot_only("ur3e_robot", load_geometry, "robot_library")
+
+    @classmethod
     def ur5(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
-        """Returns a UR5 robot.
+        """Create a UR5 robot-only cell and its default state."""
+        return cls._robot_only("ur5_robot", load_geometry, "robot_library")
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
-        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+    @classmethod
+    def ur5e(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
+        """Create a UR5e robot-only cell and its default state."""
+        return cls._robot_only("ur5e_robot", load_geometry, "robot_library")
 
-        The main planning group of the robot is named 'manipulator'.
-        The first and last link on the 'manipulator' group is named 'base_link' and 'tool0'.
-
-        Parameters
-        ----------
-        load_geometry
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
-            Newly created robot cell and its default state.
-        """
-
-        robot_cell = RobotCell.from_urdf_and_srdf(
-            urdf_filename=compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/ur5_robot" if load_geometry else None,
-        )
-        robot_cell_state = robot_cell.default_cell_state()
-
-        return robot_cell, robot_cell_state
+    @classmethod
+    def ur10(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
+        """Create a UR10 robot-only cell and its default state."""
+        return cls._robot_only("ur10_robot", load_geometry, "robot_library")
 
     @classmethod
     def ur10e(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
-        """Returns a UR10e robot.
+        """Create a UR10e robot-only cell and its default state."""
+        return cls._robot_only("ur10e_robot", load_geometry, "robot_library")
 
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
-        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
+    @classmethod
+    def ur16e(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
+        """Create a UR16e robot-only cell and its default state."""
+        return cls._robot_only("ur16e_robot", load_geometry, "robot_library")
 
-        Parameters
-        ----------
-        load_geometry
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
-            Newly created robot cell and its default state.
-        """
-
-        robot_cell = RobotCell.from_urdf_and_srdf(
-            urdf_filename=compas_fab.get("robot_library/ur10e_robot/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/ur10e_robot/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/ur10e_robot" if load_geometry else None,
-        )
-        robot_cell_state = robot_cell.default_cell_state()
-
-        return robot_cell, robot_cell_state
+    @classmethod
+    def staubli_tx2_60l(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
+        """Create a Stäubli TX2-60L robot-only cell and its default state."""
+        return cls._robot_only("staubli_tx2_60l", load_geometry)
 
     @classmethod
     def abb_irb4600_40_255(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
@@ -501,34 +500,6 @@ class RobotCellLibrary:
             urdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/urdf/robot_description.urdf"),
             srdf_filename=compas_fab.get("robot_library/abb_irb4600_40_255/robot_description_semantic.srdf"),
             local_package_mesh_folder="robot_library/abb_irb4600_40_255" if load_geometry else None,
-        )
-        robot_cell_state = robot_cell.default_cell_state()
-
-        return robot_cell, robot_cell_state
-
-    @classmethod
-    def abb_irb120_3_58(cls, load_geometry: bool = True) -> tuple[RobotCell, RobotCellState]:
-        """Returns a ABB irb120-3/58 robot.
-
-        The returned tuple contains a [`RobotCell`][compas_fab.robots.RobotCell] (robot model + semantics) and
-        a matching default [`RobotCellState`][compas_fab.robots.RobotCellState].
-
-        Parameters
-        ----------
-        load_geometry
-            Default is `True`, which means that the geometry is loaded.
-            `False` can be used to speed up the creation of the robot.
-
-        Returns
-        -------
-        tuple[[`RobotCell`][compas_fab.robots.RobotCell], [`RobotCellState`][compas_fab.robots.RobotCellState]]
-            Newly created robot cell and its default state.
-        """
-
-        robot_cell = RobotCell.from_urdf_and_srdf(
-            urdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/urdf/robot_description.urdf"),
-            srdf_filename=compas_fab.get("robot_library/abb_irb120_3_58/robot_description_semantic.srdf"),
-            local_package_mesh_folder="robot_library/abb_irb120_3_58" if load_geometry else None,
         )
         robot_cell_state = robot_cell.default_cell_state()
 

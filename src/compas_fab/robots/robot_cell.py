@@ -186,8 +186,8 @@ class RobotCell(Data):
         if local_package_mesh_folder:
             # Absolute paths are used as-is; relative paths are resolved
             # against `compas_fab.DATA` (so the existing shorthand for the
-            # bundled robot library — e.g. "robot_library/ur5_robot" — keeps
-            # working). Going through `compas_fab.get` blindly would mangle
+            # bundled robot library — e.g. "robot_library" — keeps working).
+            # Going through `compas_fab.get` blindly would mangle
             # absolute paths because `_find_resource` strips the leading
             # slash before joining.
             mesh_root = local_package_mesh_folder if os.path.isabs(local_package_mesh_folder) else compas_fab.get(local_package_mesh_folder)
