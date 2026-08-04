@@ -693,7 +693,7 @@ requires-dist = [
     { name = "bump-my-version", marker = "extra == 'dev'" },
     { name = "compas", specifier = ">=2.3,<3" },
     { name = "compas-invocations2", extras = ["mkdocs"], marker = "extra == 'dev'" },
-    { name = "compas-robots", specifier = ">=1,<2" },
+    { name = "compas-robots", git = "https://github.com/compas-dev/compas_robots.git?rev=tool-base-frame" },
     { name = "invoke", marker = "extra == 'dev'", specifier = ">=0.14" },
     { name = "mkdocs-print-site-plugin", marker = "extra == 'dev'" },
     { name = "pybullet", marker = "extra == 'dev'" },
@@ -750,13 +750,9 @@ mkdocs = [
 [[package]]
 name = "compas-robots"
 version = "1.0.1"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/compas-dev/compas_robots.git?rev=tool-base-frame#b5a1c676ddbaf7bac188695cdbcacd3c7832c693" }
 dependencies = [
     { name = "compas" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/f7/97b7e5b87b25931dc6d3e603c0af50ffd19fbaa2074b73b7bfca88aca853/compas_robots-1.0.1.tar.gz", hash = "sha256:5e3cdfc2f3e0ab00789f782ab9192b75dabbc031c542347958e6a96b17ca858b", size = 6043059, upload-time = "2026-05-15T11:05:09.738Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/90/6331e22189043fff683d883c587acc4187fe84319786a2ae7858dc9f796b/compas_robots-1.0.1-py3-none-any.whl", hash = "sha256:d9fe956d5fabccc1760be356e99a6019929326af23598d6312dca907e8677c20", size = 6077053, upload-time = "2026-05-15T11:05:07.211Z" },
 ]
 
 [[package]]
