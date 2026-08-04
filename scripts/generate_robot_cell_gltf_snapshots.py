@@ -62,6 +62,7 @@ from compas.geometry import angle_vectors
 from compas.geometry import distance_point_point
 from compas_robots import Configuration
 from compas_robots import ToolModel
+from compas_robots.model import Joint
 from compas_robots.model import LinkGeometry
 
 import compas_fab
@@ -71,8 +72,14 @@ from compas_fab.backends import MoveItPlanner
 from compas_fab.backends import PyBulletClient
 from compas_fab.backends import PyBulletPlanner
 from compas_fab.backends import RosClient
+from compas_fab.backends import Staubli_TX2_60LKinematics
+from compas_fab.backends import UR3eKinematics
+from compas_fab.backends import UR3Kinematics
+from compas_fab.backends import UR5eKinematics
 from compas_fab.backends import UR5Kinematics
 from compas_fab.backends import UR10eKinematics
+from compas_fab.backends import UR10Kinematics
+from compas_fab.backends import UR16eKinematics
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellLibrary
@@ -105,8 +112,14 @@ class LocalCellSpec:
 
 
 LOCAL_CELL_SPECS = {
+    "ur3": LocalCellSpec("generated_cone", UR3Kinematics),
+    "ur3e": LocalCellSpec("generated_cone", UR3eKinematics),
     "ur5": LocalCellSpec("generated_cone", UR5Kinematics),
+    "ur5e": LocalCellSpec("generated_cone", UR5eKinematics),
+    "ur10": LocalCellSpec("generated_cone", UR10Kinematics),
     "ur10e": LocalCellSpec("generated_cone", UR10eKinematics),
+    "ur16e": LocalCellSpec("generated_cone", UR16eKinematics),
+    "staubli_tx2_60l": LocalCellSpec("generated_cone", Staubli_TX2_60LKinematics),
     "ur5_cone_tool": LocalCellSpec("built_in_tool", UR5Kinematics),
     "ur5_gripper_one_beam": LocalCellSpec("built_in_tool", UR5Kinematics),
     "ur10e_gripper_one_beam": LocalCellSpec("built_in_tool", UR10eKinematics),
@@ -170,7 +183,7 @@ def reachable_target_frame(robot_cell: RobotCell, state: RobotCellState, target_
 
     for index, joint in enumerate(joints):
         value = float(reference_configuration[joint.name]) + REFERENCE_DELTAS[index % len(REFERENCE_DELTAS)]
-        if joint.limit:
+        if joint.limit and joint.type != Joint.CONTINUOUS:
             span = float(joint.limit.upper) - float(joint.limit.lower)
             margin = min(0.05, max(1e-6, span * 0.01))
             value = max(float(joint.limit.lower) + margin, min(float(joint.limit.upper) - margin, value))
