@@ -211,6 +211,10 @@ class RobotCellState(Data):
         attachment_frame
             The frame of the tool relative to the end frame of the planning group.
             Defaults to None, which means that the tool's frame coincides with the end frame of the planning group.
+            The tools in [`ToolLibrary`][compas_fab.robots.ToolLibrary] are authored to mount that way, so leave this
+            out for them; pass a frame only for a tool that is deliberately mounted somewhere else on the
+            flange, or at an angle to it. Note that a tool modelled for an earlier release of this library may
+            carry its mounting rotation here — see the migration notes of version 2.1.
         touch_links
             The names of the robot links that are allowed to collide with the tool.
 
