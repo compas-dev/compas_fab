@@ -1,5 +1,3 @@
-from compas.geometry import Frame
-
 from compas_fab.backends import MoveItPlanner
 from compas_fab.backends import RosClient
 from compas_fab.robots import ToolLibrary
@@ -16,11 +14,12 @@ with RosClient() as client:
     gripper = ToolLibrary.kinematic_gripper()
     robot_cell.tool_models[gripper.name] = gripper
     # Attach the gripper to the robot
+    # The tools in the ToolLibrary mount along z+, same as the last link of the UR5's
+    # planning group ('tool0'), so no attachment_frame (i.e. no rotation) is needed here.
     robot_cell_state = robot_cell.default_cell_state()
     robot_cell_state.set_tool_attached_to_group(
         gripper.name,
         robot_cell.main_group_name,
-        attachment_frame=Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]),
         touch_links=["wrist_3_link"],  # This is the link that the tool is attached to
     )
 

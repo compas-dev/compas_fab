@@ -165,6 +165,9 @@ class MoveItInverseKinematics(InverseKinematics):
             - ``"constraints"``: (:obj:`list` of :class:`compas_fab.robots.Constraint`, optional)
               An extra set of MoveIt constraints where the final link of the planning group must satisfy.
               Defaults to ``None``.
+            - ``"link"``: (:obj:`str`, optional) The name of the link the target pose refers to.
+              Defaults to the end effector link of the planning group, see
+              :meth:`compas_fab.robots.RobotCell.get_end_effector_link_name`.
             - ``"timeout"``: (:obj:`int`, optional) Maximum allowed time for one inverse kinematic
               calculation by the backend. If ``max_results`` is greater than 1, this timeout is
               applied to each calculation.
@@ -244,6 +247,11 @@ class MoveItInverseKinematics(InverseKinematics):
         # Use base_link or fallback to model's root link
         options["base_link"] = options.get("base_link", robot_cell.root_name)
         # The exposed "base_link" option is removed from documentation because I don't know what it does.
+
+        # The link the target pose refers to. This must be stated explicitly because the
+        # Planner Coordinate Frame (e.g. the 'flange' link) is not necessarily the default
+        # tip link that MoveIt would otherwise assume for the planning group (e.g. 'tool0').
+        options["link"] = options.get("link") or robot_cell.get_end_effector_link_name(group)
 
         # Setting the entire robot cell state, including the robot configuration
         planner.set_robot_cell_state(robot_cell_state)
@@ -351,6 +359,7 @@ class MoveItInverseKinematics(InverseKinematics):
             group_name=group,
             robot_state=robot_state,
             constraints=constraints,
+            ik_link_name=options["link"],
             pose_stamped=pose_stamped,
             avoid_collisions=bool(check_collision),
             attempts=options.get("attempts", 8),

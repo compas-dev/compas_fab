@@ -21,11 +21,13 @@ with RosClient() as client:
     # The default robot cell state already have the gripper and beam attached
     # We modify the robot's configuration here to a specific joint configuration
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
+    # Offset across the tool axis: the TCF's Y, since its Z now runs along the tool
     robot_cell_state.rigid_body_states["beam"].attachment_frame = Frame(
-        [0.0, 0.0, -0.1], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]
+        [0.0, -0.1, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]
     )
 
-    # Note that the values for these frames are not the same.
+    # Note that these frames sit at different origins. The gripper works along its
+    # mounting axis, so its TCF has the same orientation as the PCF.
     print("Robot Planner Coordinate Frame (PCF) relative to the world coordinate system (WCF):")
     frame = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
     print("- {}".format(frame))
@@ -44,7 +46,7 @@ Output:
 >>> Robot Planner Coordinate Frame (PCF) relative to the world coordinate system (WCF):
 >>> - Frame(point=Point(x=0.300, y=0.100, z=0.500), xaxis=Vector(x=-0.000, y=-1.000, z=0.000), yaxis=Vector(x=-0.000, y=-0.000, z=-1.000))
 >>> Tool Coordinate Frame (TCF) relative to the world coordinate system (WCF):
->>> - Frame(point=Point(x=0.350, y=0.100, z=0.500), xaxis=Vector(x=1.000, y=-0.000, z=-0.000), yaxis=Vector(x=-0.000, y=-1.000, z=0.000))
+>>> - Frame(point=Point(x=0.350, y=0.100, z=0.500), xaxis=Vector(x=-0.000, y=-1.000, z=0.000), yaxis=Vector(x=-0.000, y=-0.000, z=-1.000))
 >>> Workpiece's Object Coordinate Frame (OCF) relative to the world coordinate system (WCF):
->>> - Frame(point=Point(x=0.350, y=0.100, z=0.600), xaxis=Vector(x=1.000, y=-0.000, z=-0.000), yaxis=Vector(x=-0.000, y=-1.000, z=0.000))
+>>> - Frame(point=Point(x=0.350, y=0.100, z=0.600), xaxis=Vector(x=-0.000, y=-1.000, z=0.000), yaxis=Vector(x=-0.000, y=-0.000, z=-1.000))
 """

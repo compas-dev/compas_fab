@@ -192,11 +192,15 @@ class PositionIKRequest(ROSmsg):
         timeout=None,
         attempts=8,
         avoid_collisions=True,
+        ik_link_name="",
     ):
         self.group_name = group_name
         self.robot_state = robot_state if robot_state else RobotState()
         self.constraints = constraints if constraints else Constraints()
         self.avoid_collisions = avoid_collisions
+        # The link the `pose_stamped` refers to. An empty string lets MoveIt
+        # fall back to the default tip link of the planning group.
+        self.ik_link_name = ik_link_name
         self.pose_stamped = pose_stamped if pose_stamped else PoseStamped()
         self.timeout = timeout
         self.attempts = attempts

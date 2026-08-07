@@ -3,7 +3,7 @@
     "nickname": "Tool From Mesh",
     "category": "COMPAS FAB",
     "subcategory": "Robot Cell",
-    "description": "Construct a ToolModel from a Rhino mesh and a TCP plane. The TCP is expressed in the robot's `tool0` link frame. The same mesh is used for collision checking unless a separate `collision_mesh` is provided. Output feeds directly into a Load Robot Cell component's `tools` input.",
+    "description": "Construct a ToolModel from a Rhino mesh and a TCP plane, both expressed in the coordinates the mesh was modelled in. Wire `base_plane` to say where the robot's flange takes hold of the geometry, so the tool can be modelled wherever is convenient. The same mesh is used for collision checking unless a separate `collision_mesh` is provided. Output feeds directly into a Load Robot Cell component's `tools` input.",
     "exposure": 4,
     "ghpython": {
         "isAdvancedMode": true,
@@ -24,7 +24,11 @@
             },
             {
                 "name": "tcp_plane",
-                "description": "Tool Coordinate Frame in the robot's `tool0` link frame, as a Rhino Plane or COMPAS Frame."
+                "description": "Tool Coordinate Frame, as a Rhino Plane or COMPAS Frame, expressed in the coordinates the mesh was modelled in."
+            },
+            {
+                "name": "base_plane",
+                "description": "Optional plane, in the coordinates the mesh was modelled in, at which the robot's flange takes hold of the tool. Its Z axis points away from the robot: a tool drawn reaching along world Z needs none. For a tool drawn reaching along world X, wire the plane with Z = world X. Defaults to the world XY plane, i.e. the modelling coordinates are the tool's base frame."
             }
         ],
         "outputParameters": [

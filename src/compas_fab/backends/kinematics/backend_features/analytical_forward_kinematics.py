@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from typing import Optional
 
 from compas.geometry import Frame
+from compas.geometry import Transformation
 
 from compas_fab.backends.interfaces import ForwardKinematics
 from compas_fab.robots import RobotCell
@@ -43,6 +44,13 @@ class AnalyticalForwardKinematics(ForwardKinematics):
 
         joint_values = robot_cell_state.robot_configuration.joint_values
         pcf_frame = planner.kinematics_solver.forward(joint_values)
+
+        # The solver's own end frame is not necessarily the end effector link of the URDF
+        # model: the UR solvers, for one, end at the flange while the planning group ends
+        # at `tool0`. `flange_frame` states that offset, so apply it to land on the PCF.
+        flange_frame = planner.kinematics_solver.flange_frame
+        if flange_frame is not None:
+            pcf_frame = Frame.from_transformation(Transformation.from_frame(pcf_frame) * Transformation.from_frame(flange_frame))
 
         target_frame = robot_cell.pcf_to_target_frames(robot_cell_state, pcf_frame, target_mode, robot_cell.main_group_name)
 

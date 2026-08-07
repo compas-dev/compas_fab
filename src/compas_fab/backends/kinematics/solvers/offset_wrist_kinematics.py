@@ -66,8 +66,15 @@ UR3e_PARAMS = {
 class OffsetWristKinematics(AnalyticalKinematics):
     """ """
 
-    def __init__(self, params):
-        super(OffsetWristKinematics, self).__init__()
+    def __init__(self, params, flange_frame=None):
+        # The DH chain of an offset wrist ends at the robot's flange, whose x+ points away
+        # from the last link (ROS REP 199). The UR models this solver is used with end their
+        # planning group at `tool0` instead, whose z+ does. Without stating that fixed
+        # rotation, the solver and the URDF model disagree on the orientation of the end
+        # effector, and every target is interpreted rotated.
+        if flange_frame is None:
+            flange_frame = Frame([0.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, -1.0])
+        super(OffsetWristKinematics, self).__init__(flange_frame=flange_frame)
         self.params = params
 
     def forward(self, joint_values: list[float]) -> Frame:

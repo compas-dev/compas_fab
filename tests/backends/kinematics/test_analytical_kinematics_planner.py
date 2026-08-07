@@ -5,7 +5,6 @@ from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.tolerance import Tolerance
-from compas_robots import Configuration
 
 import compas_fab
 from compas_fab.backends import AnalyticalKinematicsPlanner
@@ -47,13 +46,22 @@ def test_forward_kinematics(ur5_planner_robot_only):
     start_state = planner.robot_cell.default_cell_state()
     frame = planner.forward_kinematics(start_state, TargetMode.ROBOT, group=None)
 
+    # The frame of the `tool0` link at the zero configuration, i.e. the same answer the
+    # URDF model gives. The solver's own chain ends at the flange, one fixed rotation
+    # earlier, which is what `flange_frame` accounts for.
     correct = Frame(
         Point(x=0.81725, y=0.19145, z=-0.00549),
-        Vector(x=0.0, y=1.0, z=-0.0),
-        Vector(x=1.0, y=-0.0, z=-0.0),
+        Vector(x=-1.0, y=0.0, z=0.0),
+        Vector(x=0.0, y=0.0, z=1.0),
     )
     assert TOL.is_allclose(frame.point, correct.point)
     assert TOL.is_allclose(frame.quaternion, correct.quaternion)
+
+    # ...and it agrees with the robot model, which is what the scene objects draw
+    robot_cell = planner.robot_cell
+    model_frame = robot_cell.robot_model.forward_kinematics(start_state.robot_configuration, robot_cell.get_end_effector_link_name())
+    assert TOL.is_allclose(frame.point, model_frame.point)
+    assert TOL.is_allclose(frame.quaternion, model_frame.quaternion)
 
 
 def test_iter_inverse_kinematics(ur5_planner_robot_only):
@@ -65,9 +73,14 @@ def test_iter_inverse_kinematics(ur5_planner_robot_only):
     start_state = planner.robot_cell.default_cell_state()
     solutions = list(planner.iter_inverse_kinematics(target, start_state, group=None))
     assert len(solutions) == 8
-    configuration = solutions[0]
-    correct = Configuration.from_revolute_values((0.022, 4.827, 1.508, 1.126, 1.876, 3.163))
-    assert correct.close_to(configuration)
+    # Every solution must actually reach the target, read through the robot model
+    robot_cell = planner.robot_cell
+    for configuration in solutions:
+        state = start_state.copy()
+        state.robot_configuration = configuration
+        reached = robot_cell.forward_kinematics_target_frame(state, TargetMode.ROBOT)
+        assert TOL.is_allclose(reached.point, target.target_frame.point)
+        assert TOL.is_allclose(reached.quaternion, target.target_frame.quaternion)
 
 
 def test_inverse_kinematics(ur5_planner_robot_only):
@@ -80,10 +93,13 @@ def test_inverse_kinematics(ur5_planner_robot_only):
     for i in range(8):
         solutions.append(planner.inverse_kinematics(target, start_state, group=None))
 
-    # Check First Solution Correctness
-    first_configuration = solutions[0]
-    correct = Configuration.from_revolute_values((0.022, 4.827, 1.508, 1.126, 1.876, 3.163))
-    assert correct.close_to(first_configuration)
+    # Check First Solution Correctness by reading it back through the robot model
+    robot_cell = planner.robot_cell
+    state = start_state.copy()
+    state.robot_configuration = solutions[0]
+    reached = robot_cell.forward_kinematics_target_frame(state, TargetMode.ROBOT)
+    assert TOL.is_allclose(reached.point, target.target_frame.point)
+    assert TOL.is_allclose(reached.quaternion, target.target_frame.quaternion)
 
     # Check that all solutions are different
     for a, b in combinations(solutions, 2):

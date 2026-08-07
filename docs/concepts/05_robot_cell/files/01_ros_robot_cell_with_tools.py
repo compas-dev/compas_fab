@@ -31,7 +31,9 @@ with RosClient() as client:
     robot_cell_state = robot_cell.default_cell_state()
     # Modify the tool state to attach the cone to the robot
     robot_cell_state.tool_states["cone"].attached_to_group = robot_cell.main_group_name
-    robot_cell_state.tool_states["cone"].attachment_frame = Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0])
+    # The tools in the ToolLibrary mount along z+, same as the last link of the UR5's
+    # planning group ('tool0'), so the attachment frame does not need any rotation.
+    robot_cell_state.tool_states["cone"].attachment_frame = Frame.worldXY()
     # Specify the link of the robot that the tool is allowed to collide with
     robot_cell_state.tool_states["cone"].touch_links = ["wrist_3_link"]
     # Move the robot to a different configuration
@@ -62,7 +64,6 @@ with RosClient() as client:
     robot_cell_state.set_tool_attached_to_group(
         gripper.name,
         robot_cell.main_group_name,
-        attachment_frame=Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]),
         touch_links=["wrist_3_link"],
     )
     # Specify the location of the detached cone tool

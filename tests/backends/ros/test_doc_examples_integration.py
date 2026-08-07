@@ -75,7 +75,7 @@ def test_02_set_robot_cell_state_with_attached_objects_example(ur5_robot_cell, p
 
     robot_cell_state.rigid_body_states["beam"].frame = Frame([1.2, 0, 0], [0, 0, 1], [1, 0, 0])
     robot_cell_state.tool_states["gripper"].attached_to_group = robot_cell.main_group_name
-    robot_cell_state.tool_states["gripper"].attachment_frame = Frame([0, 0, 0], [0, 0, 1], [1, 0, 0])
+    robot_cell_state.tool_states["gripper"].attachment_frame = Frame.worldXY()
     planner.set_robot_cell_state(robot_cell_state)
 
     robot_cell_state.rigid_body_states["beam"].attached_to_tool = "gripper"
@@ -95,7 +95,6 @@ def test_02_set_robot_cell_state_with_kinematic_tool_example(ur5_robot_cell, pla
     robot_cell_state.set_tool_attached_to_group(
         gripper.name,
         ur5_robot_cell.main_group_name,
-        attachment_frame=Frame([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]),
         touch_links=["wrist_3_link"],
     )
     robot_cell_state.robot_configuration.joint_values[1] = -1.0
@@ -134,7 +133,8 @@ def test_03_forward_kinematics_target_mode_example(ros2_client, ur5_robot_cell, 
 
     planner.set_robot_cell(robot_cell)
     robot_cell_state.robot_configuration.joint_values = [-2.238, -1.153, -2.174, 0.185, 0.667, 0.0]
-    robot_cell_state.rigid_body_states["beam"].attachment_frame = Frame([0.0, 0.0, -0.1], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
+    # Offset across the tool axis: the TCF's Y, since its Z now runs along the tool
+    robot_cell_state.rigid_body_states["beam"].attachment_frame = Frame([0.0, -0.1, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0])
 
     robot_frame = planner.forward_kinematics(robot_cell_state, TargetMode.ROBOT)
     tool_frame = planner.forward_kinematics(robot_cell_state, TargetMode.TOOL)
