@@ -449,6 +449,10 @@ class RobotCell(Data):
         group = group or self.main_group_name
         base_link_name = self.get_base_link_name(group)
         end_effector_link_name = self.get_end_effector_link_name(group)
+        
+        if base_link_name == end_effector_link_name:
+            return [base_link_name]
+            
         link_names = []
         for link in self.robot_model.iter_link_chain(base_link_name, end_effector_link_name):
             link_names.append(link.name)
