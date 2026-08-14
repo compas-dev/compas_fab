@@ -11,7 +11,7 @@ model = RobotModel.from_urdf_file(urdf)
 
 # Also load geometry
 support_package_name = ""
-loader = LocalPackageMeshLoader(compas_fab.get("robot_library/ur10e_robot"), support_package_name)
+loader = LocalPackageMeshLoader(compas_fab.get("robot_library"), support_package_name)
 model.load_geometry(loader, precision=12)
 
 print(model)

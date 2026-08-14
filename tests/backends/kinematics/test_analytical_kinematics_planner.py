@@ -8,7 +8,14 @@ from compas.tolerance import Tolerance
 
 import compas_fab
 from compas_fab.backends import AnalyticalKinematicsPlanner
+from compas_fab.backends import Staubli_TX2_60LKinematics
+from compas_fab.backends import UR3Kinematics
+from compas_fab.backends import UR3eKinematics
 from compas_fab.backends import UR5Kinematics
+from compas_fab.backends import UR5eKinematics
+from compas_fab.backends import UR10Kinematics
+from compas_fab.backends import UR10eKinematics
+from compas_fab.backends import UR16eKinematics
 from compas_fab.robots import FrameTarget
 from compas_fab.robots import RobotCellState
 from compas_fab.robots import RobotCellLibrary
@@ -22,6 +29,17 @@ TOL = Tolerance(unit="M", absolute=1e-4, relative=1e-3, angular=2e-3)
 
 urdf_filename = compas_fab.get("robot_library/ur5_robot/urdf/robot_description.urdf")
 srdf_filename = compas_fab.get("robot_library/ur5_robot/robot_description_semantic.srdf")
+
+ANALYTICAL_LIBRARY_CELLS = (
+    ("ur3", UR3Kinematics),
+    ("ur3e", UR3eKinematics),
+    ("ur5", UR5Kinematics),
+    ("ur5e", UR5eKinematics),
+    ("ur10", UR10Kinematics),
+    ("ur10e", UR10eKinematics),
+    ("ur16e", UR16eKinematics),
+    ("staubli_tx2_60l", Staubli_TX2_60LKinematics),
+)
 
 
 @pytest.fixture
@@ -37,6 +55,33 @@ def ur5_planner_robot_only():
     # Set Initial RobotCellState
     planner.set_robot_cell_state(robot_cell_state)
     return planner
+
+
+@pytest.mark.parametrize(("factory_name", "solver_class"), ANALYTICAL_LIBRARY_CELLS)
+def test_library_model_matches_analytical_solver(factory_name, solver_class):
+    """Every bundled analytical cell must use the solver's exact kinematic chain."""
+    robot_cell, state = getattr(RobotCellLibrary, factory_name)(load_geometry=False)
+    state.robot_configuration.joint_values = [0.2, -0.4, 0.6, -0.3, 0.4, 0.2]
+
+    planner = AnalyticalKinematicsPlanner(solver_class())
+    planner.set_robot_cell(robot_cell)
+    analytical_frame = planner.forward_kinematics(state, TargetMode.ROBOT)
+    model_frame = robot_cell.forward_kinematics_target_frame(state, TargetMode.ROBOT)
+
+    assert TOL.is_allclose(analytical_frame.point, model_frame.point)
+    assert TOL.is_allclose(analytical_frame.quaternion, model_frame.quaternion)
+
+    solutions = list(
+        planner.iter_inverse_kinematics(
+            FrameTarget(model_frame, TargetMode.ROBOT),
+            robot_cell.default_cell_state(),
+        )
+    )
+    assert solutions
+    for solution in solutions:
+        reached = robot_cell.robot_model.forward_kinematics(solution, robot_cell.get_end_effector_link_name())
+        assert TOL.is_allclose(reached.point, model_frame.point)
+        assert TOL.is_allclose(reached.quaternion, model_frame.quaternion)
 
 
 def test_forward_kinematics(ur5_planner_robot_only):

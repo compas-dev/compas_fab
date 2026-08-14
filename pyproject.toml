@@ -42,7 +42,7 @@ optional-dependencies = { dev = { file = "requirements-dev.txt" } }
 where = ["src"]
 
 [tool.setuptools.package-data]
-"*" = ["*.json", "*.yaml", "*.yml", "*.urdf", "*.srdf", "*.stl", "*.dae", "*.obj", "*.ghuser"]
+"*" = ["*.json", "*.yaml", "*.yml", "*.urdf", "*.srdf", "*.stl", "*.dae", "*.obj", "*.mtl", "*.ghuser", "*.md", "LICENSE"]
 
 [project.urls]
 Homepage = "https://github.com/compas-dev/compas_fab"

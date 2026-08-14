@@ -24,7 +24,7 @@ def test_pybullet_client_set_robot():
             client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
 
         # Load robot with geometry
-        mesh_folder = "robot_library/ur5_robot"
+        mesh_folder = "robot_library"
         robot_cell = RobotCell.from_urdf_and_srdf(urdf_filename, srdf_filename, mesh_folder)
         client._set_robot(robot_cell.robot_model, robot_cell.robot_semantics)
 
@@ -61,10 +61,15 @@ def test_pybullet_client_set_all_robots_from_robot_library():
             assert isinstance(robot_cell.robot_semantics, RobotSemantics)
             client._remove_robot()
 
+        set_and_check_robot_cell(*RobotCellLibrary.ur3())
+        set_and_check_robot_cell(*RobotCellLibrary.ur3e())
         set_and_check_robot_cell(*RobotCellLibrary.ur5())
+        set_and_check_robot_cell(*RobotCellLibrary.ur5e())
+        set_and_check_robot_cell(*RobotCellLibrary.ur10())
         set_and_check_robot_cell(*RobotCellLibrary.ur10e())
+        set_and_check_robot_cell(*RobotCellLibrary.ur16e())
+        set_and_check_robot_cell(*RobotCellLibrary.staubli_tx2_60l())
         set_and_check_robot_cell(*RobotCellLibrary.panda())
-        set_and_check_robot_cell(*RobotCellLibrary.abb_irb120_3_58())
         set_and_check_robot_cell(*RobotCellLibrary.abb_irb4600_40_255())
         set_and_check_robot_cell(*RobotCellLibrary.rfl())
 

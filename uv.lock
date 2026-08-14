@@ -672,7 +672,7 @@ requires-dist = [
     { name = "bump-my-version", marker = "extra == 'dev'" },
     { name = "compas", specifier = ">=2.3,<3" },
     { name = "compas-invocations2", extras = ["mkdocs"], marker = "extra == 'dev'" },
-    { name = "compas-robots", git = "https://github.com/compas-dev/compas_robots.git?rev=tool-base-frame" },
+    { name = "compas-robots", git = "https://github.com/compas-dev/compas_robots.git?rev=dae_import_fixes" },
     { name = "invoke", marker = "extra == 'dev'", specifier = ">=0.14" },
     { name = "mkdocs-print-site-plugin", marker = "extra == 'dev'" },
     { name = "pybullet", marker = "extra == 'dev'" },
@@ -741,7 +741,7 @@ mkdocs = [
 [[package]]
 name = "compas-robots"
 version = "1.0.1"
-source = { git = "https://github.com/compas-dev/compas_robots.git?rev=tool-base-frame#b5a1c676ddbaf7bac188695cdbcacd3c7832c693" }
+source = { git = "https://github.com/compas-dev/compas_robots.git?rev=dae_import_fixes#fb32a9ce31d6b5f78cbcdc900f500b632d78962e" }
 dependencies = [
     { name = "compas" },
 ]

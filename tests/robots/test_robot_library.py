@@ -24,8 +24,15 @@ TOOLS_REACHING_ALONG_Z = ["cone", "static_gripper", "static_gripper_small", "kin
 def all_robots_cells_and_states():
     robots = []
     robots.append(RobotCellLibrary.rfl())
+    robots.append(RobotCellLibrary.ur3())
+    robots.append(RobotCellLibrary.ur3e())
     robots.append(RobotCellLibrary.ur5())
+    robots.append(RobotCellLibrary.ur5e())
+    robots.append(RobotCellLibrary.ur10())
     robots.append(RobotCellLibrary.ur10e())
+    robots.append(RobotCellLibrary.ur16e())
+    robots.append(RobotCellLibrary.panda())
+    robots.append(RobotCellLibrary.staubli_tx2_60l())
     robots.append(RobotCellLibrary.abb_irb4600_40_255())
     return robots
 

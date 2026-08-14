@@ -32,7 +32,7 @@ class SphericalWristKinematics(AnalyticalKinematics):
         return joint_values
 
 
-class Staubli_TX260LKinematics(SphericalWristKinematics):
+class Staubli_TX2_60LKinematics(SphericalWristKinematics):
     """Analytical IK solver for the Stäubli TX2 60L robot."""
 
     def __init__(self):
@@ -42,7 +42,7 @@ class Staubli_TX260LKinematics(SphericalWristKinematics):
             Point(0.450, 0.020, 0.775),
             Point(0.520, 0.020, 0.775),
         ]
-        super(Staubli_TX260LKinematics, self).__init__(points)
+        super(Staubli_TX2_60LKinematics, self).__init__(points)
 
     def _pre_process(self, joint_values: list[float]) -> list[float]:
         q1, q2, q3, q4, q5, q6 = joint_values
@@ -59,6 +59,11 @@ class Staubli_TX260LKinematics(SphericalWristKinematics):
             q4 = q4 * -1
             q6 = q6 * -1 + math.pi / 2
             yield [q1, q2, q3, q4, q5, q6]
+
+
+# Backwards-compatible alias for the misspelled public name used before the
+# TX2-60L model was bundled in the robot-cell library.
+Staubli_TX260LKinematics = Staubli_TX2_60LKinematics
 
 
 class ABB_IRB4600_40_255Kinematics(SphericalWristKinematics):
