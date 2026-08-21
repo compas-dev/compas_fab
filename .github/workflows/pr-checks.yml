@@ -13,9 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Changelog check
-        uses: Zomzog/changelog-checker@v1.1.0
+        uses: Zomzog/changelog-checker@v1.3.0
         with:
           fileName: CHANGELOG.md
-          checkNotification: Simple
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
