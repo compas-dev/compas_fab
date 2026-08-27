@@ -9,11 +9,15 @@ Contributions are welcome and greatly appreciated.
 2. Create and activate a virtual environment using `venv`, `uv`, `conda`, or
    another environment manager.
 3. From the repository root, install the package in editable mode together
-   with its development tools:
+   with its development tools and optional test backends:
 
    ```bash
-   python -m pip install -e ".[dev]"
+   python -m pip install -e ".[dev,pybullet,pyroki]"
    ```
+
+   PyRoKI requires Python 3.10 or newer. Python 3.12 is the version used by the
+   integration workflow. If your change does not touch an optional backend,
+   `python -m pip install -e ".[dev]"` is sufficient for the core suite.
 
 4. Run the ordinary test suite:
 

@@ -154,6 +154,7 @@ nav:
       - Choosing a backend: backends/index.md
       - Analytical IK: backends/analytical.md
       - Analytical IK + PyBullet: backends/analytical_pybullet.md
+      - PyRoKI: backends/pyroki.md
       - PyBullet: backends/pybullet.md
       - ROS 1 + MoveIt 1: backends/ros.md
       - ROS 2 + MoveIt 2: backends/ros2.md
@@ -177,6 +178,8 @@ nav:
           - compas_fab.backends.interfaces: api/compas_fab.backends.interfaces.md
           - compas_fab.backends.ros.backend_features: api/compas_fab.backends.ros.backend_features.md
           - compas_fab.backends.pybullet.backend_features: api/compas_fab.backends.pybullet.backend_features.md
+          - compas_fab.backends.pyroki: api/compas_fab.backends.pyroki.md
+          - compas_fab.backends.pyroki.backend_features: api/compas_fab.backends.pyroki.backend_features.md
           - compas_fab.backends.kinematics.backend_features: api/compas_fab.backends.kinematics.backend_features.md
           - ActionChain design notes: developer/action.md
           - Grasshopper components: developer/grasshopper.md

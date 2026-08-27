@@ -57,14 +57,19 @@ host, which is useful for headless planning, batch jobs, CI, and more.
 
 ## Which front-end works with which backend?
 
-| Front-end | Analytical | Analytical + PyBullet | PyBullet | ROS |
-|---|:-:|:-:|:-:|:-:|
-| Rhino 8 | ✓ | — | — | ✓ (over WebSocket) |
-| Grasshopper | ✓ | — | — | ✓ (over WebSocket) |
-| Blender | ✓ | ✓ | ✓ | ✓ |
-| COMPAS Viewer | ✓ | ✓ | ✓ | ✓ |
-| Headless / VS Code | ✓ | ✓ | ✓ | ✓ |
+| Front-end | Analytical | Analytical + PyBullet | PyRoKI | PyBullet | ROS |
+|---|:-:|:-:|:-:|:-:|:-:|
+| Rhino 8 | ✓ | — | — | — | ✓ (over WebSocket) |
+| Grasshopper | ✓ | — | — | — | ✓ (over WebSocket) |
+| Blender | ✓ | ✓ | if Python/JAX are compatible | ✓ | ✓ |
+| COMPAS Viewer | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Headless / VS Code | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 PyBullet is notoriously difficult to run inside Rhino's
 Python because PyBullet ships no wheels for newer Python
 versions and doesn't compile easily.
+
+PyRoKI requires Python 3.10 or newer and JAX. It therefore does not run in
+Rhino 8's bundled Python 3.9. A normal Python 3.12 process can run PyRoKI and
+stream configurations to a CAD or browser viewer when interactive display is
+needed; visualization is deliberately separate from the backend.

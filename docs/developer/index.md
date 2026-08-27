@@ -11,7 +11,8 @@ building the Grasshopper components, or working on the internals.
   [interfaces](../api/compas_fab.backends.interfaces.md) (the abstract
   contracts) and the per-backend implementations for
   [ROS + MoveIt](../api/compas_fab.backends.ros.backend_features.md),
-  [PyBullet](../api/compas_fab.backends.pybullet.backend_features.md) and
+  [PyBullet](../api/compas_fab.backends.pybullet.backend_features.md),
+  [PyRoKI](../api/compas_fab.backends.pyroki.backend_features.md), and
   [analytical kinematics](../api/compas_fab.backends.kinematics.backend_features.md).
 - **[ActionChain design notes](action.md)**: technical notes regarding the current and future implementation of the `Action` / `ActionChain` data containers.
 - **[Grasshopper components](grasshopper.md)**: building and installing

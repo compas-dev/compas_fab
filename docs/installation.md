@@ -61,6 +61,18 @@ Or with `conda` from the `conda-forge` channel:
 conda install -c conda-forge compas_fab
 ```
 
+Optional in-process backends can be installed with extras:
+
+```bash
+pip install "compas_fab[pybullet]"
+pip install "compas_fab[pyroki]"  # Python 3.10+; Python 3.12 is tested in CI
+```
+
+The PyRoKI extra installs a pinned Git revision because PyRoKI has not published
+a package-index release yet. See the [PyRoKI backend guide](backends/pyroki.md)
+for its collision model, warm-up behavior, options, and examples. The PyRoKI
+extra is not currently available through the `conda-forge` package.
+
 ## Verify installation
 
 ```bash

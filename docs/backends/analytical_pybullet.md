@@ -24,13 +24,13 @@ paired with [AnalyticalPyBulletClient][compas_fab.backends.AnalyticalPyBulletCli
 ## Setup
 
 ```bash
-uv pip install pybullet
+uv pip install "compas_fab[pybullet]"
 ```
 
 On macOS, PyBullet may need an extra build flag:
 
 ```bash
-CFLAGS="-fno-define-target-os-macros" uv pip install pybullet
+CFLAGS="-fno-define-target-os-macros" uv pip install "compas_fab[pybullet]"
 ```
 
 The analytical solvers ship with `compas_fab` itself, nothing else to install.
