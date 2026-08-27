@@ -52,8 +52,8 @@ Start Python from the command prompt and run the following:
 ## First Steps
 
 * [Documentation](https://compas.dev/compas_fab/latest/)
-* [COMPAS FAB Examples](https://compas.dev/compas_fab/latest/examples.html)
-* [COMPAS FAB API Reference](https://compas.dev/compas_fab/latest/api.html)
+* [COMPAS FAB backend examples](https://compas.dev/compas_fab/latest/backends/)
+* [COMPAS FAB API Reference](https://compas.dev/compas_fab/latest/api/)
 * [COMPAS User Guide](https://compas.dev/compas/latest/userguide)
 * [COMPAS API Reference](https://compas.dev/compas/latest/api)
 
@@ -68,7 +68,7 @@ for questions and discussions.
 
 We love contributions!
 
-Check the [Contributor's Guide](https://github.com/compas-dev/compas_fab/blob/main/CONTRIBUTING.rst)
+Check the [Contributor's Guide](https://github.com/compas-dev/compas_fab/blob/main/CONTRIBUTING.md)
 for more details.
 
 
@@ -76,7 +76,7 @@ for more details.
 
 Ready to release a new version of **COMPAS FAB**? Here's how to do it:
 
-* We use [semver][https://semver.org/], ie. we bump versions as follows:
+* We use [semantic versioning](https://semver.org/), i.e. we bump versions as follows:
 
   * `patch`: bugfixes.
   * `minor`: backwards-compatible features added.
