@@ -25,6 +25,10 @@ jobs:
         with:
           python: ${{ matrix.python }}
           invoke_lint: true
+          # The ordinary suite includes PyBullet backend and analytical +
+          # PyBullet tests. PyBullet is an explicit package extra rather than
+          # an implicit development dependency.
+          extras: dev,pybullet
 
   build-cpython-components:
     runs-on: windows-latest
