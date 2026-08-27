@@ -78,5 +78,7 @@ The following backend feature modules are provided:
   ROS + MoveIt implementations.
 - [compas_fab.backends.pybullet.backend_features][compas_fab.backends.pybullet.backend_features] —
   PyBullet implementations.
+- [compas_fab.backends.pyroki.backend_features][compas_fab.backends.pyroki.backend_features] —
+  differentiable IK and approximate-collision implementations.
 - [compas_fab.backends.kinematics.backend_features][compas_fab.backends.kinematics.backend_features] —
   analytical-kinematics implementations.

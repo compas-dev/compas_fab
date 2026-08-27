@@ -33,13 +33,13 @@ PyBullet is an optional dependency of `compas_fab`. It is not installed by
 default because upstream does not ship wheels for the newest Python versions.
 
 ```bash
-uv pip install pybullet
+uv pip install "compas_fab[pybullet]"
 ```
 
 On macOS, PyBullet sometimes needs an extra build flag:
 
 ```bash
-CFLAGS="-fno-define-target-os-macros" uv pip install pybullet
+CFLAGS="-fno-define-target-os-macros" uv pip install "compas_fab[pybullet]"
 ```
 
 `PyBulletClient` supports three connection types:

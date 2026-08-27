@@ -84,6 +84,8 @@ from .pybullet import (
     PlanningGroupNotSupported,
 )
 
+from .pyroki import PyRokiPlanner
+
 __all__ = [
     # Exceptions
     "BackendError",
@@ -139,4 +141,6 @@ __all__ = [
     "PyBulletPlanner",
     "AnalyticalPyBulletClient",
     "PlanningGroupNotSupported",
+    # PyRoKI
+    "PyRokiPlanner",
 ]

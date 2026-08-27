@@ -40,6 +40,16 @@ It can also be installed using `pip`:
 
     pip install compas_fab
 
+Optional in-process backends are available as extras:
+
+    pip install "compas_fab[pybullet]"
+    pip install "compas_fab[pyroki]"
+
+The PyRoKI extra provides fast differentiable and collision-aware numerical IK
+on Python 3.10 or newer. Until PyRoKI publishes its first package release, the
+extra installs a tested, pinned Git commit. See the
+[backend guide](https://compas.dev/compas_fab/latest/backends/pyroki/).
+
 
 > On Windows, you may need to install [Microsoft Visual C++ 14.0](https://www.scivision.co/python-windows-visual-c++-14-required/).
 

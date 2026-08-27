@@ -1,0 +1,2 @@
+# PyRoKI is not published on PyPI yet. Pin the tested revision until an official release is available.
+pyroki @ git+https://github.com/chungmin99/pyroki.git@388e43e1fc0d0ee382968d3dd72970fd62a0450c ; python_version >= "3.10"

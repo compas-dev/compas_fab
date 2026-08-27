@@ -7,7 +7,6 @@ mkdocs-print-site-plugin
 pytest
 pytest-cov
 pytest-mock
-pybullet
 pythonnet
 ruff
 tomlkit
