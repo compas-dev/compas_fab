@@ -17,3 +17,4 @@
 - Edvard Bruun <<ebruun@princeton.edu>> [@ebruun](https://github.com/ebruun)
 - Victor Pok Yin Leung <<leung@arch.ethz.ch>> [@yck011522](https://github.com/yck011522)
 - Begüm Saral <<begum.saral@tum.de>> [@begums](https://github.com/begums)
+- OmniLink [@omnilink-tech](https://github.com/omnilink-tech)

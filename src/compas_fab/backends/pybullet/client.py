@@ -10,6 +10,7 @@ from compas import WINDOWS
 from compas.colors import Color
 from compas.datastructures import Mesh
 from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas_robots import Configuration
 from compas_robots import RobotModel
 from compas_robots import ToolModel
@@ -652,7 +653,14 @@ class PyBulletClient(PyBulletBase, ClientInterface):
 
     def _get_base_frame(self, body_id):
         pose = pybullet.getBasePositionAndOrientation(body_id, physicsClientId=self.client_id)
-        return frame_from_pose(pose)
+        # PyBullet reports the base's inertial frame, not its URDF link frame.
+        t_world_inertial = Transformation.from_frame(frame_from_pose(pose))
+        t_link_inertial = Transformation.from_frame(self._get_base_inertial_frame(body_id))
+        return Frame.from_transformation(t_world_inertial * t_link_inertial.inverse())
+
+    def _get_base_inertial_frame(self, body_id):
+        dynamics = pybullet.getDynamicsInfo(body_id, const.BASE_LINK_ID, physicsClientId=self.client_id)
+        return frame_from_pose((dynamics[3], dynamics[4]))
 
     def _get_base_name(self, body_id):
         return self._get_body_info(body_id).base_name.decode(encoding="UTF-8")
@@ -711,7 +719,9 @@ class PyBulletClient(PyBulletBase, ClientInterface):
         return frame_from_pose(pose)
 
     def _set_base_frame(self, frame, body_id):
-        point, quaternion = pose_from_frame(frame)
+        # resetBasePositionAndOrientation expects the inertial frame in world coordinates.
+        inertial_frame = frame.to_world_coordinates(self._get_base_inertial_frame(body_id))
+        point, quaternion = pose_from_frame(inertial_frame)
         pybullet.resetBasePositionAndOrientation(body_id, point, quaternion, physicsClientId=self.client_id)
 
     def _set_joint_position(self, joint_id, value, body_id):
@@ -860,8 +870,7 @@ class PyBulletClient(PyBulletBase, ClientInterface):
             self._set_object_frame(body_id, frame)
 
     def _set_object_frame(self, body_id, frame):
-        (point, quat) = pose_from_frame(frame)
-        pybullet.resetBasePositionAndOrientation(body_id, point, quat, physicsClientId=self.client_id)
+        self._set_base_frame(frame, body_id)
 
     # ------------------------------------------------------------------------------------
     # Helper functions for creating rigid bodies in PyBullet

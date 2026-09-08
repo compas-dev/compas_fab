@@ -1,4 +1,6 @@
 import pytest
+from compas.geometry import Frame
+from compas.geometry import Transformation
 from compas_robots import RobotModel
 
 import compas_fab
@@ -11,6 +13,35 @@ from compas_fab.robots import RobotCellLibrary
 def test_pybullet_client_connection_direct():
     with PyBulletClient(connection_type="direct") as client:
         assert client.is_connected
+
+
+@pytest.mark.parametrize("setter", ["_set_base_frame", "_set_object_frame"])
+@pytest.mark.parametrize("base_frame", [Frame.worldXY(), Frame([1, 2, 3], [0, 1, 0], [0, 0, 1])])
+def test_base_link_frame_with_offset_and_rotated_inertia(setter, base_frame):
+    robot_cell, state = RobotCellLibrary.abb_irb4600_40_255(load_geometry=True)
+    model = robot_cell.robot_model
+    model.root.inertial.origin = Frame([0.2, -0.3, 0.4], [0, 0, 1], [1, 0, 0])
+    tip_name = robot_cell.get_end_effector_link_name()
+    expected_tip = model.forward_kinematics(state.robot_configuration, tip_name)
+    expected_tip.transform(Transformation.from_frame(base_frame))
+
+    with PyBulletClient(connection_type="direct") as client:
+        client._set_robot(model, robot_cell.robot_semantics)
+        client._robot_cell = robot_cell
+        client._set_robot_configuration(state.robot_configuration)
+        if setter == "_set_base_frame":
+            client._set_base_frame(base_frame, client.robot_puid)
+        else:
+            client._set_object_frame(client.robot_puid, base_frame)
+
+        actual_base = client._get_link_frame(-1, client.robot_puid)
+        actual_tip = client._get_link_frame(client.robot_link_puids[tip_name], client.robot_puid)
+        # Check the child link as well: matching errors in the setter/getter could
+        # otherwise make a round-trip pass while the whole robot is displaced.
+        for actual, expected in [(actual_base, base_frame), (actual_tip, expected_tip)]:
+            assert list(actual.point) == pytest.approx(list(expected.point), abs=1e-6)
+            assert list(actual.xaxis) == pytest.approx(list(expected.xaxis), abs=1e-6)
+            assert list(actual.yaxis) == pytest.approx(list(expected.yaxis), abs=1e-6)
 
 
 def test_pybullet_client_set_robot():
