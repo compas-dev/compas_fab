@@ -5,9 +5,9 @@ prune docs
 prune tests
 prune temp
 
-include AUTHORS.rst
+include AUTHORS.md
 include CHANGELOG.md
-include CONTRIBUTING.rst
+include CONTRIBUTING.md
 include LICENSE
 include README.md
 include requirements.txt
