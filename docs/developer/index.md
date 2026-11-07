@@ -3,6 +3,8 @@
 This section is for contributors extending `compas_fab` — adding a backend,
 building the Grasshopper components, or working on the internals.
 
+- **[Contributing](contributing.md)**: development installation, tests,
+  documentation, and pull-request workflow.
 - **[Backend architecture](architecture.md)**: how clients, planners and
   backend features fit together; the contract a new backend must implement.
   The API reference for the extension points lives alongside it:

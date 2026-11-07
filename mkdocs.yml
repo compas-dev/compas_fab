@@ -172,6 +172,7 @@ nav:
           - compas_fab.rhino: api/compas_fab.rhino.md
       - Extending compas_fab:
           - developer/index.md
+          - Contributing: developer/contributing.md
           - Backend architecture: developer/architecture.md
           - compas_fab.backends.interfaces: api/compas_fab.backends.interfaces.md
           - compas_fab.backends.ros.backend_features: api/compas_fab.backends.ros.backend_features.md
