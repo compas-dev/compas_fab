@@ -23,3 +23,4 @@ jobs:
           # added the `generator` switch so it can deploy MkDocs sites in
           # addition to the original Sphinx flow.
           generator: mkdocs
+          python: '3.12'
