@@ -26,6 +26,7 @@ Requires `compas_robots >= 1.1`.
 
 ### Changed
 
+* Raised the minimum `compas_robots` requirement to `1.1`, which provides the `ToolModel.base_frame`/`reframe_base` support the tool-mounting changes rely on.
 * Migrated the contributor guide from the leftover Sphinx-era `CONTRIBUTING.rst` to a canonical Markdown guide that is also rendered in the MkDocs developer section. The setup now documents the current development commands and both ROS integration stacks.
 * Corrected the invalid inertia tensors and centres of mass in the bundled ABB IRB4600-40/2.55 and RFL URDFs using the collision-mesh approximations contributed by @omnilink-tech in #486. These assume uniform density at the existing declared masses; they are not manufacturer-calibrated dynamic parameters.
 * Fixed PyBullet base-frame reads and updates for robots and objects whose inertial frame differs from the base-link frame. This keeps the corrected ABB centre of mass from displacing the robot in planning and collision checks.
