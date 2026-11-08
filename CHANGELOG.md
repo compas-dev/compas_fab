@@ -7,15 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added
-
-### Changed
-
-### Removed
-
-
-## [2.1.0-rc0] 2026-11-08
-
 ### Migrating
 
 One library factory is removed, and three changes alter results. Code that compensated for the old behaviour needs the compensation removed.
