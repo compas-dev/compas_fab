@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Removed the `rc` pre-release step from the version bump configuration: `invoke release patch|minor|major` now produces the final version directly.
 ### Removed
 
 
