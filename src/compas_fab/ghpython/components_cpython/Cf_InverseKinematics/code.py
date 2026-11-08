@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Compute inverse kinematics for a target using a stateless planner.
 
@@ -28,7 +28,7 @@ additionally checked: a concise hint (the colliding pairs, or "collision-free /
 likely unreachable") is appended to explain the failure. Every warning/error is
 also mirrored to the `debug_info` output so it can be read in a wired panel.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 from copy import deepcopy

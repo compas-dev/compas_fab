@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Wrap an explicit RobotCellState into a named state-change Action.
 
@@ -8,7 +8,7 @@ grasped/released. The wired `post_state` is the state of the cell after
 the change has been applied. Optional `tags` (CSV) drive differentiated
 downstream execution.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 import Grasshopper

@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Set the touch_links (allowed-collision links) on a RigidBody state.
 
@@ -7,7 +7,7 @@ design (e.g. a floor under the base link, a fixture grazing the wrist).
 
 Passthrough builder: the input state is copied.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 from copy import deepcopy

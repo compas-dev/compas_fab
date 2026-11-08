@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Load a pre-defined RigidBody from RigidBodyLibrary.
 
@@ -12,7 +12,7 @@ wired into a Load Robot Cell component.
 Also returns the body's visual meshes as Rhino geometry for preview, drawn in
 the body's own base frame (not yet placed in any cell).
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 import Grasshopper

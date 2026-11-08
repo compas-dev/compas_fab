@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Attach a RigidBody to a specific robot link inside a RobotCellState.
 
@@ -12,7 +12,7 @@ If `touch_links` is left unwired, defaults to `[link_name]` (the link the
 body is attached to, which it inevitably overlaps). A warning is surfaced
 so the auto-pick isn't silent.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 from copy import deepcopy

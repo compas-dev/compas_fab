@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Create a default RobotCellState from a RobotCell.
 
@@ -6,7 +6,7 @@ The default state has the robot at zero configuration with no tools or rigid
 bodies attached. Use the cell-state attachment components downstream to wire
 in tools and workpieces.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 import Grasshopper

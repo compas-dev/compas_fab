@@ -1,4 +1,4 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Load a RobotCell from URDF and SRDF files on disk (no ROS required).
 
@@ -10,7 +10,7 @@ Tools and rigid bodies can be wired directly into `tools` / `rigid_bodies` so th
 returned cell already contains them - no separate Add* + set_robot_cell() step is
 needed. Each tool/body is registered under its own `.name`.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 import Grasshopper

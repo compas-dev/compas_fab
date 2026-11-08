@@ -1,11 +1,11 @@
-# r: compas_fab>=2.0.1
+# r: compas_fab>=2.1.0-rc0
 """
 Create FrameWaypoints from a list of Rhino planes (or COMPAS Frames).
 
 Used as input to PlanCartesianMotion to interpolate linearly through a
 sequence of fully-constrained poses.
 
-COMPAS FAB v2.0.1
+COMPAS FAB v2.1.0-rc0
 """
 
 import Grasshopper
