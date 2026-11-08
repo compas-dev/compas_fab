@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Wrap a JointTrajectory into a named Action, ready for Cf_ActionChain.
 
@@ -7,7 +7,7 @@ and the Cf_ActionChain assembler: drop one per trajectory in the chain,
 type the name next to the trajectory it labels. Optional `tags` (CSV)
 drive differentiated downstream execution (e.g. approach, linear).
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

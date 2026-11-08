@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Construct a RigidBody from a Rhino mesh (and optional separate collision mesh).
 
@@ -8,7 +8,7 @@ Use `native_scale` to declare a non-meter document scale (e.g. 0.001 for mm).
 Set `name` to the id under which the body is registered when wired into a
 `Load Robot Cell` component's `rigid_bodies` input.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

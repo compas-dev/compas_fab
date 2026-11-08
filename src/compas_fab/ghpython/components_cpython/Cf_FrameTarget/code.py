@@ -1,11 +1,11 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Create a FrameTarget for the robot's end-effector motion planning.
 
 Accepts a Rhino plane or a COMPAS Frame. The `target_mode` controls which
 frame on the robot/tool/workpiece is matched against the target.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

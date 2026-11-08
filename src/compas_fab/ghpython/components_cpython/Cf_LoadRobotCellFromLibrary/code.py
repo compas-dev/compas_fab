@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Load a pre-defined RobotCell (and matching default RobotCellState) from RobotCellLibrary.
 
@@ -8,7 +8,7 @@ needed. Each tool/body is registered under its own `.name`.
 
 A dropdown is auto-created on the `name` input listing every available cell.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

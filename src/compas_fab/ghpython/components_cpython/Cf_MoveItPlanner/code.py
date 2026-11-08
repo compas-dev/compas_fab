@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Create a MoveItPlanner from a connected RosClient, loading its robot cell from ROS.
 
@@ -19,7 +19,7 @@ missing the `/rosapi/get_ros_version` service AND the `/rosdistro` parameter, wh
 makes the client fall back to ROS 2 defaults. Workarounds: set the `/rosdistro` ROS
 param, install the rosapi service, or set `load_geometry` to False.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

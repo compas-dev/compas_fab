@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Create an AnalyticalPyBulletPlanner with its own in-process PyBullet server:
 closed-form analytical IK paired with PyBullet collision checking.
@@ -16,7 +16,7 @@ Note: the analytical kinematics convention may differ from the URDF model
 (different base/flange frames). Pair this planner with a RobotCell that matches
 its convention.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

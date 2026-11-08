@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Place an unattached RigidBody at a frame in the world inside a RobotCellState.
 
@@ -8,7 +8,7 @@ AttachRigidBodyToTool instead.
 
 Passthrough builder: the input state is copied.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 from copy import deepcopy

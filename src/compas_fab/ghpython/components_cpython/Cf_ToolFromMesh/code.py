@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Construct a ToolModel from a Rhino mesh and a TCP plane.
 
@@ -22,7 +22,7 @@ The result is a static (no joints) `ToolModel` ready to feed into a
 `Load Robot Cell` component's `tools` input. Kinematic tools (with their
 own joints) should be loaded from URDF instead.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 from math import degrees

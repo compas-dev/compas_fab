@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Connect to a ROS bridge (ROS 1 or ROS 2).
 
@@ -6,7 +6,7 @@ The client is cached in sticky and survives canvas refreshes. Toggling
 `connect` from True to False closes the connection. The ROS distro is
 auto-detected after connecting.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper

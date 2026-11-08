@@ -1,4 +1,4 @@
-# r: compas_fab>=2.1.0-rc0
+# r: compas_fab>=2.1.0
 """
 Create an AnalyticalKinematicsPlanner for closed-form FK/IK.
 
@@ -9,7 +9,7 @@ Note: the analytical kinematics convention may differ from the URDF model
 (different base/flange frames). Pair this planner with a RobotCell that
 matches its convention, or use it for FK/IK without visualization.
 
-COMPAS FAB v2.1.0-rc0
+COMPAS FAB v2.1.0
 """
 
 import Grasshopper
