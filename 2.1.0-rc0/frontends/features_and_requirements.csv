@@ -1,0 +1,20 @@
+ ,ROS MoveIt,PyBullet Planner,Analytical Kinematics,Analytical PyBullet Planner
+Environment,ROS in Docker, PyBullet in CPython, CPython or IronPython, PyBullet in CPython
+Custom Robot,Requiring editing URDF package in ROS,Support custom RobotModel,OffsetWrist and SphericalWrist Robots only,OffsetWrist and SphericalWrist Robots only
+Loading Robot Model,Must be pre-loaded in ROS,Dynamic loading supported,Dynamic loading supported,Dynamic loading supported
+Planning Groups,As defined in URDF,Limited to root chain,Support only six revolute joints,Support only six revolute joints
+Custom Tool Models,Support,Support,Support Tool Frame but no collision check,Support
+Stationary Collision Objects,Support,Support,Not available,Support
+Attached Collision Objects,Support,Support,Not available,Support
+Collision Checking (CC),Support,Support,Not available,Support
+Forward Kinematics (FK),Support,Support,Support,Support
+Inverse Kinematics (IK),,,,
+IK with FrameTarget,Support,Support,Support,Support
+IK with PointAxisTarget,Not available,Support,Not available,Not available
+Plan Motion (PM),,,,
+PM with Path Constraints,Available as MoveIt path constraints,Not available,Not available,Not available
+PM with Frame Target,Support,Support,Not available,Not available
+PM with Point Axis Target,Not available,Support,Not available,Not available
+Plan Cartesian Motion (CM),,,,
+CM with FrameWaypoints,Support,Support,Not available,Not available
+CM with PointAxisWaypoints,Not available,Support,Not available,Not available
