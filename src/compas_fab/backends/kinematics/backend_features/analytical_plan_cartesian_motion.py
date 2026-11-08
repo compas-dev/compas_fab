@@ -8,11 +8,13 @@ from compas_robots import Configuration
 from compas_fab.backends.interfaces import PlanCartesianMotion
 from compas_fab.backends.kinematics.exceptions import CartesianMotionError
 from compas_fab.backends.kinematics.utils import smallest_joint_angles
+from compas_fab.robots import FrameTarget
 from compas_fab.robots import FrameWaypoints
 from compas_fab.robots import JointTrajectory
 from compas_fab.robots import JointTrajectoryPoint
 from compas_fab.robots import PointAxisWaypoints
 from compas_fab.robots import RobotCellState
+from compas_fab.robots import TargetMode
 from compas_fab.robots import Waypoints
 
 if TYPE_CHECKING:
@@ -96,7 +98,9 @@ class AnalyticalPlanCartesianMotion(PlanCartesianMotion):
         configurations_along_path = []
         # TODO: Change to planner.iter_inverse_kinematics, should be able to list out all possible
         for frame in pcf_frames:
-            configurations = list(planner.iter_inverse_kinematics(frame, options=options))
+            # The frames are PCFs already (converted above), so they are robot-mode targets.
+            target = FrameTarget(frame, TargetMode.ROBOT)
+            configurations = list(planner.iter_inverse_kinematics(target, start_state, group, options=options))
             configurations_along_path.append(configurations)
 
         # Analytical backend only supports robots with finite IK solutions

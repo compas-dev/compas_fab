@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Fixed `plan_cartesian_motion` of `AnalyticalKinematicsPlanner` and `AnalyticalPyBulletPlanner` with frame waypoints, which always raised `BackendTargetNotSupportedError`: the planner passed plain frames to `iter_inverse_kinematics`, which only accepts a `FrameTarget`. It now also passes the start state, so the PyBullet variant checks collisions against the right cell state. Added regression tests (the previous ones were commented out).
+
 ### Removed
 
 

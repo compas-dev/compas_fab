@@ -205,3 +205,24 @@ def test_forward_inverse_agreement_ur5(ur5_planner_robot_only):
 
     start_state.robot_configuration.joint_values = [0.6, 2.5, 3.4, 4.3, 4.6, 4.3]
     forward_inverse_agreement(planner, start_state)
+
+
+def test_plan_cartesian_motion_frame_waypoints(ur5_planner_robot_only):
+    """Regression: frame waypoints used to raise BackendTargetNotSupportedError."""
+    from compas.geometry import Frame
+
+    from compas_fab.robots import FrameWaypoints
+    from compas_fab.robots import TargetMode
+
+    planner = ur5_planner_robot_only
+    robot_cell = planner.client.robot_cell
+    state = robot_cell.default_cell_state()
+    state.robot_configuration = robot_cell.zero_configuration()
+    frames = [Frame([0.45, -0.2 + 0.4 * i / 9, 0.45], [1, 0, 0], [0, -1, 0]) for i in range(10)]
+    trajectory = planner.plan_cartesian_motion(FrameWaypoints(frames, TargetMode.ROBOT), state, robot_cell.main_group_name)
+    assert trajectory.fraction == 1.0
+    assert len(trajectory.points) == len(frames)
+    for point, frame in zip(trajectory.points, frames):
+        state.robot_configuration = robot_cell.zero_configuration().merged(point)
+        reached = planner.forward_kinematics(state, TargetMode.ROBOT)
+        assert reached.point.distance_to_point(frame.point) < 1e-6

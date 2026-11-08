@@ -241,3 +241,20 @@ def forward_inverse_agreement(planner: AnalyticalPyBulletClient, start_state: Ro
 #         # NOTE: At the moment the AnalyticalPyBulletClient does not perform any interpolation between frames
 #         # NOTE: if future implementation fixes this, the following test will not be valid anymore
 #         assert len(trajectory.points) == len(frame_waypoints.target_frames)
+
+
+def test_plan_cartesian_motion_frame_waypoints(analytical_pybullet_client):
+    """Regression: frame waypoints used to raise BackendTargetNotSupportedError."""
+    from compas.geometry import Frame
+
+    from compas_fab.robots import FrameWaypoints
+
+    planner = AnalyticalPyBulletPlanner(analytical_pybullet_client, UR5Kinematics())
+    robot_cell, robot_cell_state = RobotCellLibrary.ur5()
+    planner.set_robot_cell(robot_cell, robot_cell_state)
+    frames = [Frame([0.45, -0.2 + 0.4 * i / 9, 0.45], [1, 0, 0], [0, -1, 0]) for i in range(10)]
+    start = next(c for c in planner.iter_inverse_kinematics(FrameTarget(frames[0], TargetMode.ROBOT), robot_cell_state) if c)
+    robot_cell_state.robot_configuration = start
+    trajectory = planner.plan_cartesian_motion(FrameWaypoints(frames, TargetMode.ROBOT), robot_cell_state, robot_cell.main_group_name)
+    assert trajectory.fraction == 1.0
+    assert len(trajectory.points) == len(frames)
