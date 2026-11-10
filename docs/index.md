@@ -1,7 +1,7 @@
 # COMPAS FAB
 
 **Robotic fabrication for the COMPAS Framework.** One library that drives
-five planning backends, from microsecond closed-form IK to full ROS 2 +
+five built-in planning backends, from microsecond closed-form IK to full ROS 2 +
 MoveIt 2 motion planning, and works from any CAD environment or a plain
 Python script.
 
@@ -12,7 +12,7 @@ Python script.
 Robot name=ur10e, Links=11, Joints=10 (6 configurable)
 ```
 
-## The five backends
+## The five built-in backends
 
 | Backend | What it does | Setup |
 |---|---|---|
@@ -21,6 +21,9 @@ Robot name=ur10e, Links=11, Joints=10 (6 configurable)
 | [PyBullet](backends/pybullet.md) | Numerical IK, collision checking, motion planning, in-process | `pip install pybullet` |
 | [ROS 1 + MoveIt 1](backends/ros.md) | Full motion planning over rosbridge (legacy) | Docker or local ROS setup |
 | [ROS 2 + MoveIt 2](backends/ros2.md) | Full motion planning over rosbridge (current) | Docker or local ROS setup |
+
+Separate packages can add more backends, such as the experimental
+[`compas_fab_native`](https://github.com/compas-dev/compas_fab_native), which plans on a compiled (Rust) core.
 
 Not sure which fits? See **[Choosing a backend](backends/index.md)**.
 

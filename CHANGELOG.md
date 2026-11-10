@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Listed [`compas_fab_native`](https://github.com/compas-dev/compas_fab_native) in the backend guide: an experimental planning backend on a compiled (Rust) core, maintained in its own repository.
+
 ### Changed
 
 ### Removed

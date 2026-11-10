@@ -1,6 +1,7 @@
 # Choosing a backend
 
-**COMPAS FAB** is one library that drives five different planning back-ends.
+**COMPAS FAB** is one library that drives five built-in planning back-ends, and
+separate packages can add more.
 Pick the one that matches what you want to do.
 
 ## By intent
@@ -11,10 +12,13 @@ Pick the one that matches what you want to do.
 | Compute IK *and* check collisions | [Analytical IK + PyBullet](analytical_pybullet.md) | Analytical-fast IK filtered against a real collision scene |
 | Plan motion (collisions + trajectory smoothing) without ROS | [PyBullet](pybullet.md) | In-process motion planning; runs anywhere Python runs |
 | Plan motion via ROS 2 + MoveIt 2 | [ROS 2 + MoveIt 2](ros2.md) | Current ROS LTS; the recommended starting point for new ROS work |
+| Plan Cartesian paths and free motion fast, in-process (experimental) | [compas_fab_native](https://github.com/compas-dev/compas_fab_native) | Separate package, built from source. Compiled core: closed-form IK, SIMD collision checks, millisecond Cartesian paths and free motion |
 | Drive an existing ROS 1 + MoveIt 1 setup | [ROS 1 + MoveIt 1](ros.md) | Legacy stack; only use if you must |
 | Just model / visualize a robot cell in a CAD environment | *no backend* | The core data model works without any planner. See [Concepts](../concepts.md) |
 
 ## By capability
+
+The built-in backends:
 
 | Capability | Analytical | Analytical + PyBullet | PyBullet | ROS 1 + MoveIt 1 | ROS 2 + MoveIt 2 |
 |---|:-:|:-:|:-:|:-:|:-:|
