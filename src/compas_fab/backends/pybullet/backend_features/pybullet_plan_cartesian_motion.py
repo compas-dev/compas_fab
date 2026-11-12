@@ -29,6 +29,13 @@ from compas_fab.robots import Waypoints
 
 from .helpers import check_max_jump
 
+# Optional high-performance acceleration plugin
+try:
+    import compas_forge
+    COMPAS_FORGE_AVAILABLE = True
+except ImportError:
+    COMPAS_FORGE_AVAILABLE = False
+
 if TYPE_CHECKING:
     from compas_fab.backends import PyBulletClient
     from compas_fab.backends import PyBulletPlanner
@@ -41,6 +48,54 @@ __all__ = [
 
 class PyBulletPlanCartesianMotion(PlanCartesianMotion):
     """Callable to calculate a cartesian motion path (linear in tool space)."""
+
+    def _check_continuous_collisions_forge(self, state_start: RobotCellState, state_end: RobotCellState, group: str, options: dict) -> None:
+        """Helper to run Continuous Collision Detection (CCD) using the Rust-backed compas-forge engine."""
+        if not COMPAS_FORGE_AVAILABLE:
+            return
+            
+        planner: PyBulletPlanner = self
+        client: PyBulletClient = planner.client
+        
+        from compas_fab.backends.pybullet.conversions import pose_from_frame
+        
+        group_links = client.robot_cell.get_link_names(group)
+        for link_name in group_links:
+            # Iterate and check up to 3 collision elements registered per robot link
+            for collision_idx in range(3):
+                link_id = "robot_{}_{}".format(link_name, collision_idx)
+                try:
+                    # Calculate live link poses at start and end configurations using forward kinematics
+                    frame_start = planner.forward_kinematics_to_link(state_start, link_name)
+                    frame_end = planner.forward_kinematics_to_link(state_end, link_name)
+                    p_start, q_start = pose_from_frame(frame_start)
+                    p_end, q_end = pose_from_frame(frame_end)
+                    link_pose_start = p_start + q_start
+                    link_pose_end = p_end + q_end
+                    
+                    # Query CCD against all static meshes in the cache registry
+                    for obj_id, obj_frame in getattr(client, '_forge_object_poses', {}).items():
+                        p_obj, q_obj = pose_from_frame(obj_frame)
+                        obj_pose = p_obj + q_obj
+                        
+                        # Call Rust GJK/EPA continuous swept-collision checker
+                        res_raw = compas_forge.check_swept_collision_cached(
+                            link_id, link_pose_start, link_pose_end,
+                            obj_id, obj_pose, obj_pose
+                        )
+                        import json
+                        res = json.loads(res_raw)
+                        
+                        if res.get("has_collision"):
+                            raise CollisionCheckError(
+                                "Continuous swept collision detected between link '{}' "
+                                "and obstacle '{}' at time of impact {:.4f}!".format(
+                                    link_name, obj_id, res['time_of_impact']
+                                )
+                            )
+                except ValueError:
+                    # Mesh ID not registered in compas_forge cache (e.g. virtual link without mesh), skip safely
+                    break
 
     def plan_cartesian_motion(
         self,
@@ -180,116 +235,7 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
         group: Optional[str] = None,
         options: Optional[dict] = None,
     ) -> JointTrajectory:
-        """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints.
-
-        Similar to the :meth:`~plan_cartesian_motion_frame_waypoints` method, this method calculates a cartesian motion path
-        (linear in tool space) for Point Axis Waypoints. The main difference is that the interpolation is
-        performed with the point and axis of the target. The main application of this function is
-        for 3D printing, milling, or other applications where the tool is cylindrical and must follow a specific path.
-        Users should select the correct target_mode in the waypoints to ensure that the planner interpolates correctly,
-        It is common to use TargetMode.TOOL for the example applications mentioned above, such that the reference frame
-        is the tool coordinate frame (TCF).
-        Note that the Z axis of the reference frame is aligned with the axis of the target.
-        Users who wish to use other axis should consider redefining the ToolModel.frame in their tools.
-
-        Users can choose to provide waypoints densely or sparsely.
-        High density waypoints will allow the user to control precisely the path of the tool, such as
-        when following a curve. This is because the planner is guaranteed to generate a JointTrajectoryPoint
-        exactly at each waypoint. Sparse waypoints is suitable when the tool traces a straight line, the planner
-        will create interpolated points between the waypoints automatically.
-
-        The interpolated points and axis have regular spacing between each waypoint segment.
-        The interpolation spacing is controlled by the ``max_step_distance`` and ``max_step_angle`` options,
-        they control the distance between points and the angle between axis. This setting affects the smoothness
-        of the trajectory.
-
-        Unlike the Cartesian motion planning with Frame Waypoints, the planner will not perform sub-division
-        of the interpolation when the joint jump is too large. It will simply reject the IK solution and try a different
-        tool orientation. Therefore, the user should not set the ``max_jump`` parameters too low, as it may prevent the
-        planner from finding a solution. For application that are not bounded by the joint speed, the user can set the
-        ``max_jump`` parameters to a high value (e.g. 0.1 meter and 1 pi radian), simply as a means to avoid sudden joint flips.
-
-        For applications that require a specific tool speed, the user can use the max_jump parameters as a rudimentary way
-        of constraining the maximum difference between two consecutive points, hence keeping speed within the desired range.
-
-        The planning algorithm starts searching from the starting configuration and iteratively tries to find the next IK solution
-        in the forward direction. When searching for the next IK solution, the planner will use the last configuration to perform
-        a gradient decent, this is to ensure that the next configuration is close to the last one. However, this also limits the
-        planner to not be able to jump to another configuration (e.g. from elbow up to elbow down). Users should therefore be
-        aware that the planner is incomplete and may not find certain solutions even if one exists.
-
-        Because of the iterative search, the search space and searching time is highly sensitive to the starting configuration.
-        A good starting configuration can greatly reduce the search time, while a bad starting configuration can make the search
-        impossible. In general the user should provide a starting configuration that is likely to transition smoothly to all the
-        waypoints.
-
-        The planner can be configured to sample the starting configuration to improve the chance of finding a solution,
-        this is controlled by the ``sample_start_configuration`` option. If enabled, the planner will treat the starting
-        configuration as an freely rotatable point-axis target. If a solution is found, the sampled configuration will be
-        returned in trajectory.start_configuration. In this mode, the start_state.robot_configuration is ignored.
-
-        Notes
-        -----
-        Users should call :meth:`~PyBulletPlanCartesianMotion.plan_cartesian_motion` instead of this method directly.
-        Doing so will ensure that necessary scaling and checks are performed.
-
-        Parameters
-        ----------
-        waypoints
-            The waypoints for the robot to follow.
-        start_state
-            The starting state of the robot cell at the beginning of the motion.
-            The attribute `robot_configuration`, must be provided.
-        group
-            The planning group used for calculation.
-        options
-            Dictionary containing the following key-value pairs:
-
-            - ``"max_step_distance"``: (:obj:`float`, optional)
-              The max Cartesian distance between two consecutive points in the result.
-              Unit is in meters, defaults to ``0.01``.
-            - ``"max_step_angle"``: (:obj:`float`, optional)
-              The max angular distance between two consecutive points in the result.
-              Unit is in radians, defaults to ``0.1``.
-            - ``"sample_start_configuration"``: (:obj:`bool`, optional)
-              Whether or not to sample the start configuration. Defaults to ``False``.
-            - ``"check_collision"``: (:obj:`bool`, optional)
-              Whether or not to avoid collision. Defaults to ``True``.
-            - ``"max_jump_prismatic"``: (:obj:`float`, optional)
-              The maximum allowed distance of prismatic joint positions
-              between consecutive trajectory points.
-              Unit is in meters, defaults to ``0.1``.
-              Setting this to ``0`` will disable this check.
-            - ``"max_jump_revolute"``: (:obj:`float`, optional)
-              The maximum allowed distance of revolute and continuous joint positions
-              between consecutive trajectory points.
-              Unit is in radians, defaults to :math:`\\pi / 2` (90 degrees).
-              Setting this to ``0`` will disable this check.
-            - ``"check_collision"``: (:obj:`bool`, optional)
-              Whether or not to avoid collision. Defaults to ``True``.
-            - ``"verbose"``: (:obj:`bool`, optional)
-                Whether or not to print verbose output. Defaults to ``True``.
-            - ``"skip_preplanning_collision_check"``: (:obj:`bool`, optional)
-                Whether or not to skip the target check before planning. Defaults to ``True``.
-                The preplanning check in intended to provide a fail-fast feedback for the user.
-                However, if there are many targets in the waypoints, the check maybe more
-                time consuming than the benefit it provides.
-                Because this planner is often used for 3D printing, milling, etc. the user is likely
-                to provide dense waypoints, therefore this check is disabled by default.
-
-        Returns
-        -------
-        :class:`compas_fab.robots.JointTrajectory`
-            The calculated trajectory.
-
-        Raises
-        ------
-        :class:`compas_fab.backends.MPNoIKSolutionError`
-            If no IK solution could be found by the kinematic solver.
-            The partially planned trajectory before the unreachable target is returned.
-            The unreachable target frame is returned.
-
-        """
+        """Calculates a cartesian motion path (linear in tool space) for Point Axis Waypoints."""
 
         # Set default option values
         options = options or {}
@@ -463,6 +409,21 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     within_max_jump = False
                     if options["verbose"]:
                         print("Step: {} Option {} violated max_jump".format(current_step, ik_option_indices[-1]))
+
+            # Run Continuous Collision Detection (CCD) using compas-forge before accepting step configuration
+            if ik_result is not None and within_max_jump and COMPAS_FORGE_AVAILABLE and options.get("check_collision", True):
+                state_start = deepcopy(start_state)
+                state_start.robot_configuration = planned_configurations[-1]
+                
+                state_end = deepcopy(start_state)
+                state_end.robot_configuration = ik_result
+                
+                try:
+                    self._check_continuous_collisions_forge(state_start, state_end, group, options)
+                except CollisionCheckError as e:
+                    within_max_jump = False # Reject IK target solution on sweep collision detected
+                    if options["verbose"]:
+                        print("Step: {} Option {} violated CCD constraints: {}".format(current_step, ik_option_indices[-1], e.message))
 
             # If valid IK solution found, proceed to the next step
             if ik_result is not None and within_max_jump:
@@ -810,6 +771,26 @@ class PyBulletPlanCartesianMotion(PlanCartesianMotion):
                     message = "plan_cartesian_motion_frame_waypoints(): Segment {}, Inverse Kinematics failed at t={}.\n".format(i, interpolation_ts[j])
                     message = message + e.message
                     raise MPInterpolationInCollisionError(message=message, target=target, collision_pairs=e.collision_pairs, partial_trajectory=trajectory)
+                
+                # Run Continuous Collision Detection (CCD) using compas-forge between consecutive trajectory points
+                if COMPAS_FORGE_AVAILABLE and options.get("check_collision", True):
+                    state_start = deepcopy(start_state)
+                    state_start.robot_configuration.joint_values = trajectory.points[-1].joint_values
+                    
+                    state_end = deepcopy(start_state)
+                    state_end.robot_configuration.joint_values = new_joint_positions
+                    
+                    try:
+                        self._check_continuous_collisions_forge(state_start, state_end, group, options)
+                    except CollisionCheckError as e:
+                        # Map to COMPAS standard interpolation collision error structure safely
+                        raise MPInterpolationInCollisionError(
+                            message="plan_cartesian_motion_frame_waypoints(): Continuous swept collision detected at segment {}, step {}. ".format(i, j) + e.message,
+                            target=target,
+                            collision_pairs=[],
+                            partial_trajectory=trajectory
+                        )
+
                 if options["verbose"]:
                     print("Segment {} of {}, j={}, t={}, joint_values={}".format(i + 1, len(waypoints.target_frames), j, interpolation_ts[j], new_joint_positions))
 

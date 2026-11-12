@@ -107,6 +107,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 client._set_tool_configuration(tool_name, tool_state.configuration)
 
         # Update the position of RigidBody models
+        rigid_body_world_frames = {}
         for rigid_body_name, rigid_body_state in robot_cell_state.rigid_body_states.items():
             # Compute rigid_body_base_frame for the rigid body
             rigid_body_base_frame = None
@@ -151,9 +152,19 @@ class PyBulletSetRobotCellState(SetRobotCellState):
 
             # Set the frame of the rigid body
             client._set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
+            rigid_body_world_frames[rigid_body_name] = rigid_body_base_frame
 
         # The client needs to keep track of the latest robot cell state
         client._robot_cell_state = robot_cell_state
+
+        # Cache live world poses of tools and rigid bodies for high-performance swept collision checks
+        client._forge_object_poses = {}
+        for tool_name, frame in tool_base_frames.items():
+            if frame:
+                client._forge_object_poses["tool_{}".format(tool_name)] = frame
+        for rb_name, frame in rigid_body_world_frames.items():
+            if frame:
+                client._forge_object_poses["body_{}".format(rb_name)] = frame
 
         # This function updates the position of all models in the robot cell, technically we could
         # keep track of the previous state and only update the models that have changed to improve performance.
@@ -181,6 +192,7 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 tool_base_frames[tool_name] = tool_base_frame
                 client._set_tool_base_frame(tool_name, tool_base_frame)
 
+        rigid_body_world_frames = {}
         for rigid_body_name, rigid_body_state in robot_cell_state.rigid_body_states.items():
             # Filter only the rigid bodies that are attached to tools that are processed in the previous step
             if rigid_body_state.attached_to_tool in tool_base_frames:
@@ -192,6 +204,17 @@ class PyBulletSetRobotCellState(SetRobotCellState):
                 rigid_body_base_frame = self._compute_workpiece_frame_from_tool_base_frame(rigid_body_state, tool_model, tool_base_frame)
 
                 client._set_rigid_body_base_frame(rigid_body_name, rigid_body_base_frame)
+                rigid_body_world_frames[rigid_body_name] = rigid_body_base_frame
+
+        # Cache live world poses of attached tools and rigid bodies for high-performance swept collision checks
+        if not hasattr(client, "_forge_object_poses"):
+            client._forge_object_poses = {}
+        for tool_name, frame in tool_base_frames.items():
+            if frame:
+                client._forge_object_poses["tool_{}".format(tool_name)] = frame
+        for rb_name, frame in rigid_body_world_frames.items():
+            if frame:
+                client._forge_object_poses["body_{}".format(rb_name)] = frame
 
     def _compute_workpiece_frame_from_tool_base_frame(self, rigid_body_state: RigidBodyState, tool_model: ToolModel, tool_base_frame: Frame):
         """Compute the rigid body base frame from the tool base frame and attachment frame."""

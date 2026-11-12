@@ -5,8 +5,33 @@ from compas_fab.backends.interfaces import SetRobotCell
 from compas_fab.robots import RobotCell
 from compas_fab.robots import RobotCellState
 
+# Optional high-performance acceleration plugin
+try:
+    import compas_forge
+    COMPAS_FORGE_AVAILABLE = True
+except ImportError:
+    COMPAS_FORGE_AVAILABLE = False
+
 if TYPE_CHECKING:
     from compas_fab.backends import PyBulletClient
+
+
+def _register_forge_mesh(mesh_id: str, geometry) -> None:
+    """Helper to extract flat buffers and register mesh to the compas-forge Rust core."""
+    if not COMPAS_FORGE_AVAILABLE or geometry is None:
+        return
+    
+    from compas.datastructures import Mesh
+    
+    # If geometry is already a COMPAS Mesh
+    if isinstance(geometry, Mesh):
+        compas_forge.register_mesh_to_cache(mesh_id, geometry)
+    
+    # If geometry is a basic COMPAS shape (like Box, Sphere, Cylinder, etc.), convert to Mesh
+    elif hasattr(geometry, 'to_vertices_and_faces'):
+        vertices, faces = geometry.to_vertices_and_faces()
+        temp_mesh = Mesh.from_vertices_and_faces(vertices, faces)
+        compas_forge.register_mesh_to_cache(mesh_id, temp_mesh)
 
 
 class PyBulletSetRobotCell(SetRobotCell):
@@ -53,11 +78,30 @@ class PyBulletSetRobotCell(SetRobotCell):
             client._remove_rigid_body(rigid_body_id)
         # client.rigid_bodies_puids = {}
 
+        # Clear any existing Rust cache registry on loading a new cell
+        if COMPAS_FORGE_AVAILABLE:
+            compas_forge.clear_mesh_cache()
+
         # Add the robot cell to the PyBullet world
         for name, tool_model in robot_cell.tool_models.items():
             client._add_tool(name, tool_model)
+            
+            # Automatically register tool link collision meshes to the Rust cache core
+            if COMPAS_FORGE_AVAILABLE:
+                for link in tool_model.links:
+                    for i, collision in enumerate(link.collision):
+                        mesh_id = "tool_{}_{}_{}".format(name, link.name, i)
+                        _register_forge_mesh(mesh_id, collision.geometry)
+
         for name, rigid_body in robot_cell.rigid_body_models.items():
             client._add_rigid_body(name, rigid_body)
+            
+            # Automatically register stationary rigid body obstacles to the Rust cache core
+            if COMPAS_FORGE_AVAILABLE:
+                mesh_id = "body_{}".format(name)
+                geom = getattr(rigid_body, 'geometry', None) or getattr(rigid_body, 'mesh', None)
+                if geom:
+                    _register_forge_mesh(mesh_id, geom)
 
         # Feed the robot to the client
         if robot_cell.robot_model:
@@ -67,6 +111,13 @@ class PyBulletSetRobotCell(SetRobotCell):
                 robot_cell.robot_model,
                 robot_cell.robot_semantics,
             )
+            
+            # Automatically register robot link collision meshes to the Rust cache core
+            if COMPAS_FORGE_AVAILABLE:
+                for link in robot_cell.robot_model.links:
+                    for i, collision in enumerate(link.collision):
+                        mesh_id = "robot_{}_{}".format(link.name, i)
+                        _register_forge_mesh(mesh_id, collision.geometry)
 
         # Keep a copy of the robot cell in the client
         # from copy import deepcopy
