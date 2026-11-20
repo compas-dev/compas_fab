@@ -728,6 +728,39 @@ class Waypoints(Target):
     def __init__(self, target_mode: TargetMode = None, native_scale: float = 1.0, name: str = "Generic Waypoints"):
         super(Waypoints, self).__init__(target_mode=target_mode, native_scale=native_scale, name=name)
 
+    @property
+    def waypoints(self):
+        if hasattr(self, "target_frames"):
+            return self.target_frames
+        elif hasattr(self, "target_points_and_axes"):
+            return self.target_points_and_axes
+        else:
+            raise NotImplementedError
+
+    def __len__(self):
+        return len(self.waypoints)
+
+    def __getitem__(self, item):
+        return self.waypoints[item]
+
+    def __setitem__(self, key, value):
+        self.waypoints[key] = value
+
+    def __delitem__(self, key):
+        del self.waypoints[key]
+
+    def __iter__(self):
+        return iter(self.waypoints)
+
+    def append(self, item):
+        self.waypoints.append(item)
+
+    def extend(self, items):
+        self.waypoints.extend(items)
+
+    def insert(self, i, item):
+        self.waypoints.insert(i, item)
+
 
 class FrameWaypoints(Waypoints):
     """Represents a sequence of fully constrained pose target for the robot's end-effector using a [`Frame`][compas.geometry.Frame].
